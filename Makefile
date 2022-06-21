@@ -9,14 +9,18 @@ TEST_FLAGS := hi
 CC := gcc
 CC_FLAGS := -g -c -Wall
 
+
 all: $(EXEC)
 	./$(EXEC) $(TEST_FLAGS)
+
 
 out/%.o: src/%.c
 	$(CC) $(CC_FLAGS) $< -o $@
 
+
 $(EXEC): $(OBJECTS)
 	$(CC) $^ -o $@
+
 
 clean:
 	rm $(OBJECTS) $(EXEC)
