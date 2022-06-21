@@ -3,12 +3,15 @@
 
 int main() 
 {
-    lexer lx = {
-        .col_pos = 0,
-        .line_pos = 0,
-        .char_offset = 0,
-        .source = "1 + 2",
-    };
+    lexer lx = lexer_new("1 + 2");
+    vector tokens = vector_new(10);
+    lexify(&lx, &tokens);
 
-    lexify(&lx);
+    for (size_t i = 0; i < tokens.size; i++)
+    {
+        lxtoken* tk = tokens.items[i];
+        printf("%s %i\n", tk->value, tk->type);
+    }
+
+    return 0;
 }
