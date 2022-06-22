@@ -1,8 +1,8 @@
 #include "lex.h"
 
-filepos clone_pos(filepos* original)
+lxpos clone_pos(lxpos* original)
 {
-    filepos pos = {
+    lxpos pos = {
         .col_pos = original->col_pos,
         .line_pos = original->line_offset,
         .char_offset = original->char_offset,
@@ -12,10 +12,10 @@ filepos clone_pos(filepos* original)
 }
 
 
-lxtoken* lxtoken_new(lexer* lx, const char* value, lxtype type)
+lxtoken* lxtoken_new(const char* value, lxtype type, lxpos pos)
 {
     lxtoken* tk = (lxtoken*)malloc(sizeof(lxtoken));
-    tk->pos = clone_pos(&lx->pos);
+    tk->pos = pos;
     tk->type = type;
     tk->value = value;
     return tk;
@@ -57,6 +57,7 @@ lxtoken* lex(lexer* lx)
     char* buf = (char*) malloc(sizeof(char) * 10000);
 
     lxtype type;
+    lxpos pos = clone_pos(&lx->pos);
 
     if (isalpha((int) lx->lookahead)) 
     {
@@ -88,6 +89,12 @@ lxtoken* lex(lexer* lx)
             case '-':
             case '/':
             case '*':
+            case '%':
+            case '<':
+            case '>':
+            case '&':
+            case '|':
+            case '^':
                 type = LX_OPERATOR;
                 buf[len++] = c;
                 break;
@@ -96,9 +103,10 @@ lxtoken* lex(lexer* lx)
         }
     }
 
+    // terminates string
     buf[len] = '\0';
 
-    return lxtoken_new(lx, buf, type);
+    return lxtoken_new(buf, type, pos);
 }
 
 char lexadvance(lexer* lx)

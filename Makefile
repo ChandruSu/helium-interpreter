@@ -8,6 +8,8 @@ TEST_FLAGS := hi
 
 CC := gcc
 CC_FLAGS := -g -c -Wall
+DB := gdb
+DB_FLAGS := $(EXEC)
 
 
 all: $(EXEC)
@@ -24,3 +26,7 @@ $(EXEC): $(OBJECTS)
 
 clean:
 	rm $(OBJECTS) $(EXEC)
+
+
+debug:
+	$(DB) $(DB_FLAGS)

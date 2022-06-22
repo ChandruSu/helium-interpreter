@@ -8,7 +8,6 @@
 #include "string.h"
 #include "stdio.h"
 
-
 typedef enum lxtype {
     LX_SYMBOL,          // 0
     LX_INTEGER,
@@ -21,30 +20,50 @@ typedef enum lxtype {
     LX_RIGHT_PAREN,     // 8
 } lxtype;
 
-typedef struct filepos {
+typedef struct lxpos {
     int col_pos;
     int line_pos;
     int char_offset;
     int line_offset;
-} filepos;
+} lxpos;
 
-filepos clone_pos(filepos* original);
+/**
+ * @brief Clones position into new struct object.
+ * 
+ * @param original Original struct to be cloned
+ * @return Cloned position
+ */
+lxpos clone_pos(lxpos* original);
 
 typedef struct lxtoken {
     lxtype type;
     const char* value;
-    filepos pos;
+    lxpos pos;
 } lxtoken;
 
 typedef struct lexer {
-    filepos pos;
+    lxpos pos;
     const char* source;
     char current;
     char lookahead;
 } lexer;
 
-lxtoken* lxtoken_new(lexer* lx, const char* value, lxtype type);
+/**
+ * @brief Lexer token constructor
+ * 
+ * @param value Token value
+ * @param type Token type
+ * @param pos Token position in source
+ * @return Pointer to token
+ */
+lxtoken* lxtoken_new(const char* value, lxtype type, lxpos pos);
 
+/**
+ * @brief Lexer constructor method.
+ * 
+ * @param src Source code string
+ * @return lexer 
+ */
 lexer lexer_new(const char* src);
 
 /**
@@ -56,10 +75,32 @@ lexer lexer_new(const char* src);
  */
 void lexify(lexer* lx, vector* tokens);
 
+/**
+ * @brief Extracts next token in source code and returns lexer
+ *      token.
+ * 
+ * @param lx Lexer state
+ * @return Pointer to token
+ */
 lxtoken* lex(lexer* lx);
 
+/**
+ * @brief Advances cursor by one character, updates lookahead
+ *      and current members and returns the character at cursor.
+ * 
+ * @param lx Lexer state
+ * @return Character at cursor
+ */
 char lexadvance(lexer* lx);
 
+/**
+ * @brief Terminates program and prints error message with the
+ *      position of the error source in code and the line of code
+ *      which raised the error.
+ * 
+ * @param lx Lexer state
+ * @param msg Error message
+ */
 void lexerror(lexer* lx, const char* msg);
 
 #endif
