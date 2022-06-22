@@ -27,14 +27,6 @@ typedef struct lxpos {
     int line_offset;
 } lxpos;
 
-/**
- * @brief Clones position into new struct object.
- * 
- * @param original Original struct to be cloned
- * @return Cloned position
- */
-lxpos clone_pos(lxpos* original);
-
 typedef struct lxtoken {
     lxtype type;
     const char* value;
@@ -49,6 +41,14 @@ typedef struct lexer {
 } lexer;
 
 /**
+ * @brief Clones position into new struct object.
+ * 
+ * @param original Original struct to be cloned
+ * @return Cloned position
+ */
+lxpos clone_pos(lxpos* original);
+
+/**
  * @brief Lexer token constructor
  * 
  * @param value Token value
@@ -57,6 +57,14 @@ typedef struct lexer {
  * @return Pointer to token
  */
 lxtoken* lxtoken_new(const char* value, lxtype type, lxpos pos);
+
+/**
+ * @brief Represents lexer token as a string and prints it to
+ *      standard output.
+ * 
+ * @param tk Token to print
+ */
+void lxtoken_display(lxtoken* tk);
 
 /**
  * @brief Lexer constructor method.

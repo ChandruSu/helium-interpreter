@@ -11,6 +11,17 @@ lxpos clone_pos(lxpos* original)
     return pos;
 }
 
+const char* lxtype_strings[] = {
+    "LX_SYMBOL      ",
+    "LX_INTEGER     ",
+    "LX_OPERATOR    ",
+    "LX_EOF         ",
+    "LX_COMMENT     ",
+    "LX_NEWLINE     ",
+    "LX_WHITESPACE  ",
+    "LX_LEFT_PAREN  ",
+    "LX_RIGHT_PAREN ",
+};
 
 lxtoken* lxtoken_new(const char* value, lxtype type, lxpos pos)
 {
@@ -19,6 +30,11 @@ lxtoken* lxtoken_new(const char* value, lxtype type, lxpos pos)
     tk->type = type;
     tk->value = value;
     return tk;
+}
+
+void lxtoken_display(lxtoken* tk)
+{
+    printf("(%03i, %03i) %s %s\n", tk->pos.line_pos, tk->pos.col_pos, lxtype_strings[tk->type], tk->value);   
 }
 
 lexer lexer_new(const char* src)
@@ -57,7 +73,11 @@ lxtoken* lex(lexer* lx)
     char* buf = (char*) malloc(sizeof(char) * 10000);
 
     lxtype type;
+
+    // Advancced position
     lxpos pos = clone_pos(&lx->pos);
+    pos.col_pos++;
+    pos.char_offset++;
 
     if (isalpha((int) lx->lookahead)) 
     {
@@ -98,6 +118,12 @@ lxtoken* lex(lexer* lx)
                 type = LX_OPERATOR;
                 buf[len++] = c;
                 break;
+            case '(':
+                type = LX_LEFT_PAREN;
+                break;
+            case ')':
+                type = LX_RIGHT_PAREN;
+                break;
             default:
                 lexerror(lx, "Syntax error! Failed to identify symbol");
         }
@@ -130,6 +156,6 @@ char lexadvance(lexer* lx)
 
 void lexerror(lexer* lx, const char* msg)
 {
-    fprintf(stderr, "%s[err] %s (%d, %d) %s\n", ERR_COL, msg, lx->pos.line_pos, lx->pos.col_pos, DEF_COL);
+    fprintf(stderr, "%s[err] %s (%d, %d)\n%s\n", ERR_COL, msg, lx->pos.line_pos + 1, lx->pos.col_pos + 1, DEF_COL);
     exit(0);
 }
