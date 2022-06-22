@@ -21,6 +21,8 @@ const char* lxtype_strings[] = {
     "LX_WHITESPACE  ",
     "LX_LEFT_PAREN  ",
     "LX_RIGHT_PAREN ",
+    "LX_ASSIGN      ",
+    "LX_STRING      ",
 };
 
 lxtoken* lxtoken_new(const char* value, lxtype type, lxpos pos)
@@ -79,15 +81,21 @@ lxtoken* lex(lexer* lx)
     pos.col_pos++;
     pos.char_offset++;
 
-    if (isalpha((int) lx->lookahead)) 
+    if (isalpha((int) lx->lookahead) || lx->lookahead == '_')
     {
         type = LX_SYMBOL;
-        do buf[len++] = lexadvance(lx); while (isalnum((int) lx->lookahead));
+        do buf[len++] = lexadvance(lx); while (isalnum((int) lx->lookahead) || isdigit((int) lx->lookahead) || lx->lookahead == '_');
     } 
     else if (isdigit((int) lx->lookahead))
     {
         type = LX_INTEGER;
         do buf[len++] = lexadvance(lx); while (isdigit((int) lx->lookahead));
+    }
+    else if (lx->lookahead == '"')
+    {
+        char c =lexadvance(lx);
+        while ((c = lexadvance(lx)) != '"') buf[len++] = c;
+        type = LX_STRING;
     }
     else
     {
@@ -105,16 +113,18 @@ lxtoken* lex(lexer* lx)
             case '\t':
                 type = LX_WHITESPACE;
                 break;
-            case '+':
+            case ':':
+                type = LX_ASSIGN;
+                break;
+            case '+': // numeric operations
             case '-':
             case '/':
             case '*':
             case '%':
-            case '<':
-            case '>':
-            case '&':
+            case '&': // bitwise operations
             case '|':
             case '^':
+            case '~':
                 type = LX_OPERATOR;
                 buf[len++] = c;
                 break;

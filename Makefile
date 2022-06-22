@@ -4,7 +4,7 @@ HEADER  := $(wildcard src/*.h src/*/*.h)
 OBJECTS := $(SOURCE:src/%.c=out/%.o)
 
 EXEC := out/output.exe
-TEST_FLAGS := hi
+TEST_FLAGS := test.he
 
 CC := gcc
 CC_FLAGS := -g -c -Wall

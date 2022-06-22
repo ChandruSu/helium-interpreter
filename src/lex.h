@@ -18,6 +18,8 @@ typedef enum lxtype {
     LX_WHITESPACE,
     LX_LEFT_PAREN,
     LX_RIGHT_PAREN,     // 8
+    LX_ASSIGN,
+    LX_STRING
 } lxtype;
 
 typedef struct lxpos {
