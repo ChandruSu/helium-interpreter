@@ -8,6 +8,10 @@
 #define WAR_COL "\033[32m"
 #define DEF_COL "\033[0m"
 
+typedef unsigned char boolean;
+#define true 1
+#define false 0
+
 /**
  * @brief Prints file error and terminates program.
  * 
