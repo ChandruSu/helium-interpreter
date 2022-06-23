@@ -19,7 +19,8 @@ typedef enum lxtype {
     LX_LEFT_PAREN,
     LX_RIGHT_PAREN,     // 8
     LX_ASSIGN,
-    LX_STRING
+    LX_STRING,
+    LX_FUNCTION
 } lxtype;
 
 typedef struct lxpos {
@@ -41,14 +42,6 @@ typedef struct lexer {
     char current;
     char lookahead;
 } lexer;
-
-/**
- * @brief Clones position into new struct object.
- * 
- * @param original Original struct to be cloned
- * @return Cloned position
- */
-lxpos clone_pos(lxpos* original);
 
 /**
  * @brief Lexer token constructor

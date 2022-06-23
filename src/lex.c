@@ -1,15 +1,11 @@
 #include "lex.h"
 
-lxpos clone_pos(lxpos* original)
-{
-    lxpos pos = {
-        .col_pos = original->col_pos,
-        .line_pos = original->line_offset,
-        .char_offset = original->char_offset,
-        .line_offset = original->line_offset
-    };
-    return pos;
-}
+#define streq(a, b) strcmp(a, b) == 0
+
+// forward declarations
+char* reduce_string_buffer(char* buffer);
+lxtype determine_nature(char* s);
+lxpos clone_pos(lxpos* original);
 
 const char* lxtype_strings[] = {
     "LX_SYMBOL      ",
@@ -23,6 +19,7 @@ const char* lxtype_strings[] = {
     "LX_RIGHT_PAREN ",
     "LX_ASSIGN      ",
     "LX_STRING      ",
+    "LX_FUNCTION    "
 };
 
 lxtoken* lxtoken_new(const char* value, lxtype type, lxpos pos)
@@ -83,8 +80,9 @@ lxtoken* lex(lexer* lx)
 
     if (isalpha((int) lx->lookahead) || lx->lookahead == '_')
     {
-        type = LX_SYMBOL;
         do buf[len++] = lexadvance(lx); while (isalnum((int) lx->lookahead) || isdigit((int) lx->lookahead) || lx->lookahead == '_');
+        buf[len] = '\0';
+        type = determine_nature(buf);
     } 
     else if (isdigit((int) lx->lookahead))
     {
@@ -134,13 +132,17 @@ lxtoken* lex(lexer* lx)
             case ')':
                 type = LX_RIGHT_PAREN;
                 break;
+            case '#':
+                type = LX_COMMENT;
+                break;
             default:
                 lexerror(lx, "Syntax error! Failed to identify symbol");
         }
     }
 
-    // terminates string
+    // terminates string and reduces size
     buf[len] = '\0';
+    buf = reduce_string_buffer(buf);
 
     return lxtoken_new(buf, type, pos);
 }
@@ -164,8 +166,47 @@ char lexadvance(lexer* lx)
     return lx->current;
 }
 
+// Determines the lex type of a string symbol
+lxtype determine_nature(char* s)
+{
+    lxtype type = LX_SYMBOL;
+
+    // checks against reserved keywords.
+    if (streq(s, "function")) {
+        type = LX_FUNCTION;
+    } // ...
+
+    // deletes symbol buffer for reserved keyword types.
+    if (type != LX_SYMBOL) {
+        s[0] = '\0';
+    }
+
+    return type;
+}
+
+char* reduce_string_buffer(char* buffer)
+{
+    size_t len = strlen(buffer);
+    char* new_buffer = (char*)malloc(sizeof(char) * len);
+    strcpy(new_buffer, buffer);
+    free(buffer);
+    return new_buffer;
+}
+
 void lexerror(lexer* lx, const char* msg)
 {
     fprintf(stderr, "%s[err] %s (%d, %d)\n%s\n", ERR_COL, msg, lx->pos.line_pos + 1, lx->pos.col_pos + 1, DEF_COL);
     exit(0);
+}
+
+// Clones lxpos object to freeze location data for tokens.
+lxpos clone_pos(lxpos* original)
+{
+    lxpos pos = {
+        .col_pos = original->col_pos,
+        .line_pos = original->line_offset,
+        .char_offset = original->char_offset,
+        .line_offset = original->line_offset
+    };
+    return pos;
 }
