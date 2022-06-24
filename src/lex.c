@@ -6,20 +6,21 @@
 char* reduce_string_buffer(char* buffer);
 lxtype determine_nature(char* s);
 lxpos clone_pos(lxpos* original);
+boolean check_pattern(lexer* lx, const char* pattern);
 
 const char* lxtype_strings[] = {
-    "LX_SYMBOL      ",
-    "LX_INTEGER     ",
-    "LX_OPERATOR    ",
-    "LX_EOF         ",
-    "LX_COMMENT     ",
-    "LX_NEWLINE     ",
-    "LX_WHITESPACE  ",
-    "LX_LEFT_PAREN  ",
-    "LX_RIGHT_PAREN ",
-    "LX_ASSIGN      ",
-    "LX_STRING      ",
-    "LX_FUNCTION    "
+    "LX_SYMBOL        ",
+    "LX_INTEGER       ",
+    "LX_OPERATOR      ",
+    "LX_EOF           ",
+    "LX_COMMENT       ",
+    "LX_NEWLINE       ",
+    "LX_WHITESPACE    ",
+    "LX_LEFT_PAREN    ",
+    "LX_RIGHT_PAREN   ",
+    "LX_ASSIGN        ",
+    "LX_STRING        ",
+    "LX_FUNCTION      "
 };
 
 lxtoken* lxtoken_new(const char* value, lxtype type, lxpos pos)
@@ -94,6 +95,10 @@ lxtoken* lex(lexer* lx)
         char c =lexadvance(lx);
         while ((c = lexadvance(lx)) != '"') buf[len++] = c;
         type = LX_STRING;
+    }
+    else if (check_pattern(lx, "<-"))
+    {
+        type = LX_ASSIGN;
     }
     else
     {
@@ -184,6 +189,26 @@ lxtype determine_nature(char* s)
     return type;
 }
 
+// Checks for patterns against current lexer position - should
+// only be used for non-whitespace dependent patterns.
+boolean check_pattern(lexer* lx, const char* pattern)
+{
+    size_t len = strlen(pattern);
+    for (size_t i = 0; i < len; i++)
+    {
+        if (lx->source[lx->pos.char_offset + i + 1] != pattern[i]) {
+            return false;
+        }
+    }
+    
+    while (len-- > 0) {
+        lexadvance(lx);
+    }
+
+    return true;
+}
+
+// Reduces memory allocated for a terminated character buffer
 char* reduce_string_buffer(char* buffer)
 {
     size_t len = strlen(buffer);
@@ -195,7 +220,9 @@ char* reduce_string_buffer(char* buffer)
 
 void lexerror(lexer* lx, const char* msg)
 {
-    fprintf(stderr, "%s[err] %s (%d, %d)\n%s\n", ERR_COL, msg, lx->pos.line_pos + 1, lx->pos.col_pos + 1, DEF_COL);
+    fprintf(stderr, "%s[err] %s (%d, %d):\n", ERR_COL, msg, lx->pos.line_pos + 1, lx->pos.col_pos + 1);
+    fprintf(stderr, "\n\t%04i %s\n", lx->pos.line_pos, get_line(lx->source, lx->pos.line_offset));
+    fprintf(stderr, "\t%s^\n%s", paddchar('~', 5 + lx->pos.col_pos), DEF_COL);
     exit(0);
 }
 

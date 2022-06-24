@@ -20,7 +20,7 @@ out/%.o: src/%.c
 	$(CC) $(CC_FLAGS) $< -o $@
 
 
-$(EXEC): $(OBJECTS)
+$(EXEC): $(OBJECTS) $(HEADER)
 	$(CC) $^ -o $@
 
 

@@ -14,6 +14,8 @@ int main(int argc, const char* argv[])
     vector tokens = vector_new(16);
     lexify(&lx, &tokens);
 
+    printf("%s Beginning lexical anaylsis:\n", MESSAGE);
+    
     for (size_t i = 0; i < tokens.size; i++)
     {
         lxtoken_display(tokens.items[i]);

@@ -43,3 +43,24 @@ const char* read_file(const char* filepath)
     fclose(fptr);
     return buffer;
 }
+
+const char* get_line(const char* source, int start)
+{
+    char* buf = (char*)malloc(sizeof(char) * 1000);
+
+    int i = 0;
+    while (source[start + i] != '\n' && source[start + i] != '\0') {
+        buf[i] = source[start + i];
+        i++;
+    }
+
+    buf[i] = '\0';
+    return buf;
+}
+
+const char* paddchar(char c, int n) {
+    char* buf = (char*) malloc(sizeof(char) * n);
+    memset(buf, c, n);
+    buf[n+1] = '\0';
+    return buf;
+}

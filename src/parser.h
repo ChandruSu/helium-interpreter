@@ -11,6 +11,17 @@ typedef struct parser {
     const char* source;
 } parser;
 
+typedef enum asttype {
+    AST_ROOT
+} asttype;
+
+typedef struct astnode {
+    const char* value;
+    asttype type;
+    vector children;
+    lxpos pos;
+} astnode;
+
 /**
  * @brief Returns the token at the current parser position without
  *      removing it from the token stream.
