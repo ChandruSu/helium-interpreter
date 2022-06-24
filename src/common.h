@@ -35,8 +35,23 @@ void file_error(const char* msg, const char* fname);
  */
 const char* read_file(const char* filepath);
 
+/**
+ * @brief Returns a substring beginning at a specified position
+ *      till the end of the line (till newline character is reached).
+ * 
+ * @param source Super-string
+ * @param start Beginning position
+ * @return Substring
+ */
 const char* get_line(const char* source, int start);
 
+/**
+ * @brief Returns a string of a character repeated n times.
+ * 
+ * @param c Character to repeat
+ * @param n Number of times to repeat
+ * @return Padding string
+ */
 const char* paddchar(char c, int n);
 
 #endif

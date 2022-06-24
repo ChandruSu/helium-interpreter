@@ -20,7 +20,8 @@ typedef enum lxtype {
     LX_RIGHT_PAREN,     // 8
     LX_ASSIGN,
     LX_STRING,
-    LX_FUNCTION
+    LX_FUNCTION,
+    LX_CALL
 } lxtype;
 
 typedef struct lxpos {
@@ -105,5 +106,14 @@ char lexadvance(lexer* lx);
  * @param msg Error message
  */
 void lexerror(lexer* lx, const char* msg);
+
+/**
+ * @brief Clones lexer position and freezes it to record the locaiton
+ *      of a token in source.
+ * 
+ * @param original Original position to be cloned
+ * @return Lexer position
+ */
+lxpos clone_pos(lxpos* original);
 
 #endif

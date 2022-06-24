@@ -12,7 +12,13 @@ typedef struct parser {
 } parser;
 
 typedef enum asttype {
-    AST_ROOT
+    AST_ROOT,
+    AST_INTEGER,
+    AST_REFERENCE,
+    AST_CALL,
+    AST_UNARY_EXPRESSION,
+    AST_BNARY_EXPRESSION,
+    AST_BLOCK
 } asttype;
 
 typedef struct astnode {
@@ -77,6 +83,51 @@ boolean is_empty(parser* p);
  * @param p Reference to parser
  * @param msg Error message to output
  */
-void parser_error(parser* p, const char* msg);
+void parsererror(parser* p, const char* msg);
+
+/**
+ * @brief Parses the full stream token into an abstract syntax tree
+ *      to be interpreted.
+ * 
+ * @param p Reference to parser
+ * @return Root node of AST
+ */
+astnode* parse(parser* p);
+
+/**
+ * @brief Parses expression tokens into an abstract syntax tree.
+ * 
+ * @param p Reference to parser
+ * @return Abstract syntax tree
+ */
+astnode* parse_expression(parser* p);
+
+/**
+ * @brief Parses an expression primary i.e integers, variable refs,
+ *      parenthesis enclosed expressions, function calls and unary
+ *      expressions.
+ * 
+ * @param p Reference to parser
+ * @return Abstract syntax tree 
+ */
+astnode* parse_primary(parser* p);
+
+/**
+ * @brief Parses a function call expression primary including
+ *      argument expressions.
+ * 
+ * @param p 
+ * @return astnode* 
+ */
+astnode* parse_function_call(parser* p);
+
+/**
+ * @brief Represents abstract syntax tree into a string representation
+ *      to be printed out.
+ * 
+ * @param node Abstract syntax node
+ * @return String
+ */
+const char* astnode_tostr(astnode* node);
 
 #endif

@@ -5,7 +5,6 @@
 // forward declarations
 char* reduce_string_buffer(char* buffer);
 lxtype determine_nature(char* s);
-lxpos clone_pos(lxpos* original);
 boolean check_pattern(lexer* lx, const char* pattern);
 
 const char* lxtype_strings[] = {
@@ -65,6 +64,7 @@ void lexify(lexer* lx, vector* tokens)
             vector_push(tokens, token);
         }
     }
+    vector_push(tokens, token);
 }
 
 lxtoken* lex(lexer* lx)
@@ -139,6 +139,9 @@ lxtoken* lex(lexer* lx)
                 break;
             case '#':
                 type = LX_COMMENT;
+                break;
+            case '@':
+                type = LX_CALL;
                 break;
             default:
                 lexerror(lx, "Syntax error! Failed to identify symbol");

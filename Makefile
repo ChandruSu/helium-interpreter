@@ -4,7 +4,7 @@ HEADER  := $(wildcard src/*.h src/*/*.h)
 OBJECTS := $(SOURCE:src/%.c=out/%.o)
 
 EXEC := out/output.exe
-TEST_FLAGS := test.he
+TEST_FLAGS := -f test.he
 
 CC := gcc
 CC_FLAGS := -g -c -Wall
@@ -21,7 +21,7 @@ out/%.o: src/%.c
 
 
 $(EXEC): $(OBJECTS) $(HEADER)
-	$(CC) $^ -o $@
+	$(CC) -g $^ -o $@
 
 
 clean:

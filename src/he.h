@@ -4,5 +4,6 @@
 #include "common.h"
 #include "datatypes.h"
 #include "lex.h"
+#include "parser.h"
 
 #endif
