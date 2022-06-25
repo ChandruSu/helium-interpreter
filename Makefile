@@ -1,9 +1,9 @@
 
 SOURCE  := $(wildcard src/*.c src/*/*.c)
 HEADER  := $(wildcard src/*.h src/*/*.h)
-OBJECTS := $(SOURCE:src/%.c=out/%.o)
+OBJECTS := $(SOURCE:src/%.c=bin/%.o)
 
-EXEC := out/output.exe
+EXEC := out/helium.exe
 TEST_FLAGS := -f test.he
 
 CC := gcc
@@ -16,11 +16,11 @@ all: $(EXEC)
 	./$(EXEC) $(TEST_FLAGS)
 
 
-out/%.o: src/%.c
+bin/%.o: src/%.c
 	$(CC) $(CC_FLAGS) $< -o $@
 
 
-$(EXEC): $(OBJECTS) $(HEADER)
+$(EXEC): $(OBJECTS)
 	$(CC) -g $^ -o $@
 
 

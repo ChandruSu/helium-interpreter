@@ -1,7 +1,5 @@
 #include "lex.h"
 
-#define streq(a, b) strcmp(a, b) == 0
-
 // forward declarations
 char* reduce_string_buffer(char* buffer);
 lxtype determine_nature(char* s);
@@ -100,6 +98,10 @@ lxtoken* lex(lexer* lx)
     {
         type = LX_ASSIGN;
     }
+    else if (check_pattern(lx, "<=") || check_pattern(lx, ">="))
+    {
+        type = LX_OPERATOR;
+    }
     else
     {
         char c = lexadvance(lx);
@@ -116,14 +118,13 @@ lxtoken* lex(lexer* lx)
             case '\t':
                 type = LX_WHITESPACE;
                 break;
-            case ':':
-                type = LX_ASSIGN;
-                break;
             case '+': // numeric operations
             case '-':
             case '/':
             case '*':
             case '%':
+            case '<': // boolean operations
+            case '>':
             case '&': // bitwise operations
             case '|':
             case '^':
@@ -222,10 +223,11 @@ char* reduce_string_buffer(char* buffer)
 }
 
 void lexerror(lexer* lx, const char* msg)
-{
+{   
     fprintf(stderr, "%s[err] %s (%d, %d):\n", ERR_COL, msg, lx->pos.line_pos + 1, lx->pos.col_pos + 1);
-    fprintf(stderr, "\n\t%04i %s\n", lx->pos.line_pos, get_line(lx->source, lx->pos.line_offset));
-    fprintf(stderr, "\t%s^\n%s", paddchar('~', 5 + lx->pos.col_pos), DEF_COL);
+    fprintf(stderr, "\t|\n");
+    fprintf(stderr, "\t| %04i %s\n", lx->pos.line_pos, get_line(lx->source, lx->pos.line_offset));
+    fprintf(stderr, "\t| %s'\n%s", paddchar('~', 5 + lx->pos.col_pos), DEF_COL);
     exit(0);
 }
 

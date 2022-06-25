@@ -10,9 +10,11 @@
 #define MSG_COL "\033[32m"
 #define DEF_COL "\033[0m"
 
-#define MESSAGE "[\033[32mmessage\033[0m]"
-#define ERROR "[\033[31merror\033[0m]"
-#define WARNING "[\033[33mwarning\033[0m]"
+#define MESSAGE "[\033[1;32mmessage\033[0m]"
+#define ERROR "[\033[1;31merror\033[0m]"
+#define WARNING "[\033[1;33mwarning\033[0m]"
+
+#define streq(a, b) strcmp(a, b) == 0
 
 typedef unsigned char boolean;
 #define true 1

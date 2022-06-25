@@ -1,7 +1,5 @@
 #include "parser.h"
 
-#define streq(a, b) strcmp(a, b) == 0
-
 int precedence(parser* p, lxtoken* op);
 astnode* apply_op(vector* primaries, vector* operators);
 
@@ -57,6 +55,7 @@ astnode* astnode_new(const char* value, asttype type, lxpos pos) {
 
 astnode* parse(parser* p)
 {
+    while (consume_optional(p, LX_NEWLINE));
     return parse_expression(p);
 }
 
@@ -138,7 +137,7 @@ astnode* parse_primary(parser* p)
             break;
 
         default:
-            parsererror(p, "Failed to parse token");
+            parsererror(p, "Unexpected token found");
     }
 
     return node;
@@ -219,6 +218,6 @@ void parsererror(parser* p, const char* msg)
     fprintf(stderr, "%s[err] %s (%d, %d):\n", ERR_COL, msg, tk->pos.line_pos + 1, tk->pos.col_pos + 1);
     fprintf(stderr, "\t|\n");
     fprintf(stderr, "\t| %04i %s\n", tk->pos.line_pos, get_line(p->source, tk->pos.line_offset));
-    fprintf(stderr, "\t| %s^\n%s", paddchar('~', 5 + tk->pos.col_pos), DEF_COL);
+    fprintf(stderr, "\t| %s'\n%s", paddchar('~', 5 + tk->pos.col_pos), DEF_COL);
     exit(0);
 }
