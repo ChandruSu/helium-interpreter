@@ -184,7 +184,7 @@ astnode* apply_op(vector* operands, vector* operators)
     v1 = (lxtoken*) vector_pop(operands);
     v0 = (lxtoken*) vector_pop(operands);
 
-    astnode* expression = astnode_new(op->value, AST_BNARY_EXPRESSION, clone_pos(&op->pos));
+    astnode* expression = astnode_new(op->value, AST_BINARY_EXPRESSION, clone_pos(&op->pos));
     vector_push(&expression->children, v0);
     vector_push(&expression->children, v1);
     return expression;

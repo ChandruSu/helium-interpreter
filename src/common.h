@@ -56,4 +56,13 @@ const char* get_line(const char* source, int start);
  */
 const char* paddchar(char c, int n);
 
+/**
+ * @brief Calculates a unique hashcode for the provided
+ *      string.
+ * 
+ * @param str String to hash
+ * @return hashcode
+ */
+size_t strhash(unsigned char *str);
+
 #endif

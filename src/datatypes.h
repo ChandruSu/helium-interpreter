@@ -95,4 +95,26 @@ void vector_insert(vector* v, size_t index, void* item);
  */
 void* vector_rm(vector* v, size_t index);
 
+// ----------------- VM VALUES -----------------
+
+typedef enum Type {
+    TYPE_INT,
+    TYPE_FLOAT,
+    TYPE_STRING,
+    TYPE_BOOLEAN,
+} __attribute__ ((__packed__)) Type;
+
+typedef union Value {
+    const boolean b;
+    const int i;
+    const float f;
+    const char* s;
+} Value;
+
+typedef struct TValue {
+    Value value;
+    Type type;
+} __attribute__ ((__packed__)) TValue;
+
+
 #endif

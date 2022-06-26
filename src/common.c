@@ -64,3 +64,15 @@ const char* paddchar(char c, int n) {
     buf[n+1] = '\0';
     return buf;
 }
+
+// by dan bernstein
+size_t strhash(unsigned char *str)
+{
+    size_t hash = 5381;
+    int c;
+
+    while ((c = *str++))
+        hash = ((hash << 5) + hash) + c; /* hash * 33 + c */
+
+    return hash;
+}

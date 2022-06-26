@@ -46,14 +46,27 @@ int main(int argc, const char* argv[])
     astnode* tree = parse(&p);
     printf("%s\n\n", astnode_tostr(tree));
 
+    for (size_t i = 0; i < tokens.size; i++)
+    {
+        free(tokens.items[i]);
+    }
+
     // interpreting
     interpreter in = {
-        .root = tree
+        .program = (unsigned int*) malloc(sizeof(unsigned int) * 1000),
+        .program_size = 0,
+        .vm = {
+            .calls     = (call_info*) malloc(sizeof(call_info) * MAX_CALLS),
+            .ci        = 0,
+            .constants = (TValue*) malloc(sizeof(TValue) * MAX_CONSTANTS),
+            .registers = (TValue*) malloc(sizeof(TValue) * MAX_REGISTERS),
+            .heap      = (TValue*) malloc(sizeof(TValue) * MAX_HEAP_SIZE),
+        },
     };
 
-    printf("\n%s Beginning interpretting:\n\n", MESSAGE);
+    printf("%s Beginning interpretting:\n\n", MESSAGE);
 
-    interpret(&in);
+    interpret(&in, tree);
 
     return 0;
 }

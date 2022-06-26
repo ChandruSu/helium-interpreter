@@ -17,7 +17,7 @@ typedef enum asttype {
     AST_REFERENCE,
     AST_CALL,
     AST_UNARY_EXPRESSION,
-    AST_BNARY_EXPRESSION,
+    AST_BINARY_EXPRESSION,
     AST_BLOCK
 } asttype;
 
