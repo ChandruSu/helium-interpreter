@@ -17,7 +17,10 @@ const char* lxtype_strings[] = {
     "LX_RIGHT_PAREN   ",
     "LX_ASSIGN        ",
     "LX_STRING        ",
-    "LX_FUNCTION      "
+    "LX_FUNCTION      ",
+    "LX_CALL          ",
+    "LX_BLOCK         ",
+    "LX_SEPARATOR     ",
 };
 
 lxtoken* lxtoken_new(const char* value, lxtype type, lxpos pos)
@@ -144,6 +147,9 @@ lxtoken* lex(lexer* lx)
             case '@':
                 type = LX_CALL;
                 break;
+            case ',':
+                type = LX_SEPARATOR;
+                break;
             default:
                 lexerror(lx, "Syntax error! Failed to identify symbol");
         }
@@ -226,7 +232,7 @@ void lexerror(lexer* lx, const char* msg)
 {   
     fprintf(stderr, "%s[err] %s (%d, %d):\n", ERR_COL, msg, lx->pos.line_pos + 1, lx->pos.col_pos + 1);
     fprintf(stderr, "\t|\n");
-    fprintf(stderr, "\t| %04i %s\n", lx->pos.line_pos, get_line(lx->source, lx->pos.line_offset));
+    fprintf(stderr, "\t| %04i %s\n", lx->pos.line_pos + 1, get_line(lx->source, lx->pos.line_offset));
     fprintf(stderr, "\t| %s'\n%s", paddchar('~', 5 + lx->pos.col_pos), DEF_COL);
     exit(0);
 }

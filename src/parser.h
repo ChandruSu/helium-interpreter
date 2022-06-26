@@ -18,7 +18,8 @@ typedef enum asttype {
     AST_CALL,
     AST_UNARY_EXPRESSION,
     AST_BINARY_EXPRESSION,
-    AST_BLOCK
+    AST_BLOCK,
+    AST_ASSIGN,
 } asttype;
 
 typedef struct astnode {
@@ -93,6 +94,10 @@ void parsererror(parser* p, const char* msg);
  * @return Root node of AST
  */
 astnode* parse(parser* p);
+
+astnode* parse_block(parser* p, lxtype terminal);
+
+astnode* parse_statement(parser* p);
 
 /**
  * @brief Parses expression tokens into an abstract syntax tree.

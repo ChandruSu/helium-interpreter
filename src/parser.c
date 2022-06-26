@@ -2,6 +2,11 @@
 
 int precedence(parser* p, lxtoken* op);
 astnode* apply_op(vector* primaries, vector* operators);
+void strip_newlines(parser* p);
+astnode* astnode_new(const char* value, asttype type, lxpos pos);
+
+
+// ------------------ TOKEN TRAVERSAL ------------------
 
 lxtoken* peek(parser* p)
 {
@@ -42,21 +47,48 @@ boolean is_empty(parser* p)
     return p->position >= p->tokens.size || peek(p)->type == LX_EOF;
 }
 
-// ---------- PARSER METHODS ----------
-
-astnode* astnode_new(const char* value, asttype type, lxpos pos) {
-    astnode* node = (astnode*)malloc(sizeof(astnode));
-    node->value = value;
-    node->type = type;
-    node->children = vector_new(4);
-    node->pos = pos;
-    return node;
-}
+// ------------------ PARSING METHODS ------------------
 
 astnode* parse(parser* p)
 {
-    while (consume_optional(p, LX_NEWLINE));
-    return parse_expression(p);
+    return parse_block(p, LX_EOF);
+}
+
+astnode* parse_block(parser* p, lxtype terminal)
+{
+    astnode* block = astnode_new("block", LX_BLOCK, clone_pos(&peek(p)->pos));
+
+    strip_newlines(p);
+    
+    while (!is_empty(p) && peek(p)->type != terminal) 
+    {
+        astnode* st = parse_statement(p);
+        vector_push(&block->children, st);
+        strip_newlines(p);
+    }
+
+    return block;
+}
+
+astnode* parse_statement(parser* p)
+{
+    astnode* st = astnode_new(NULL, AST_ASSIGN, clone_pos(&peek(p)->pos));
+
+    switch (peek(p)->type)
+    {
+        case LX_SYMBOL:
+            st->type = AST_ASSIGN;
+            st->value = eat(p)->value;
+            consume(p, LX_ASSIGN);
+            vector_push(&st->children, parse_expression(p));
+            break;
+        
+        default:
+            parsererror(p, "Invalid statement!");
+            break;
+    }
+
+    return st;
 }
 
 astnode* parse_expression(parser* p)
@@ -145,7 +177,36 @@ astnode* parse_primary(parser* p)
 
 astnode* parse_function_call(parser* p)
 {
-    return NULL;
+    consume(p, LX_CALL);
+
+    astnode* fcall = (astnode*) malloc(sizeof(astnode));
+    fcall->type = AST_CALL;
+    fcall->pos = clone_pos(&peek(p)->pos);
+    fcall->value = eat(p)->value;
+    fcall->children = vector_new(4);
+
+    consume(p, LX_LEFT_PAREN);
+
+    if (!is_empty(p) && peek(p)->type != LX_RIGHT_PAREN) {
+        do {
+            vector_push(&fcall->children, parse_expression(p));
+        } while (consume_optional(p, LX_SEPARATOR));
+    }
+
+    consume(p, LX_RIGHT_PAREN);
+
+    return fcall;
+}
+
+// ------------------ UTILITY METHODS ------------------
+
+astnode* astnode_new(const char* value, asttype type, lxpos pos) {
+    astnode* node = (astnode*)malloc(sizeof(astnode));
+    node->value = value;
+    node->type = type;
+    node->children = vector_new(4);
+    node->pos = pos;
+    return node;
 }
 
 /**
@@ -190,6 +251,11 @@ astnode* apply_op(vector* operands, vector* operators)
     return expression;
 }
 
+void strip_newlines(parser* p)
+{
+    while (consume_optional(p, LX_NEWLINE));
+}
+
 const char* astnode_tostr(astnode* node)
 {
     if (node->children.size == 0) {
@@ -217,7 +283,7 @@ void parsererror(parser* p, const char* msg)
     lxtoken* tk = peek(p);
     fprintf(stderr, "%s[err] %s (%d, %d):\n", ERR_COL, msg, tk->pos.line_pos + 1, tk->pos.col_pos + 1);
     fprintf(stderr, "\t|\n");
-    fprintf(stderr, "\t| %04i %s\n", tk->pos.line_pos, get_line(p->source, tk->pos.line_offset));
+    fprintf(stderr, "\t| %04i %s\n", tk->pos.line_pos + 1, get_line(p->source, tk->pos.line_offset));
     fprintf(stderr, "\t| %s'\n%s", paddchar('~', 5 + tk->pos.col_pos), DEF_COL);
     exit(0);
 }
