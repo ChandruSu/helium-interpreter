@@ -134,9 +134,9 @@ unsigned int encode_instruction_3R(vm_op op, short r0, short r1, short r2)
     return (op & 0xff) | ((r0 & 0xff) << 8) | ((r1 & 0xff) << 16) | ((r2 & 0xff) << 24);
 }
 
-unsigned int encode_instruction_R_i(vm_op op, short r0, short i)
+unsigned int encode_instruction_R_i(vm_op op, short r0, short i0)
 {
-    return (op & 0xff) | ((r0 & 0xff) << 8) | ((i & 0xffff) << 16);
+    return (op & 0xff) | ((r0 & 0xff) << 8) | ((i0 & 0xffff) << 16);
 }
 
 // ---------------------- UTILS ----------------------

@@ -4,7 +4,6 @@
 #include "stdlib.h"
 #include "common.h"
 
-
 // ------------------- VECTOR -------------------
 
 typedef struct vector {
@@ -140,16 +139,61 @@ typedef struct map {
     size_t capacity;
 } map;
 
+/**
+ * @brief Map constructor initialises map with empty values and
+ *      null keys.
+ * 
+ * @param init_capacity Initial size 
+ * @return Map
+ */
 map map_new(size_t init_capacity);
 
+/**
+ * @brief Inserts a new key-value pair into a map. Collisions are
+ *      handled using linear probing.
+ * 
+ * @param m Map
+ * @param k String key
+ * @param v TValue value
+ */
 void map_put(map* m, const char* k, TValue* v);
 
+/**
+ * @brief Retrieves and returns an value in the map by key. Returns
+ *      NULL if key is not present.
+ * 
+ * @param m Map
+ * @param k Key
+ * @return TValue value 
+ */
 TValue* map_get(map* m, const char* k);
 
+/**
+ * @brief Removes and returns an value in the map by key and old address
+ *      is set to NULL. Returns NULL if key is not present.
+ * 
+ * @param m Map
+ * @param k Key
+ * @return TValue value 
+ */
 TValue* map_remove(map* m, const char* k);
 
+/**
+ * @brief Returns true if map contains key, false otherwise.
+ * 
+ * @param m Map
+ * @param k Key
+ * @return boolean 
+ */
 boolean map_contains(map* m, const char* k);
 
+/**
+ * @brief Resizes a map and re-inserts all values into the new map at
+ *      the appropriate positions.
+ * 
+ * @param m Map
+ * @param new_capacity New size
+ */
 void map_resize(map* m, size_t new_capacity);
 
 #endif
