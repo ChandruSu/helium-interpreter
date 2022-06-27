@@ -1,5 +1,7 @@
 #include "datatypes.h"
 
+// ------------------- VECTOR -------------------
+
 vector vector_new(size_t init_capacity)
 {
     vector v = {
@@ -104,4 +106,181 @@ void* vector_rm(vector* v, size_t index)
     }
 
     return item;   
+}
+
+// --------------- TAGGED VALUES ---------------
+
+TValue* TNull()
+{
+    TValue* v = (TValue*)malloc(sizeof(TValue));
+    v->type = TYPE_NULL;
+    v->value.s = NULL;
+    return v;
+}
+
+TValue* TInt(int i)
+{
+    TValue* v = (TValue*)malloc(sizeof(TValue));
+    v->type = TYPE_INT;
+    v->value.i = i;
+    return v;
+}
+
+TValue* TFloat(float f)
+{
+    TValue* v = (TValue*)malloc(sizeof(TValue));
+    v->type = TYPE_FLOAT;
+    v->value.f = f;
+    return v;
+}
+
+TValue* TString(const char* s)
+{
+    TValue* v = (TValue*)malloc(sizeof(TValue));
+    v->type = TYPE_STRING;
+    v->value.s = s;
+    return v;
+}
+
+TValue* TBool(boolean b)
+{
+    TValue* v = (TValue*)malloc(sizeof(TValue));
+    v->type = TYPE_BOOLEAN;
+    v->value.b = b;
+    return v;
+}
+
+const char* TValue_tostr(TValue* v)
+{
+    if (v->type == TYPE_STRING) {
+        return v->value.s;
+    } else {
+        char* buf = (char*)malloc(sizeof(char) * 32);
+
+        if (v->type == TYPE_BOOLEAN) {
+            sprintf(buf, "%s", v->value.b ? "True" : "False");
+        } else if (v->type == TYPE_INT) {
+            sprintf(buf, "%i", v->value.i);
+        } else if (v->type == TYPE_FLOAT) {
+            sprintf(buf, "%f", v->value.f);
+        } else {
+            sprintf(buf, "NULL");
+        }
+
+        return buf;
+    }
+}
+
+// -------------- STRING HASH MAP --------------
+
+map map_new(size_t init_capacity)
+{
+    map m = {
+        .keys = (const char**) calloc(sizeof(const char*) * init_capacity, sizeof(const char*)),
+        .values = (TValue**) malloc(sizeof(TValue*) * init_capacity),
+        .size = 0,
+        .capacity = init_capacity
+    };
+
+    return m;
+}
+
+void map_put(map* m, const char* k, TValue* v)
+{
+    if (((float) m->size / m->capacity) >= 0.50) {
+        map_resize(m, m->capacity * 3);
+    }
+
+    size_t i = strhash(k) % m->capacity;
+
+    for (size_t j = 0; j < m->capacity; j++)
+    {
+        if (m->keys[i] == NULL || strcmp(m->keys[i], k) == 0) 
+        {
+            m->keys[i] = k;
+            m->values[i] = v;
+            m->size++;
+            return;
+        } 
+        else 
+        {
+            i = (i + 1) % m->capacity;
+        }
+    }
+}
+
+TValue* map_get(map* m, const char* k)
+{
+    size_t i = strhash(k) % m->capacity;
+
+    for (size_t j = 0; j < m->capacity; j++) 
+    {
+        if (m->keys[i] != NULL && strcmp(m->keys[i], k) == 0) 
+        {
+            return m->values[i];
+        } 
+        else 
+        {
+            i = (i + 1) % m->capacity;
+        }
+    }
+    
+    return NULL;
+}
+
+TValue* map_remove(map* m, const char* k)
+{
+    size_t i = strhash(k) % m->capacity;
+
+    for (size_t j = 0; j < m->capacity; j++) 
+    {
+        if (m->keys[i] != NULL && streq(m->keys[i], k)) {
+            m->size--;
+            m->keys[i] = NULL;
+            return m->values[i];
+        } else {
+            i = (i + 1) % m->capacity;
+        }
+    }
+
+    return NULL;
+}
+
+boolean map_contains(map* m, const char* k)
+{
+    size_t i = strhash(k) % m->capacity;
+
+    for (size_t j = 0; j < m->capacity; j++)
+    {
+        if (m->keys[i] != NULL && streq(m->keys[i], k)) {
+            return true;
+        } else {
+            i = (i + 1) % m->capacity;
+        }
+    }
+    return false;
+}
+
+void map_resize(map* m, size_t new_capacity)
+{
+    map m1 = {
+        .keys = (const char**) calloc(sizeof(const char*) * new_capacity, sizeof(const char*)),
+        .values = (TValue**) malloc(sizeof(TValue*) * new_capacity),
+        .size = 0,
+        .capacity = new_capacity
+    };
+
+    for (size_t i = 0; i < m->capacity; i++)
+    {
+        if (m->keys[i] != NULL) 
+        {
+            map_put(&m1, m->keys[i], m->values[i]);
+        }
+    }
+
+    free(m->keys);
+    free(m->values);
+    m->keys = m1.keys;
+    m->values = m1.values;
+    m->capacity = m1.capacity;
 }

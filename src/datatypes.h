@@ -2,6 +2,8 @@
 #define HE_DATATYPES_HEADER
 
 #include "stdlib.h"
+#include "common.h"
+
 
 // ------------------- VECTOR -------------------
 
@@ -98,6 +100,7 @@ void* vector_rm(vector* v, size_t index);
 // ----------------- VM VALUES -----------------
 
 typedef enum Type {
+    TYPE_NULL,
     TYPE_INT,
     TYPE_FLOAT,
     TYPE_STRING,
@@ -105,9 +108,9 @@ typedef enum Type {
 } __attribute__ ((__packed__)) Type;
 
 typedef union Value {
-    const boolean b;
-    const int i;
-    const float f;
+    boolean b;
+    int i;
+    float f;
     const char* s;
 } Value;
 
@@ -116,5 +119,37 @@ typedef struct TValue {
     Type type;
 } __attribute__ ((__packed__)) TValue;
 
+TValue* TNull();
+
+TValue* TInt(int i);
+
+TValue* TFloat(float f);
+
+TValue* TString(const char* s);
+
+TValue* TBool(boolean b);
+
+const char* TValue_tostr(TValue* v);
+
+// -------------- STRING HASH MAP --------------
+
+typedef struct map {
+    const char** keys;
+    TValue** values;
+    size_t size;
+    size_t capacity;
+} map;
+
+map map_new(size_t init_capacity);
+
+void map_put(map* m, const char* k, TValue* v);
+
+TValue* map_get(map* m, const char* k);
+
+TValue* map_remove(map* m, const char* k);
+
+boolean map_contains(map* m, const char* k);
+
+void map_resize(map* m, size_t new_capacity);
 
 #endif
