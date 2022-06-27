@@ -63,6 +63,6 @@ const char* paddchar(char c, int n);
  * @param str String to hash
  * @return hashcode
  */
-size_t strhash(unsigned char *str);
+size_t strhash(const char *str);
 
 #endif

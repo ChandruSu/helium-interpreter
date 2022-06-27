@@ -164,7 +164,7 @@ const char* TValue_tostr(TValue* v)
         } else if (v->type == TYPE_FLOAT) {
             sprintf(buf, "%f", v->value.f);
         } else {
-            sprintf(buf, "NULL");
+            sprintf(buf, "Null");
         }
 
         return buf;

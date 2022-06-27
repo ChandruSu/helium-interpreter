@@ -66,7 +66,7 @@ const char* paddchar(char c, int n) {
 }
 
 // by dan bernstein
-size_t strhash(unsigned char *str)
+size_t strhash(const char *str)
 {
     size_t hash = 5381;
     int c;
