@@ -151,6 +151,9 @@ TValue* coerce_constant(program* p, astnode* k_node)
         case TYPE_FLOAT:
             return TFloat(atof(k_node->value));
         
+        case TYPE_STRING:
+            return TString(k_node->value);
+
         default:
             translate_err(p, k_node, "Cannot coerce token into a value");
     }

@@ -21,6 +21,8 @@ const char* lxtype_strings[] = {
     "LX_CALL          ",
     "LX_BLOCK         ",
     "LX_SEPARATOR     ",
+    "LX_BOOL          ",
+    "LX_NULL          ",
 };
 
 lxtoken* lxtoken_new(const char* value, lxtype type, lxpos pos)
@@ -34,7 +36,7 @@ lxtoken* lxtoken_new(const char* value, lxtype type, lxpos pos)
 
 void lxtoken_display(lxtoken* tk)
 {
-    printf("(%03i, %03i) %s %s\n", tk->pos.line_pos, tk->pos.col_pos, lxtype_strings[tk->type], tk->value);   
+    printf("(%03i, %03i) %s %s\n", tk->pos.line_pos + 1, tk->pos.col_pos + 1, lxtype_strings[tk->type], tk->value);   
 }
 
 lexer lexer_new(const char* src)
@@ -189,11 +191,10 @@ lxtype determine_nature(char* s)
     // checks against reserved keywords.
     if (streq(s, "function")) {
         type = LX_FUNCTION;
-    } // ...
-
-    // deletes symbol buffer for reserved keyword types.
-    if (type != LX_SYMBOL) {
-        s[0] = '\0';
+    } else if (streq(s, "false") || streq(s, "true")) {
+        type = LX_BOOL;
+    } else if (streq(s, "null")) {
+        type = LX_NULL;
     }
 
     return type;
@@ -242,7 +243,7 @@ lxpos clone_pos(lxpos* original)
 {
     lxpos pos = {
         .col_pos = original->col_pos,
-        .line_pos = original->line_offset,
+        .line_pos = original->line_pos,
         .char_offset = original->char_offset,
         .line_offset = original->line_offset
     };

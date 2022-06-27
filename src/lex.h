@@ -24,6 +24,8 @@ typedef enum lxtype {
     LX_CALL,            // 12
     LX_BLOCK,
     LX_SEPARATOR,
+    LX_BOOL,
+    LX_NULL,
 } lxtype;
 
 typedef struct lxpos {
