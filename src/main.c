@@ -55,14 +55,13 @@ int main(int argc, const char* argv[])
     interpreter in = {
         .program = {
             .instructions = (unsigned int*) malloc(sizeof(unsigned int) * 1000),
-            .size = 0,
-            .constants = (TValue*) malloc(sizeof(TValue) * MAX_CONSTANTS),
-            
-            .source = src
+            .size         = 0,
+            .constants    = (TValue*) malloc(sizeof(TValue) * MAX_CONSTANTS),
+            .source       = src
         },
         .vm = {
-            .calls     = (call_info*) malloc(sizeof(call_info) * MAX_CALLS),
             .ci        = 0,
+            .calls     = (call_info*) malloc(sizeof(call_info) * MAX_CALLS),
             .registers = (TValue*) malloc(sizeof(TValue) * MAX_REGISTERS),
             .heap      = (TValue*) malloc(sizeof(TValue) * MAX_HEAP_SIZE),
         },
@@ -72,14 +71,13 @@ int main(int argc, const char* argv[])
 
     translate_ast(&in.program, tree);
 
-
+    printf("Constants: \n");
     for (size_t i = 0; i < 5; i++)
     {
         TValue* k = &in.program.constants[i];
         printf("Constant %li = %s\n", i, TValue_tostr(k));
     }
     
-
     printf("\nInstructions: \n");
     for (size_t i = 0; i < in.program.size; i++)
     {
