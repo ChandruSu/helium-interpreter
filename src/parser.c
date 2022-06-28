@@ -80,9 +80,14 @@ astnode* parse_statement(parser* p)
             st->type = AST_ASSIGN;
             st->value = eat(p)->value;
             consume(p, LX_ASSIGN);
-            vector_push(&st->children, parse_expression(p));
+            
+            if (peek(p)->type == LX_FUNCTION) {
+                vector_push(&st->children, parse_function_definition(p));
+            } else {
+                vector_push(&st->children, parse_expression(p));
+            }
             break;
-        
+
         default:
             parsererror(p, "Invalid statement!");
             break;
@@ -158,8 +163,7 @@ astnode* parse_primary(parser* p)
 
         case LX_OPERATOR:
             // validates operator
-            if (strcmp(peek(p)->value, "-") && strcmp(peek(p)->value, "+")) 
-            {
+            if (strcmp(peek(p)->value, "-") && strcmp(peek(p)->value, "+")) {
                 parsererror(p, "Invalid unary operator");
             }
 
@@ -196,6 +200,31 @@ astnode* parse_function_call(parser* p)
     consume(p, LX_RIGHT_PAREN);
 
     return fcall;
+}
+
+astnode* parse_function_definition(parser* p)
+{
+    astnode* func = astnode_new("code", AST_FUNCTION, clone_pos(&consume(p, LX_FUNCTION)->pos));;
+    astnode* params = astnode_new("args", AST_PARAMS, clone_pos(&consume(p, LX_LEFT_PAREN)->pos));
+    vector_push(&func->children, params);
+
+    // code header
+    if (peek(p)->type != LX_RIGHT_PAREN) 
+    {
+        do {
+            lxtoken* param = consume(p, LX_SYMBOL);
+            vector_push(&params->children, astnode_new(param->value, AST_PARAM, clone_pos(&param->pos)));
+        } 
+        while (consume_optional(p, LX_SEPARATOR));
+    }
+    consume(p, LX_RIGHT_PAREN);
+
+    // code body
+    consume(p, LX_LEFT_BRACE);
+    vector_push(&func->children,parse_block(p, LX_RIGHT_BRACE));
+    consume(p, LX_RIGHT_BRACE);
+
+    return func;
 }
 
 // ------------------ UTILITY METHODS ------------------

@@ -30,6 +30,7 @@ void execute_instruction(interpreter* in, uint32_t instruction)
     uint8_t r1 = (instruction >> 16) & 0xff;
     uint8_t r2 = (instruction >> 24) & 0xff;
     uint8_t ix = (instruction >> 16) & 0xffff;
+    TValue v0, v1;
 
     switch (op)
     {
@@ -52,10 +53,15 @@ void execute_instruction(interpreter* in, uint32_t instruction)
         case OP_SUB:
         case OP_MUL:
         case OP_DIV:
-            TValue v0 = in->vm.registers[in->vm.ccall->sp + r1];
-            TValue v1 = in->vm.registers[in->vm.ccall->sp + r2];
+            v0 = in->vm.registers[in->vm.ccall->sp + r1];
+            v1 = in->vm.registers[in->vm.ccall->sp + r2];
             in->vm.registers[in->vm.ccall->sp + r0] = apply_binary_operation(op, v0, v1);
             in->vm.top--; // TODO: Based on assumption!!
+            break;
+        
+        case OP_NEG:
+            v0 = in->vm.registers[in->vm.ccall->sp + r1];
+            in->vm.registers[in->vm.ccall->sp + r0] = *TInt(-v0.value.i);
             break;
 
         default:

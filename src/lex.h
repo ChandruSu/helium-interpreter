@@ -18,12 +18,14 @@ typedef enum lxtype {
     LX_WHITESPACE,
     LX_LEFT_PAREN,
     LX_RIGHT_PAREN,     // 8
+    LX_LEFT_BRACE,
+    LX_RIGHT_BRACE,
     LX_ASSIGN,
-    LX_STRING,
+    LX_STRING,          // 12
     LX_FUNCTION,
-    LX_CALL,            // 12
+    LX_CALL,
     LX_BLOCK,
-    LX_SEPARATOR,
+    LX_SEPARATOR,       // 16
     LX_BOOL,
     LX_NULL,
 } lxtype;

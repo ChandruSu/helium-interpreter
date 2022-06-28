@@ -6,23 +6,25 @@ lxtype determine_nature(char* s);
 boolean check_pattern(lexer* lx, const char* pattern);
 
 const char* lxtype_strings[] = {
-    "LX_SYMBOL        ",
-    "LX_INTEGER       ",
-    "LX_OPERATOR      ",
-    "LX_EOF           ",
-    "LX_COMMENT       ",
-    "LX_NEWLINE       ",
-    "LX_WHITESPACE    ",
-    "LX_LEFT_PAREN    ",
-    "LX_RIGHT_PAREN   ",
-    "LX_ASSIGN        ",
-    "LX_STRING        ",
-    "LX_FUNCTION      ",
-    "LX_CALL          ",
-    "LX_BLOCK         ",
-    "LX_SEPARATOR     ",
-    "LX_BOOL          ",
-    "LX_NULL          ",
+    "LX_SYMBOL           ",
+    "LX_INTEGER          ",
+    "LX_OPERATOR         ",
+    "LX_EOF              ",
+    "LX_COMMENT          ",
+    "LX_NEWLINE          ",
+    "LX_WHITESPACE       ",
+    "LX_LEFT_PAREN       ",
+    "LX_RIGHT_PAREN      ",
+    "LX_LEFT_BRACE       ",
+    "LX_RIGHT_BRACE      ",
+    "LX_ASSIGN           ",
+    "LX_STRING           ",
+    "LX_FUNCTION         ",
+    "LX_CALL             ",
+    "LX_BLOCK            ",
+    "LX_SEPARATOR        ",
+    "LX_BOOL             ",
+    "LX_NULL             ",
 };
 
 lxtoken* lxtoken_new(const char* value, lxtype type, lxpos pos)
@@ -123,6 +125,12 @@ lxtoken* lex(lexer* lx)
             case '\t':
                 type = LX_WHITESPACE;
                 break;
+            case '{':
+                type = LX_LEFT_BRACE;
+                break;
+            case '}':
+                type = LX_RIGHT_BRACE;
+                break;
             case '+': // numeric operations
             case '-':
             case '/':
@@ -151,6 +159,9 @@ lxtoken* lex(lexer* lx)
                 break;
             case ',':
                 type = LX_SEPARATOR;
+                break;
+            case '$':
+                type = LX_FUNCTION;
                 break;
             default:
                 lexerror(lx, "Syntax error! Failed to identify symbol");
@@ -189,9 +200,7 @@ lxtype determine_nature(char* s)
     lxtype type = LX_SYMBOL;
 
     // checks against reserved keywords.
-    if (streq(s, "function")) {
-        type = LX_FUNCTION;
-    } else if (streq(s, "false") || streq(s, "true")) {
+    if (streq(s, "false") || streq(s, "true")) {
         type = LX_BOOL;
     } else if (streq(s, "null")) {
         type = LX_NULL;

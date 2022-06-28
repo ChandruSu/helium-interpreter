@@ -20,6 +20,9 @@ typedef enum asttype {
     AST_BINARY_EXPRESSION,
     AST_BLOCK,
     AST_ASSIGN,
+    AST_FUNCTION,
+    AST_PARAMS,
+    AST_PARAM,
 } asttype;
 
 typedef struct astnode {
@@ -98,6 +101,8 @@ astnode* parse(parser* p);
 astnode* parse_block(parser* p, lxtype terminal);
 
 astnode* parse_statement(parser* p);
+
+astnode* parse_function_definition(parser* p);
 
 /**
  * @brief Parses expression tokens into an abstract syntax tree.

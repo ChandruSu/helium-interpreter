@@ -23,7 +23,7 @@ void translate_statement(program* p, astnode* n)
             break;
         
         default:
-            translate_err(p, n, "Invalid statement node");
+            translate_err(p, n, "Invalid statement node - could not translate");
             break;
     }
 }
@@ -50,10 +50,10 @@ void translate_expression(program* p, astnode* n)
             p->translator.sp -= 1;
             p->instructions[p->size++] = encode_instruction_3R(op_code, p->translator.sp - 1, p->translator.sp - 1, p->translator.sp);
             break;
-        
+
         case AST_UNARY_EXPRESSION:
             translate_expression(p, vector_get(&n->children, 0));
-            p->instructions[p->size++] = encode_instruction_3R(OP_NEG, p->translator.sp, p->translator.sp, 0);
+            p->instructions[p->size++] = encode_instruction_3R(OP_NEG, p->translator.sp - 1, p->translator.sp - 1, 0);
             break;
 
         case AST_INTEGER:
@@ -70,7 +70,7 @@ void translate_expression(program* p, astnode* n)
             break;
 
         default:
-            translate_err(p, n, "Invalid expression node");
+            translate_err(p, n, "Invalid expression node - could not translate");
             break;
     }
 }

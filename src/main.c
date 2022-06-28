@@ -75,7 +75,7 @@ int main(int argc, const char* argv[])
         },
     };
 
-    printf("%s Beginning interpretting:\n\n", MESSAGE);
+    printf("%s Beginning translation:\n\n", MESSAGE);
 
     translate_ast(&in.program, tree);
     
@@ -86,6 +86,7 @@ int main(int argc, const char* argv[])
         printf("%s\n", disassemble_instruction(&in.program, ins));
     }
 
+    printf("%s Beginning execution:\n\n", MESSAGE);
     execute_program(&in);
     
     printf("\nOutput:\n");
@@ -94,8 +95,7 @@ int main(int argc, const char* argv[])
         printf("Global %li = %s\n", i, TValue_tostr(&in.vm.heap[i]));
     }
     
-
-    printf("Program has reached end!");
+    printf("%sProgram has ended successfully!\n", MESSAGE);
 
     return 0;
 }
