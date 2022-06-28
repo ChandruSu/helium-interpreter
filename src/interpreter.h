@@ -3,6 +3,9 @@
 
 #include "parser.h"
 #include "datatypes.h"
+#include "stdlib.h"
+#include "stdio.h"
+#include "inttypes.h"
 
 #define MAX_CALLS 0xff
 #define MAX_REGISTERS 0xffff
@@ -25,21 +28,31 @@ typedef struct call_info {
     size_t bp;
     size_t sp;
     size_t pc;
+    size_t size;
+    uint32_t* program;
     struct call_info* prev;
 } call_info;
 
 typedef struct virtual_machine {
+    size_t top;
+    call_info* ccall;
     call_info* calls;
-    size_t ci;
     TValue* registers;
     TValue* heap;
 } virtual_machine;
 
+typedef struct translator {
+    size_t sp;
+    map constant_table;
+    map symbol_table;
+} translator;
+
 typedef struct program {
-    unsigned int* instructions;
+    uint32_t* instructions;
     size_t size;
     TValue* constants;
     const char* source;
+    translator translator;
 } program;
 
 typedef struct interpreter {
@@ -47,11 +60,7 @@ typedef struct interpreter {
     virtual_machine vm;
 } interpreter;
 
-typedef struct translator {
-    size_t sp;
-    map constant_table;
-    map symbol_table;
-} translator;
+// ------------------------ TRANSLATION ------------------------
 
 /**
  * @brief Translates whole abstract syntax tree and stores intermediate
@@ -66,31 +75,28 @@ void translate_ast(program* p, astnode* n);
  * @brief Translates statement node into intermediate assembly code.
  * 
  * @param p Reference to program
- * @param t Translator object
  * @param n Statement node
  */
-void translate_statement(program* p, translator* t, astnode* n);
+void translate_statement(program* p, astnode* n);
 
 /**
  * @brief Translates expression node into intermediate assembly and
  *      recursively resolves binary expressions.
  * 
  * @param p Reference to program
- * @param t Translator object
  * @param n Expression node
  */
-void translate_expression(program* p, translator* t, astnode* n);
+void translate_expression(program* p, astnode* n);
 
 /**
  * @brief Registers constant literal if it does not already exist or
  *      returns its address within the constant table.
  * 
  * @param p Reference to program
- * @param t Translator object
  * @param k Constant node
  * @return address in constant table
  */
-unsigned short register_constant(program* p, translator* t, astnode* k);
+unsigned short register_constant(program* p, astnode* k);
 
 /**
  * @brief Registers variable symbol if it does not already exist in the
@@ -98,22 +104,20 @@ unsigned short register_constant(program* p, translator* t, astnode* k);
  *      exist.
  * 
  * @param p Reference to program
- * @param t Translator object
  * @param g Symbol node
  * @return address in symbol table
  */
-unsigned short register_global(program* p, translator* t, astnode* g);
+uint16_t register_global(program* p, astnode* g);
 
 /**
  * @brief Fetches global variable address or throws an error if variable
  *      does not exist.
  * 
  * @param p Reference to program
- * @param t Translator object
  * @param g Symbol node
  * @return address in symbol table
  */
-unsigned short load_global(program* p, translator* t, astnode* g);
+uint16_t load_global(program* p, astnode* g);
 
 /**
  * @brief Produces 32-bit instruction that can be executed. Register addresses
@@ -125,7 +129,7 @@ unsigned short load_global(program* p, translator* t, astnode* g);
  * @param r2 Register index 3
  * @return 32-bit binary instruction 
  */
-unsigned int encode_instruction_3R(vm_op op, short r0, short r1, short r2);
+uint32_t encode_instruction_3R(vm_op op, uint8_t r0, uint8_t r1, uint8_t r2);
 
 /**
  * @brief Produces 32-bit instruction that can be executed. Register addresses
@@ -136,7 +140,7 @@ unsigned int encode_instruction_3R(vm_op op, short r0, short r1, short r2);
  * @param i 16-bit operand
  * @return 32-bit binary instruction 
  */
-unsigned int encode_instruction_R_i(vm_op op, short r0, short i0);
+uint32_t encode_instruction_R_i(vm_op op, uint8_t r0, uint16_t i0);
 
 /**
  * @brief Prints semantic error and displays location of error in source code.
@@ -146,5 +150,22 @@ unsigned int encode_instruction_R_i(vm_op op, short r0, short i0);
  * @param msg Error message
  */
 void translate_err(program* p, astnode* node, const char* msg);
+
+/**
+ * @brief Disassembles binary instruction and converts it to string representation.
+ * 
+ * @param p Reference to program
+ * @param ins 32-bit instruction
+ * @return String
+ */
+const char* disassemble_instruction(program* p, uint32_t ins);
+
+// ------------------------- EXECUTION -------------------------
+
+void execute_program(interpreter* in);
+
+void execute_instruction(interpreter* in, uint32_t instruction);
+
+void runtime_err(const char* msg);
 
 #endif

@@ -1,9 +1,9 @@
 #ifndef HE_COMMON_HEADER
 #define HE_COMMON_HEADER
 
-#include "stdio.h"
-#include "stdlib.h"
-#include "string.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 #define ERR_COL "\033[31m"
 #define WAR_COL "\033[33m"

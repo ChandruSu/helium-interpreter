@@ -150,6 +150,34 @@ TValue* TBool(boolean b)
     return v;
 }
 
+boolean TValEqual(TValue* a, TValue* b)
+{
+    if (a->type == b->type) {
+        switch (a->type)
+        {
+            case TYPE_NULL:
+                return true;
+            
+            case TYPE_INT:
+                return a->value.i == b->value.i;
+
+            case TYPE_FLOAT:
+                return a->value.f == b->value.f;
+            
+            case TYPE_STRING:
+                return strcmp(a->value.s, b->value.s) == 0;
+                
+            case TYPE_BOOLEAN:
+                return a->value.b == b->value.b;
+            
+            default:
+                return false;
+        }
+    } else {
+        return false;
+    }
+}
+
 const char* TValue_tostr(TValue* v)
 {
     if (v->type == TYPE_STRING) {
@@ -225,6 +253,21 @@ TValue* map_get(map* m, const char* k)
         }
     }
     
+    return NULL;
+}
+
+const char* map_get_key(map* m, TValue* v)
+{
+    for (size_t i = 0; i < m->capacity; i++)
+    {
+        if (m->keys[i] != NULL)
+        {
+            if (TValEqual(m->values[i], v))
+            {
+                return m->keys[i];
+            }
+        }
+    }
     return NULL;
 }
 

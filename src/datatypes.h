@@ -1,7 +1,7 @@
 #ifndef HE_DATATYPES_HEADER
 #define HE_DATATYPES_HEADER
 
-#include "stdlib.h"
+#include <stdlib.h>
 #include "common.h"
 
 // ------------------- VECTOR -------------------
@@ -167,6 +167,15 @@ void map_put(map* m, const char* k, TValue* v);
  * @return TValue value 
  */
 TValue* map_get(map* m, const char* k);
+
+/**
+ * @brief Retrieves the key of an entry using the value.
+ * 
+ * @param m Map
+ * @param v TValue value
+ * @return Key 
+ */
+const char* map_get_key(map* m, TValue* v);
 
 /**
  * @brief Removes and returns an value in the map by key and old address

@@ -1,12 +1,12 @@
 #ifndef HE_LEXER_HEADER
 #define HE_LEXER_HEADER
 
-// includes
+#include <ctype.h>
+#include <string.h>
+#include <stdio.h>
+
 #include "common.h"
-#include "ctype.h"
 #include "datatypes.h"
-#include "string.h"
-#include "stdio.h"
 
 typedef enum lxtype {
     LX_SYMBOL,          // 0

@@ -22,6 +22,8 @@ int main(int argc, const char* argv[])
         exit(0);
     }
 
+    printf("%s Reading code:\n\n%s\n", MESSAGE, src);
+
     // lexical analysis
     printf("%s Beginning lexical anaylsis:\n\n", MESSAGE);
 
@@ -54,13 +56,19 @@ int main(int argc, const char* argv[])
     // interpreting
     interpreter in = {
         .program = {
-            .instructions = (unsigned int*) malloc(sizeof(unsigned int) * 1000),
+            .instructions = (uint32_t*) malloc(sizeof(uint32_t) * 1000),
             .size         = 0,
             .constants    = (TValue*) malloc(sizeof(TValue) * MAX_CONSTANTS),
-            .source       = src
+            .source       = src,
+            .translator = {
+                .sp = 0,
+                .constant_table = map_new(21),
+                .symbol_table = map_new(21),
+            }
         },
         .vm = {
-            .ci        = 0,
+            .top       = 0,
+            .ccall     = NULL,
             .calls     = (call_info*) malloc(sizeof(call_info) * MAX_CALLS),
             .registers = (TValue*) malloc(sizeof(TValue) * MAX_REGISTERS),
             .heap      = (TValue*) malloc(sizeof(TValue) * MAX_HEAP_SIZE),
@@ -70,20 +78,24 @@ int main(int argc, const char* argv[])
     printf("%s Beginning interpretting:\n\n", MESSAGE);
 
     translate_ast(&in.program, tree);
-
-    printf("Constants: \n");
-    for (size_t i = 0; i < 5; i++)
-    {
-        TValue* k = &in.program.constants[i];
-        printf("Constant %li = %s\n", i, TValue_tostr(k));
-    }
     
-    printf("\nInstructions: \n");
+    printf("Instructions: \n");
     for (size_t i = 0; i < in.program.size; i++)
     {
         int ins = in.program.instructions[i];
-        printf("%i %i %i %i\n", ins & 0xff, (ins >> 8) & 0xff, (ins >> 16) & 0xff, (ins >> 24) & 0xff);
+        printf("%s\n", disassemble_instruction(&in.program, ins));
     }
+
+    execute_program(&in);
+    
+    printf("\nOutput:\n");
+    for (size_t i = 0; i < in.program.translator.symbol_table.size; i++)
+    {
+        printf("Global %li = %s\n", i, TValue_tostr(&in.vm.heap[i]));
+    }
+    
+
+    printf("Program has reached end!");
 
     return 0;
 }
