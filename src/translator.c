@@ -17,11 +17,29 @@ void translate_statement(program* p, astnode* n)
     switch (n->type)
     {
         case AST_ASSIGN:
-            translate_expression(p, vector_get(&n->children, 0));
-            short g_addr = register_global(p, n);
-            p->instructions[p->size++] = encode_instruction_R_i(OP_STG, --p->translator.sp, g_addr);
+            astnode* rhs = vector_get(&n->children, 0);
+            
+            if (rhs->type == AST_FUNCTION) {
+                uint16_t code_addr = translate_function_definition(p, rhs);
+                p->instructions[p->size++] = encode_instruction_R_i(OP_LDK, p->translator.sp++, code_addr);
+            } else {
+                translate_expression(p, rhs);
+            }
+
+            vm_scope scope;
+            vm_op operation;
+            uint16_t g_addr = register_variable(p, n->value, &scope);
+
+            switch (scope) {
+                case SCOPE_LOCAL: operation = OP_STL; break;
+                case SCOPE_GLOBAL: operation = OP_STG; break;
+                default: translate_err(p, n, "Invalid scope operation!");
+            }
+
+            p->instructions[p->size++] = encode_instruction_R_i(operation, --p->translator.sp, g_addr);
             break;
         
+        case AST_CALL:
         default:
             translate_err(p, n, "Invalid statement node - could not translate");
             break;
@@ -57,35 +75,79 @@ void translate_expression(program* p, astnode* n)
             break;
 
         case AST_INTEGER:
-            short k_address = register_constant(p, n); 
+            short k_address = register_constant(p, n->value, *coerce_constant(p, n)); 
             p->instructions[p->size++] = encode_instruction_R_i(OP_LDK, p->translator.sp++, k_address);
             break;
 
         case AST_REFERENCE:
-            unsigned short g_addr = load_global(p, n);
-            p->instructions[p->size++] = encode_instruction_R_i(OP_LDG, p->translator.sp++, g_addr);
+            vm_scope scope;
+            vm_op operation;
+            uint16_t g_addr = dereference_variable(p, n->value, &scope);
+            
+            switch (scope) {
+                case SCOPE_LOCAL: operation = OP_LDL; break;
+                case SCOPE_GLOBAL: operation = OP_LDG; break;
+                case SCOPE_CLOSED: operation = OP_LDC; break;
+                default: translate_err(p, n, "Invalid scope operation!");
+            }
+
+            p->instructions[p->size++] = encode_instruction_R_i(operation, p->translator.sp++, g_addr);
             break;
 
         case AST_CALL:
-            break;
-
         default:
             translate_err(p, n, "Invalid expression node - could not translate");
             break;
     }
 }
 
+uint16_t translate_function_definition(program* p, astnode* f)
+{
+    program* p0 = malloc(sizeof(program));
+    
+    p0->instructions = (uint32_t*) malloc(sizeof(uint32_t) * 1000);
+    p0->size = 0;
+    p0->constants = malloc(sizeof(TValue) * 0xff);
+    p0->source = p->source;
+    p0->translator.sp = 0;
+    p0->translator.constant_table = map_new(23);
+    p0->translator.symbol_table = map_new(23);
+    p0->prev = p;
+
+    astnode* params = vector_get(&f->children, 0);
+    for (size_t i = 0; i < params->children.size; i++) {
+        astnode* symbol = vector_get(&params->children, i);
+        map_put(&p->translator.symbol_table, symbol->value, TInt(-i - 1));
+    }
+
+    astnode* code = vector_get(&f->children, 1);
+    for (size_t i = 0; i < code->children.size; i++) {
+        translate_statement(p0, vector_get(&code->children, i));
+    }
+    
+    TValue* code_object = malloc(sizeof(TValue));
+    code_object->type = TYPE_POINTER;
+    code_object->value.pp = p0;
+
+    char* buf = malloc(sizeof(char) * 16);
+    sprintf(buf, "<code %p>", p0);
+
+    disassemble_program(p0);
+
+    return register_constant(p, buf, *code_object);
+}
+
 // --------------- SYMBOL/VAR STORAGE ----------------
 
-uint16_t register_constant(program* p, astnode* k)
+uint16_t register_constant(program* p, const char* cname, TValue val)
 {
-    TValue* k_addr = map_get(&p->translator.constant_table, k->value);
+    TValue* k_addr = map_get(&p->translator.constant_table, cname);
 
     if (k_addr == NULL) 
     {
         TValue* index = TInt(p->translator.constant_table.size);
-        map_put(&p->translator.constant_table, k->value, index);
-        p->constants[index->value.i] = *coerce_constant(p, k);
+        map_put(&p->translator.constant_table, cname, index);
+        p->constants[index->value.i] = val;
         return index->value.i;
     }
     else
@@ -94,31 +156,56 @@ uint16_t register_constant(program* p, astnode* k)
     }
 }
 
-uint16_t register_global(program* p, astnode* g)
+uint16_t register_variable(program* p, const char* vname, vm_scope* scope)
 {
-    TValue* g_addr = map_get(&p->translator.symbol_table, g->value);
+    uint16_t addr = dereference_variable(p, vname, scope);
 
-    if (g_addr == NULL) 
+    // registers new variables
+    if (addr == (uint16_t)(-1)) 
     {
         TValue* index = TInt(p->translator.symbol_table.size);
-        map_put(&p->translator.symbol_table, g->value, index);
+        map_put(&p->translator.symbol_table, vname, index);
+
+        if (p->prev == NULL)
+            *scope = SCOPE_GLOBAL;
+        else
+            *scope = SCOPE_LOCAL;
+        
         return index->value.i;
-    }
-    else
+    } 
+    else 
     {
-        return g_addr->value.i;
+        return addr;
     }
 }
 
-uint16_t load_global(program* p, astnode* g)
+uint16_t dereference_variable(program* p, const char* vname, vm_scope* scope)
 {
-    TValue* g_addr = map_get(&p->translator.symbol_table, g->value);
+    program* p0 = p;
+    TValue* addr = map_get(&p->translator.symbol_table, vname);
 
-    if (g_addr == NULL) {
-        translate_err(p, g, "Undeclared variable cannot be dereferenced");
+    // iterative search for variable address
+    while (addr == NULL && p0->prev != NULL) {
+        p0 = p0->prev;
+        addr = map_get(&p0->translator.symbol_table, vname);
+    }
+    
+    if (addr == NULL) 
+    {
+        *scope = SCOPE_NONE;
+        return -1;
+    }
+    
+    // returns variable scope for registered variable
+    if (p0->prev == NULL) {
+        *scope = SCOPE_GLOBAL;
+    } else if (p0 == p) {
+        *scope = SCOPE_LOCAL;
+    } else {
+        *scope = SCOPE_CLOSED;
     }
 
-    return g_addr->value.i;
+    return addr->value.i;
 }
 
 // -------------------- ENCODING ---------------------
@@ -136,15 +223,18 @@ uint32_t encode_instruction_R_i(vm_op op, uint8_t r0, uint16_t i0)
 // ---------------------- UTILS ----------------------
 
 const char* ASM_OP_STR[] = {
-    "OP_MOV",
+    "OP_MOV",     // 0
     "OP_LDK",
     "OP_LDG",
     "OP_STG",
+    "OP_LDL",     // 4
+    "OP_STL",
+    "OP_LDC",
     "OP_ADD",
-    "OP_SUB",
+    "OP_SUB",     // 8
     "OP_MUL",
     "OP_DIV",
-    "OP_NEG",     // 8
+    "OP_NEG",
 };
 
 TValue* coerce_constant(program* p, astnode* k_node)
@@ -164,6 +254,17 @@ TValue* coerce_constant(program* p, astnode* k_node)
             translate_err(p, k_node, "Cannot coerce token into a value");
     }
     return NULL;
+}
+
+void disassemble_program(program* p)
+{
+    for (size_t i = 0; i < p->size; i++)
+    {
+        int ins = p->instructions[i];
+        printf("%s\n", disassemble_instruction(p, ins));
+    }
+
+    printf("\n");
 }
 
 const char* disassemble_instruction(program* p, uint32_t ins)
@@ -189,10 +290,19 @@ const char* disassemble_instruction(program* p, uint32_t ins)
 
         case OP_LDG:
         case OP_STG:
+            program* p0 = p;
+            while (p0->prev != NULL) p0 = p->prev;
+
             TValue* index = TInt((ins >> 16) & 0xffff);
+            sprintf(buf, "%s %i %i \t (%s)", ASM_OP_STR[op], (ins >> 8) & 0xff, index->value.i, map_get_key(&p0->translator.symbol_table, index));
+            break;
+        case OP_LDL:
+        case OP_STL:
+            index = TInt((ins >> 16) & 0xffff);
             sprintf(buf, "%s %i %i \t (%s)", ASM_OP_STR[op], (ins >> 8) & 0xff, index->value.i, map_get_key(&p->translator.symbol_table, index));
             break;
 
+        case OP_LDC:
         default:
             break;
     }

@@ -65,6 +65,7 @@ void execute_instruction(interpreter* in, uint32_t instruction)
             break;
 
         default:
+            fprintf(stderr, "%s\n", disassemble_instruction(&in->program, instruction));
             runtime_err("Failed to decode statement!");
     }
 }

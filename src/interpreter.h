@@ -17,12 +17,22 @@ typedef enum vm_op {
     OP_LDK,
     OP_LDG,
     OP_STG,
-    OP_ADD,     // 4
-    OP_SUB,
+    OP_LDL,     // 4
+    OP_STL,
+    OP_LDC,
+    OP_ADD,
+    OP_SUB,     // 8
     OP_MUL,
     OP_DIV,
-    OP_NEG,     // 8
+    OP_NEG,
 } vm_op;
+
+typedef enum vm_scope {
+    SCOPE_NONE,
+    SCOPE_LOCAL,
+    SCOPE_CLOSED,
+    SCOPE_GLOBAL
+} vm_scope;
 
 typedef struct call_info {
     size_t bp;
@@ -53,6 +63,7 @@ typedef struct program {
     TValue* constants;
     const char* source;
     translator translator;
+    struct program* prev;
 } program;
 
 typedef struct interpreter {
@@ -88,36 +99,22 @@ void translate_statement(program* p, astnode* n);
  */
 void translate_expression(program* p, astnode* n);
 
+uint16_t translate_function_definition(program* p, astnode* f);
+
 /**
  * @brief Registers constant literal if it does not already exist or
  *      returns its address within the constant table.
  * 
  * @param p Reference to program
- * @param k Constant node
+ * @param cname Constant name
+ * @param val Constant value
  * @return address in constant table
  */
-unsigned short register_constant(program* p, astnode* k);
+unsigned short register_constant(program* p, const char* cname, TValue val);
 
-/**
- * @brief Registers variable symbol if it does not already exist in the
- *      global scope. Returns the current symbol address if variable does
- *      exist.
- * 
- * @param p Reference to program
- * @param g Symbol node
- * @return address in symbol table
- */
-uint16_t register_global(program* p, astnode* g);
+uint16_t register_variable(program* p, const char* vname, vm_scope* scope);
 
-/**
- * @brief Fetches global variable address or throws an error if variable
- *      does not exist.
- * 
- * @param p Reference to program
- * @param g Symbol node
- * @return address in symbol table
- */
-uint16_t load_global(program* p, astnode* g);
+uint16_t dereference_variable(program* p, const char* vname, vm_scope* scope);
 
 /**
  * @brief Produces 32-bit instruction that can be executed. Register addresses
@@ -150,6 +147,8 @@ uint32_t encode_instruction_R_i(vm_op op, uint8_t r0, uint16_t i0);
  * @param msg Error message
  */
 void translate_err(program* p, astnode* node, const char* msg);
+
+void disassemble_program(program* p);
 
 /**
  * @brief Disassembles binary instruction and converts it to string representation.

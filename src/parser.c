@@ -88,6 +88,11 @@ astnode* parse_statement(parser* p)
             }
             break;
 
+        case LX_CALL:
+            free(st);
+            st = parse_function_call(p);
+            break;
+
         default:
             parsererror(p, "Invalid statement!");
             break;
@@ -191,10 +196,13 @@ astnode* parse_function_call(parser* p)
 
     consume(p, LX_LEFT_PAREN);
 
-    if (!is_empty(p) && peek(p)->type != LX_RIGHT_PAREN) {
-        do {
+    if (!is_empty(p) && peek(p)->type != LX_RIGHT_PAREN) 
+    {
+        do 
+        {
             vector_push(&fcall->children, parse_expression(p));
-        } while (consume_optional(p, LX_SEPARATOR));
+        } 
+        while (consume_optional(p, LX_SEPARATOR));
     }
 
     consume(p, LX_RIGHT_PAREN);

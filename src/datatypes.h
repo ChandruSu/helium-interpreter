@@ -104,6 +104,7 @@ typedef enum Type {
     TYPE_FLOAT,
     TYPE_STRING,
     TYPE_BOOLEAN,
+    TYPE_POINTER,
 } __attribute__ ((__packed__)) Type;
 
 typedef union Value {
@@ -111,6 +112,7 @@ typedef union Value {
     int i;
     float f;
     const char* s;
+    void* pp;
 } Value;
 
 typedef struct TValue {

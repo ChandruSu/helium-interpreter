@@ -186,13 +186,35 @@ const char* TValue_tostr(TValue* v)
         char* buf = (char*)malloc(sizeof(char) * 32);
 
         if (v->type == TYPE_BOOLEAN) {
-            sprintf(buf, "%s", v->value.b ? "True" : "False");
         } else if (v->type == TYPE_INT) {
-            sprintf(buf, "%i", v->value.i);
         } else if (v->type == TYPE_FLOAT) {
-            sprintf(buf, "%f", v->value.f);
         } else {
-            sprintf(buf, "Null");
+        }
+
+        switch (v->type)
+        {
+            case TYPE_BOOLEAN:
+                sprintf(buf, "%s", v->value.b ? "True" : "False");
+                break;
+                
+            case TYPE_INT:
+                sprintf(buf, "%i", v->value.i);
+                break;
+                
+            case TYPE_FLOAT:
+                sprintf(buf, "%f", v->value.f);
+                break;
+                
+            case TYPE_POINTER:
+                sprintf(buf, "Pointer %p", v->value.pp);
+                break;
+
+            case TYPE_NULL:
+                sprintf(buf, "Null");
+                break;
+            
+            default:
+                break;
         }
 
         return buf;

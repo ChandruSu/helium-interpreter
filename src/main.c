@@ -62,9 +62,10 @@ int main(int argc, const char* argv[])
             .source       = src,
             .translator = {
                 .sp = 0,
-                .constant_table = map_new(21),
-                .symbol_table = map_new(21),
-            }
+                .constant_table = map_new(23),
+                .symbol_table = map_new(23),
+            },
+            .prev = NULL,
         },
         .vm = {
             .top       = 0,
@@ -80,13 +81,9 @@ int main(int argc, const char* argv[])
     translate_ast(&in.program, tree);
     
     printf("Instructions: \n");
-    for (size_t i = 0; i < in.program.size; i++)
-    {
-        int ins = in.program.instructions[i];
-        printf("%s\n", disassemble_instruction(&in.program, ins));
-    }
+    disassemble_program(&in.program);
 
-    printf("%s Beginning execution:\n\n", MESSAGE);
+    printf("\n%s Beginning execution:\n\n", MESSAGE);
     execute_program(&in);
     
     printf("\nOutput:\n");
@@ -95,7 +92,7 @@ int main(int argc, const char* argv[])
         printf("Global %li = %s\n", i, TValue_tostr(&in.vm.heap[i]));
     }
     
-    printf("%sProgram has ended successfully!\n", MESSAGE);
+    printf("\n%sProgram has ended successfully!\n", MESSAGE);
 
     return 0;
 }
