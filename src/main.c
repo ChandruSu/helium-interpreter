@@ -52,47 +52,8 @@ int main(int argc, const char* argv[])
     {
         free(tokens.items[i]);
     }
-
-    // interpreting
-    interpreter in = {
-        .program = {
-            .instructions = (uint32_t*) malloc(sizeof(uint32_t) * 1000),
-            .size         = 0,
-            .constants    = (TValue*) malloc(sizeof(TValue) * MAX_CONSTANTS),
-            .source       = src,
-            .translator = {
-                .sp = 0,
-                .constant_table = map_new(23),
-                .symbol_table = map_new(23),
-            },
-            .prev = NULL,
-        },
-        .vm = {
-            .top       = 0,
-            .ccall     = NULL,
-            .calls     = (call_info*) malloc(sizeof(call_info) * MAX_CALLS),
-            .registers = (TValue*) malloc(sizeof(TValue) * MAX_REGISTERS),
-            .heap      = (TValue*) malloc(sizeof(TValue) * MAX_HEAP_SIZE),
-        },
-    };
-
-    printf("%s Beginning translation:\n\n", MESSAGE);
-
-    translate_ast(&in.program, tree);
     
-    printf("Instructions: \n");
-    disassemble_program(&in.program);
-
-    printf("\n%s Beginning execution:\n\n", MESSAGE);
-    execute_program(&in);
-    
-    printf("\nOutput:\n");
-    for (size_t i = 0; i < in.program.translator.symbol_table.size; i++)
-    {
-        printf("Global %li = %s\n", i, TValue_tostr(&in.vm.heap[i]));
-    }
-    
-    printf("\n%sProgram has ended successfully!\n", MESSAGE);
+    printf("\n%s Program has ended successfully!\n", MESSAGE);
 
     return 0;
 }
