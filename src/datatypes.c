@@ -107,3 +107,102 @@ void* vector_rm(vector* v, size_t index)
 
     return item;   
 }
+
+void vector_delete(vector* v)
+{
+    free(v->items);
+    free(v);
+}
+
+// ----------------- STRING MAP -----------------
+
+map map_new(size_t init_capacity)
+{
+    map m = {
+        .keys = malloc(sizeof(const char*) * init_capacity),
+        .values = malloc(sizeof(void*) * init_capacity),
+        .size = 0,
+        .capacity = init_capacity
+    };
+    return m;
+}
+
+void* map_get(map* m, const char* key)
+{
+    for (size_t i = 0; i < m->size; i++) {
+        if (streq(key, m->keys[i])) {
+            return m->values[i];
+        }
+    }
+    return NULL;
+}
+
+void map_put(map* m, const char* key, void* value)
+{
+    for (size_t i = 0; i < m->size; i++) {
+        if (streq(key, m->keys[i])) {
+            m->values[i] = value;
+            return;
+        }
+    }
+
+    if (m->size == m->capacity) {
+        map_resize(m, m->capacity * 2);
+    }
+
+    m->keys[m->size] = key;
+    m->values[m->size++] = value;
+}
+
+void* map_rm(map* m, const char* key)
+{
+    void* out = NULL;
+    for (size_t i = 0; i < m->size; i++) {
+        if (streq(key, m->keys[i])) {
+            out = m->values[i];
+            m->size--;
+        }
+        if (out) {
+            m->keys[i] = m->keys[i + 1];
+            m->values[i] = m->values[i + 1];
+        }
+    }
+
+    m->keys[m->size] = NULL;
+    m->values[m->size] = NULL;
+
+    if (m->size < m->capacity / 4) {
+        map_resize(m, m->capacity / 2);
+    }
+
+    return out;
+}
+
+boolean map_has(map* m, const char* key)
+{
+    for (size_t i = 0; i < m->size; i++) {
+        if (streq(key, m->keys[i])) {
+            return true;
+        }
+    }
+    return false;
+}
+
+void map_resize(map* m, size_t new_capacity)
+{
+    const char** keys = realloc(m->keys, sizeof(const char*) * new_capacity);
+    void** values = realloc(m->values, sizeof(void*) * new_capacity);
+
+    if (keys && values) {
+        m->keys = keys;
+        m->values = values;
+        m->capacity = new_capacity;
+    }
+}
+
+void map_delete(map* m)
+{
+    free(m->keys);
+    free(m->values);
+    free(m);
+}

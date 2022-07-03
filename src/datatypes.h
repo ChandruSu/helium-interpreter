@@ -96,4 +96,87 @@ void vector_insert(vector* v, size_t index, void* item);
  */
 void* vector_rm(vector* v, size_t index);
 
+/**
+ * @brief Deletes the vector object and deallocates the space 
+ *      allocated to store it's items.
+ * 
+ * @param v Reference to vector
+ */
+void vector_delete(vector* v);
+
+// ----------------- STRING MAP -----------------
+
+typedef struct map {
+    const char** keys;
+    void** values;
+    size_t size;
+    size_t capacity;
+} map;
+
+/**
+ * @brief Map constructor allocates space for an empty 
+ *      string map.
+ * 
+ * @param init_capacity Initial size of map
+ * @return Map object
+ */
+map map_new(size_t init_capacity);
+
+/**
+ * @brief Fetches a map value by key, returns NULL if key is
+ *      not present in the map.
+ * 
+ * @param m Reference to map
+ * @param key Key
+ * @return Value
+ */
+void* map_get(map* m, const char* key);
+
+/**
+ * @brief Inserts a new key-value entry to the end of the string
+ *       map and resizes the map if necessary.
+ * 
+ * @param m Reference to map
+ * @param key Key
+ * @param value Value
+ */
+void map_put(map* m, const char* key, void* value);
+
+/**
+ * @brief Removes and returns an entry from the map by key and 
+ *      shifts remaining entries to fill empty space. Returns NULL if
+ *      key is not present in map.
+ * 
+ * @param m Reference to map
+ * @param key Key of entry to remove
+ * @return Value
+ */
+void* map_rm(map* m, const char* key);
+
+/**
+ * @brief Returns true if a specified key exists in the map, returns
+ *      false otherwise.
+ * 
+ * @param m Reference to map
+ * @param key Key to search
+ * @return True if map contains key, false otherwise 
+ */
+boolean map_has(map* m, const char* key);
+
+/**
+ * @brief Resizes map to contain a specified number of entries.
+ * 
+ * @param m Reference to map
+ * @param new_capacity New max size of map
+ */
+void map_resize(map* m, size_t new_capacity);
+
+/**
+ * @brief Deletes the map object and deallocates the space 
+ *      allocated to store it's entries.
+ * 
+ * @param m Reference to map
+ */
+void map_delete(map* m);
+
 #endif
