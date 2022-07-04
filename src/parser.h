@@ -94,21 +94,43 @@ void parsererror(parser* p, const char* msg);
  *      to be interpreted.
  * 
  * @param p Reference to parser
- * @return Root node of AST
+ * @return Root AST node
  */
 astnode* parse(parser* p);
 
+/**
+ * @brief Parses multiple statements until a terminal token is hit
+ *      and returns a vector node containing each statement.
+ * 
+ * @param p Reference to parser
+ * @param terminal Terminal token
+ * @return AST node
+ */
 astnode* parse_block(parser* p, lxtype terminal);
 
+/**
+ * @brief Parses single-line statements i.e variable assignments,
+ *      function declarations, function calls etc. 
+ * 
+ * @param p Reference to parser
+ * @return AST node
+ */
 astnode* parse_statement(parser* p);
 
+/**
+ * @brief Parses funcion definition into a syntax node with argument
+ *      symbols and definition block.
+ * 
+ * @param p Reference to parser
+ * @return AST node
+ */
 astnode* parse_function_definition(parser* p);
 
 /**
  * @brief Parses expression tokens into an abstract syntax tree.
  * 
  * @param p Reference to parser
- * @return Abstract syntax tree
+ * @return AST node
  */
 astnode* parse_expression(parser* p);
 
@@ -118,7 +140,7 @@ astnode* parse_expression(parser* p);
  *      expressions.
  * 
  * @param p Reference to parser
- * @return Abstract syntax tree 
+ * @return AST node
  */
 astnode* parse_primary(parser* p);
 
@@ -126,8 +148,8 @@ astnode* parse_primary(parser* p);
  * @brief Parses a function call expression primary including
  *      argument expressions.
  * 
- * @param p 
- * @return astnode* 
+ * @param p Reference to parser
+ * @return AST node
  */
 astnode* parse_function_call(parser* p);
 

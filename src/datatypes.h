@@ -98,7 +98,8 @@ void* vector_rm(vector* v, size_t index);
 
 /**
  * @brief Deletes the vector object and deallocates the space 
- *      allocated to store it's items.
+ *      allocated to store it's items. Map must be heap allocated 
+ *      or else segmentation fault will occur.
  * 
  * @param v Reference to vector
  */
@@ -173,7 +174,8 @@ void map_resize(map* m, size_t new_capacity);
 
 /**
  * @brief Deletes the map object and deallocates the space 
- *      allocated to store it's entries.
+ *      allocated to store it's entries. Map must be heap
+ *      allocated or else segmentation fault will occur.
  * 
  * @param m Reference to map
  */

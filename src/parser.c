@@ -51,7 +51,8 @@ boolean is_empty(parser* p)
 
 astnode* parse(parser* p)
 {
-    return parse_block(p, LX_EOF);
+    astnode* tree = parse_block(p, LX_EOF);
+    return tree;
 }
 
 astnode* parse_block(parser* p, lxtype terminal)
