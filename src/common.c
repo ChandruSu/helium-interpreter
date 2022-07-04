@@ -76,3 +76,9 @@ size_t strhash(const char *str)
 
     return hash;
 }
+
+void failure(const char* msg)
+{
+    fprintf(stderr, "%s %s\n", ERROR, msg);
+    exit(0);
+}

@@ -8,6 +8,8 @@ int main(int argc, const char* argv[])
     if (argc < 3) {
         fprintf(stderr, "%s Invalid number of arguments recieved!", ERROR);
         exit(0);
+    } else {
+        src = read_file(argv[2]);
     }
 
     printf("\n%s Reading code:\n\n%s\n", MESSAGE, src);
@@ -36,8 +38,25 @@ int main(int argc, const char* argv[])
 
     printf("\n%s Beginning compilation:\n\n", MESSAGE);
 
+    program pp = {
+        .code = malloc(sizeof(instruction) * 0xff),
+        .length = 0,
+        .constants = malloc(sizeof(Value) * 0xff),
+        .src_code = src,
+        .prev = NULL,
+
+        .constant_table = map_new(37),
+        .symbol_table = map_new(37)
+    };
     
-    compile();
+    compile(&pp, tree);
+
+    for (size_t i = 0; i < pp.length; i++)
+    {
+        instruction in = pp.code[i];
+        printf("%s\n", disassemble(in));
+    }
+    
     
     printf("\n%s Program has ended successfully!\n\n", MESSAGE);
     return 0;

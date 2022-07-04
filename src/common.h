@@ -65,4 +65,12 @@ const char* paddchar(char c, int n);
  */
 size_t strhash(const char *str);
 
+/**
+ * @brief Prints error message to standard error and terminates the
+ *      programmer.
+ * 
+ * @param msg Error message
+ */
+void failure(const char* msg);
+
 #endif

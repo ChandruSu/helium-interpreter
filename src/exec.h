@@ -8,12 +8,15 @@
 
 // ------------------ VM TYPES ------------------
 
+typedef struct program program;
+
 typedef enum vm_type {
+    VM_NULL,
     VM_INT,
     VM_BOOL,
     VM_FLOAT,
     VM_STRING,
-    VM_POINTER,
+    VM_PROGRAM,
 } vm_type;
 
 typedef struct Value {
@@ -23,21 +26,45 @@ typedef struct Value {
         int32_t to_int;
         float to_float;
         const char* to_str;
-        void* to_pointer;
+        program* to_code;
     } value;
 } Value;
+
+Value value_from_node(astnode* node);
+
+const char* value_to_str(Value* v);
+
+Value* vNull();
+Value* vInt(int i);
+Value* vFloat(program* p);
+Value* vString(const char* s);
+Value* vBool(boolean b);
+Value* vCode(program* p);
 
 // ------------------- VM IR --------------------
 
 typedef enum vm_op {
-    OP_ADD,
+    OP_ADD,             // 0
     OP_SUB,
     OP_MUL,
     OP_DIV,
-    OP_LOADK,
+    OP_NEG,             // 4
+    OP_PUSHK,
+    OP_STORG,
+    OP_LOADG,
 } vm_op;
 
+typedef enum vm_scope {
+    VM_LOCAL_SCOPE,
+    VM_GLOBAL_SCOPE,
+    VM_CLOSED_SCOPE,
+} vm_scope;
+
 typedef union instruction {
+    struct {
+        vm_op op;
+    } stackop;
+    
     struct {
         vm_op op;
         uint8_t r0;
@@ -47,15 +74,13 @@ typedef union instruction {
 
     struct {
         vm_op op;
-        uint8_t r0;
         uint16_t ux;
-    } r0ux;
+    } ux;
     
     struct {
         vm_op op;
-        uint8_t r0;
         int16_t sx;
-    } r0sx;
+    } sx;
 
     uint32_t bits;
 } instruction;
@@ -66,6 +91,9 @@ typedef struct program {
     Value* constants;
     struct program* prev;
     const char* src_code;
+
+    map symbol_table;
+    map constant_table;
 } program;
 
 void compile(program* p, astnode* root);
@@ -76,7 +104,17 @@ void compile_assignment(program* p, astnode* s);
 
 void compile_expression(program* p, astnode* expression);
 
+void compile_call(program* p, astnode* call);
+
 void compilererr(program* p, lxpos pos, const char* msg);
+
+size_t register_constant(program* p, Value v);
+
+size_t register_variable(program* p, const char* name, vm_scope* scope);
+
+size_t dereference_variable(program* p, const char* name, vm_scope* scope);
+
+const char* disassemble(instruction i);
 
 // --------------------- VM ---------------------
 
