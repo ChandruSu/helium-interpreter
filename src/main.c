@@ -5,13 +5,7 @@ int main(int argc, const char* argv[])
 {
     const char* src;
 
-    if (argc == 3) {
-        if (streq(argv[1], "-f")) {
-            src = read_file(argv[2]);
-        } else if (streq(argv[1], "-s")) {
-            src = argv[2];
-        }
-    } else {
+    if (argc < 3) {
         fprintf(stderr, "%s Invalid number of arguments recieved!", ERROR);
         exit(0);
     }
@@ -25,9 +19,8 @@ int main(int argc, const char* argv[])
     vector tokens = vector_new(16);
     lexify(&lx, &tokens);
     
-    for (size_t i = 0; i < tokens.size; i++) {
+    for (size_t i = 0; i < tokens.size; i++)
         lxtoken_display(tokens.items[i]);
-    }
 
     // syntax parsing
     printf("\n%s Beginning syntax parsing:\n\n", MESSAGE);
@@ -40,8 +33,12 @@ int main(int argc, const char* argv[])
 
     astnode* tree = parse(&p);
     printf("%s\n", astnode_tostr(tree));
+
+    printf("\n%s Beginning compilation:\n\n", MESSAGE);
+
+    
+    compile();
     
     printf("\n%s Program has ended successfully!\n\n", MESSAGE);
-
     return 0;
 }
