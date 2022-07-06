@@ -16,11 +16,11 @@ vm_op scope_store_op_map[] = {
 
 // -------------- COMPILER METHODS --------------
 
-void compile(program* p, astnode* root)
+void compile(program* p, astnode* block)
 {
-    for (size_t i = 0; i < root->children.size; i++)
+    for (size_t i = 0; i < block->children.size; i++)
     {
-        compile_statement(p, vector_get(&root->children, i));
+        compile_statement(p, vector_get(&block->children, i));
     }
 }
 
