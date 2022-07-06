@@ -36,6 +36,7 @@ int main(int argc, const char* argv[])
     astnode* tree = parse(&p);
     printf("%s\n", astnode_tostr(tree));
 
+    // byte code compilation
     printf("\n%s Beginning compilation:\n\n", MESSAGE);
 
     program pp = {
@@ -51,10 +52,26 @@ int main(int argc, const char* argv[])
     };
     
     compile(&pp, tree);
+    printf(disassemble_program(&pp));
+    
+    // execution
+    printf("\n%s Beginning bytecode execution:\n\n", MESSAGE);
+    
+    virtual_machine vm = {
+        .ci = -1,
+        .call_stack = malloc(sizeof(call_info) * 32),
+        .heap = malloc(sizeof(Value) * 0xff),
+        .stack = malloc(sizeof(Value) * 0xff),
+    };
 
-    printf("%s", disassemble_program(&pp));
+    run_program(&vm, &pp);
+
+    for (size_t i = 0; i < 0xf; i++)
+    {
+        printf("Heap %li = %s\n", i, value_to_str(&vm.heap[i]));
+    }
     
-    
+
     printf("\n%s Program has ended successfully!\n\n", MESSAGE);
     return 0;
 }

@@ -6,5 +6,6 @@
 #include "lex.h"
 #include "parser.h"
 #include "compiler.h"
+#include "vm.h"
 
 #endif
