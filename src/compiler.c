@@ -79,7 +79,35 @@ void compile_call(program* p, astnode* call)
 
 void compile_function(program* p, astnode* function)
 {
+    program* p0 = malloc(sizeof(program));
+    p0->code = malloc(sizeof(instruction) * 0xff);
+    p0->length = 0;
+    p0->constants = malloc(sizeof(Value) * 0xff);
+    p0->src_code = p->src_code;
+    p0->prev = p;
+    p0->constant_table = map_new(37);
+    p0->symbol_table = map_new(37);
 
+    // register parameter names
+    astnode* params = vector_get(&function->children, 0);
+    for (p0->argc = 0; p0->argc < params->children.size; p0->argc++)
+    {
+        vm_scope scope;
+        astnode* param = vector_get(&params->children, p0->argc);
+        register_variable_unique(p0, param->value, &scope);  
+    
+        if (scope == VM_DUPLICATE_IN_SCOPE) {
+            compilererr(p0, param->pos, "Duplicate variable name in function definition!");
+        }
+    }
+
+    // compiles program code
+    compile(p0, vector_get(&function->children, 1));;
+
+    // stores code object as local constant
+    p->code[p->length].ux.op = OP_PUSHK;
+    p->code[p->length].ux.ux = register_constant(p, *vCode(p0));
+    p->length++;
 }
 
 void compile_expression(program* p, astnode* expression)
@@ -155,6 +183,21 @@ int16_t register_variable(program* p, const char* name, vm_scope* scope)
     }
 }
 
+int16_t register_variable_unique(program* p, const char* name, vm_scope* scope)
+{
+    size_t address = dereference_variable(p, name, scope);
+
+    if (*scope == VM_UNKNOWN_SCOPE) {
+        Value* a = vInt(p->symbol_table.size);
+        map_put(&p->symbol_table, name, a);
+        *scope = p->prev == NULL ? VM_GLOBAL_SCOPE : VM_LOCAL_SCOPE;
+        return a->value.to_int;
+    } else {
+        *scope = VM_DUPLICATE_IN_SCOPE;
+        return address;
+    }
+}
+
 int16_t dereference_variable(program* p, const char* name, vm_scope* scope)
 {
     Value* address = map_get(&p->symbol_table, name);
@@ -212,8 +255,39 @@ const char* operation_strings[] = {
     "OP_CALL     ",
 };
 
+const char* disassemble_program(program* p) 
+{
+    char* buf = malloc(sizeof(char) * 32 * 100);
+    buf[0] = '\0';
+
+    // disassembles instructions
+    for (size_t i = 0; i < p->length; i++)
+    {
+        strcat(buf, "\t");
+        strcat(buf, disassemble(p, p->code[i]));
+        strcat(buf, "\n");
+    }
+    strcat(buf, "\n");
+
+    for (size_t i = 0; i < p->constant_table.size; i++)
+    {
+        Value* index = p->constant_table.values[i];
+        Value program = p->constants[index->value.to_int];
+
+        if (program.type == VM_PROGRAM)
+        {
+            strcat(buf, value_to_str(&program));
+            strcat(buf, ":\n");
+            strcat(buf, disassemble_program(p->constants[index->value.to_int].value.to_code));
+            strcat(buf, "\n");
+        }
+    }
+    
+    return buf;
+}
+
 const char* disassemble(program* p, instruction i) {
-    char* buf = malloc(sizeof(char) * 64);
+    char* buf = malloc(sizeof(char) * 32);
 
     switch (i.stackop.op)
     {
@@ -233,11 +307,13 @@ const char* disassemble(program* p, instruction i) {
         
         case OP_STORG:
         case OP_LOADG:
+            // uses global program to decode symbols
+            while (p->prev != NULL) p = p->prev;
         case OP_STORL:
         case OP_LOADL:
             const char* vname;
 
-            // decodes reference name in symbol table
+            // decodes reference name in local symbol table
             for (size_t i0 = 0; i0 < p->symbol_table.size; i0++) {
                 if (((Value*)p->symbol_table.values[i0])->value.to_int == i.sx.sx) {
                     vname = p->symbol_table.keys[i0];

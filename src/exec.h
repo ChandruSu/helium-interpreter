@@ -62,6 +62,7 @@ typedef enum vm_scope {
     VM_GLOBAL_SCOPE,
     VM_CLOSED_SCOPE,
     VM_UNKNOWN_SCOPE,
+    VM_DUPLICATE_IN_SCOPE,
 } vm_scope;
 
 typedef union instruction {
@@ -92,6 +93,7 @@ typedef union instruction {
 typedef struct program {
     instruction* code;
     size_t length;
+    size_t argc;
     Value* constants;
     struct program* prev;
     const char* src_code;
@@ -118,7 +120,11 @@ uint16_t register_constant(program* p, Value v);
 
 int16_t register_variable(program* p, const char* name, vm_scope* scope);
 
+int16_t register_variable_unique(program* p, const char* name, vm_scope* scope);
+
 int16_t dereference_variable(program* p, const char* name, vm_scope* scope);
+
+const char* disassemble_program(program* p);
 
 const char* disassemble(program* p, instruction i);
 

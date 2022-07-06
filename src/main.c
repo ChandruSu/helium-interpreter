@@ -41,6 +41,7 @@ int main(int argc, const char* argv[])
     program pp = {
         .code = malloc(sizeof(instruction) * 0xff),
         .length = 0,
+        .argc = 0,
         .constants = malloc(sizeof(Value) * 0xff),
         .src_code = src,
         .prev = NULL,
@@ -51,11 +52,7 @@ int main(int argc, const char* argv[])
     
     compile(&pp, tree);
 
-    for (size_t i = 0; i < pp.length; i++)
-    {
-        instruction in = pp.code[i];
-        printf("%s\n", disassemble(&pp, in));
-    }
+    printf("%s", disassemble_program(&pp));
     
     
     printf("\n%s Program has ended successfully!\n\n", MESSAGE);
