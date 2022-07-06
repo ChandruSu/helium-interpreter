@@ -94,6 +94,12 @@ astnode* parse_statement(parser* p)
             st = parse_function_call(p);
             break;
 
+        case LX_RETURN:
+            eat(p);
+            st->type = AST_RETURN;
+            vector_push(&st->children, parse_expression(p));
+            break;
+
         default:
             parsererror(p, "Invalid statement!");
             break;

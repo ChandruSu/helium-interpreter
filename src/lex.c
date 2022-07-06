@@ -25,6 +25,7 @@ const char* lxtype_strings[] = {
     "LX_SEPARATOR        ",
     "LX_BOOL             ",
     "LX_NULL             ",
+    "LX_RETURN           ",
 };
 
 lxtoken* lxtoken_new(const char* value, lxtype type, lxpos pos)
@@ -204,6 +205,8 @@ lxtype determine_nature(char* s)
         type = LX_BOOL;
     } else if (streq(s, "null")) {
         type = LX_NULL;
+    } else if (streq(s, "return")) {
+        type = LX_RETURN;
     }
 
     return type;

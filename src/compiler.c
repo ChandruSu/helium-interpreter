@@ -5,15 +5,13 @@ vm_op decode_op(const char* operator);
 vm_op scope_load_op_map[] = {
     OP_LOADL,
     OP_LOADG,
-    OP_LOADG,
-    OP_LOADG,
+    OP_NOP,
 };
 
 vm_op scope_store_op_map[] = {
     OP_STORL,
     OP_STORG,
-    OP_STORG,
-    OP_STORG,
+    OP_NOP,
 };
 
 // -------------- COMPILER METHODS --------------
@@ -36,6 +34,15 @@ void compile_statement(program* p, astnode* statement)
         
         case AST_CALL:
             compile_call(p, statement);
+            break;
+        
+        case AST_RETURN:
+            if (p->prev == NULL) {
+                compilererr(p, statement->pos, "Cannot use return statement in global scope!");
+            }
+
+            compile_expression(p, vector_get(&statement->children, 0));
+            p->code[p->length++].stackop.op = OP_RET;
             break;
         
         default:
@@ -94,7 +101,7 @@ void compile_function(program* p, astnode* function)
     {
         vm_scope scope;
         astnode* param = vector_get(&params->children, p0->argc);
-        register_variable_unique(p0, param->value, &scope);  
+        register_unique_variable_local(p0, param->value, &scope);  
     
         if (scope == VM_DUPLICATE_IN_SCOPE) {
             compilererr(p0, param->pos, "Duplicate variable name in function definition!");
@@ -183,18 +190,18 @@ int16_t register_variable(program* p, const char* name, vm_scope* scope)
     }
 }
 
-int16_t register_variable_unique(program* p, const char* name, vm_scope* scope)
+int16_t register_unique_variable_local(program* p, const char* name, vm_scope* scope)
 {
-    size_t address = dereference_variable(p, name, scope);
+    Value* address = map_get(&p->symbol_table, name);
 
-    if (*scope == VM_UNKNOWN_SCOPE) {
-        Value* a = vInt(p->symbol_table.size);
-        map_put(&p->symbol_table, name, a);
+    if (address == NULL) {
+        address = vInt(p->symbol_table.size);
+        map_put(&p->symbol_table, name, address);
         *scope = p->prev == NULL ? VM_GLOBAL_SCOPE : VM_LOCAL_SCOPE;
-        return a->value.to_int;
+        return address->value.to_int;
     } else {
         *scope = VM_DUPLICATE_IN_SCOPE;
-        return address;
+        return address->value.to_int;
     }
 }
 
@@ -242,17 +249,19 @@ vm_op decode_op(const char* operator)
 }
 
 const char* operation_strings[] = {
-    "OP_ADD      ",            // 0
+    "OP_NOP      ",             // 0
+    "OP_ADD      ",
     "OP_SUB      ",
     "OP_MUL      ",
-    "OP_DIV      ",
-    "OP_NEG      ",            // 4
+    "OP_DIV      ",             // 4
+    "OP_NEG      ",
     "OP_PUSHK    ",
     "OP_STORG    ",
-    "OP_LOADG    ",
-    "OP_STORL    ",            // 8
+    "OP_LOADG    ",             // 8
+    "OP_STORL    ",
     "OP_LOADL    ",
     "OP_CALL     ",
+    "OP_RET      ",             // 12
 };
 
 const char* disassemble_program(program* p) 
@@ -267,7 +276,6 @@ const char* disassemble_program(program* p)
         strcat(buf, disassemble(p, p->code[i]));
         strcat(buf, "\n");
     }
-    strcat(buf, "\n");
 
     for (size_t i = 0; i < p->constant_table.size; i++)
     {
@@ -276,10 +284,10 @@ const char* disassemble_program(program* p)
 
         if (program.type == VM_PROGRAM)
         {
+            strcat(buf, "\n");
             strcat(buf, value_to_str(&program));
             strcat(buf, ":\n");
             strcat(buf, disassemble_program(p->constants[index->value.to_int].value.to_code));
-            strcat(buf, "\n");
         }
     }
     
@@ -297,6 +305,8 @@ const char* disassemble(program* p, instruction i) {
         case OP_DIV:
         case OP_NEG:
         case OP_CALL:
+        case OP_RET:
+        case OP_NOP:
             sprintf(buf, "%s", operation_strings[i.stackop.op]);
             break;
         

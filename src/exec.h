@@ -44,17 +44,19 @@ Value* vCode(program* p);
 // ------------------- VM IR --------------------
 
 typedef enum vm_op {
-    OP_ADD,             // 0
+    OP_NOP,             // 0
+    OP_ADD,
     OP_SUB,
     OP_MUL,
-    OP_DIV,
-    OP_NEG,             // 4
+    OP_DIV,             // 4
+    OP_NEG,
     OP_PUSHK,
     OP_STORG,
-    OP_LOADG,
-    OP_STORL,           // 8
+    OP_LOADG,           // 8
+    OP_STORL,
     OP_LOADL,
     OP_CALL,
+    OP_RET,             // 12
 } vm_op;
 
 typedef enum vm_scope {
@@ -120,7 +122,7 @@ uint16_t register_constant(program* p, Value v);
 
 int16_t register_variable(program* p, const char* name, vm_scope* scope);
 
-int16_t register_variable_unique(program* p, const char* name, vm_scope* scope);
+int16_t register_unique_variable_local(program* p, const char* name, vm_scope* scope);
 
 int16_t dereference_variable(program* p, const char* name, vm_scope* scope);
 

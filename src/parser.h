@@ -23,6 +23,7 @@ typedef enum asttype {
     AST_FUNCTION,
     AST_PARAMS,
     AST_PARAM,
+    AST_RETURN,
 } asttype;
 
 typedef struct astnode {
