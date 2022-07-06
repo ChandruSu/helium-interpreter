@@ -52,12 +52,16 @@ typedef enum vm_op {
     OP_PUSHK,
     OP_STORG,
     OP_LOADG,
+    OP_STORL,           // 8
+    OP_LOADL,
+    OP_CALL,
 } vm_op;
 
 typedef enum vm_scope {
     VM_LOCAL_SCOPE,
     VM_GLOBAL_SCOPE,
     VM_CLOSED_SCOPE,
+    VM_UNKNOWN_SCOPE,
 } vm_scope;
 
 typedef union instruction {
@@ -106,15 +110,17 @@ void compile_expression(program* p, astnode* expression);
 
 void compile_call(program* p, astnode* call);
 
+void compile_function(program* p, astnode* function);
+
 void compilererr(program* p, lxpos pos, const char* msg);
 
-size_t register_constant(program* p, Value v);
+uint16_t register_constant(program* p, Value v);
 
-size_t register_variable(program* p, const char* name, vm_scope* scope);
+int16_t register_variable(program* p, const char* name, vm_scope* scope);
 
-size_t dereference_variable(program* p, const char* name, vm_scope* scope);
+int16_t dereference_variable(program* p, const char* name, vm_scope* scope);
 
-const char* disassemble(instruction i);
+const char* disassemble(program* p, instruction i);
 
 // --------------------- VM ---------------------
 

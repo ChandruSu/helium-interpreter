@@ -54,7 +54,7 @@ int main(int argc, const char* argv[])
     for (size_t i = 0; i < pp.length; i++)
     {
         instruction in = pp.code[i];
-        printf("%s\n", disassemble(in));
+        printf("%s\n", disassemble(&pp, in));
     }
     
     

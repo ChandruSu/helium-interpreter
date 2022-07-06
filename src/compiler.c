@@ -2,6 +2,22 @@
 
 vm_op decode_op(const char* operator);
 
+vm_op scope_load_op_map[] = {
+    OP_LOADL,
+    OP_LOADG,
+    OP_LOADG,
+    OP_LOADG,
+};
+
+vm_op scope_store_op_map[] = {
+    OP_STORL,
+    OP_STORG,
+    OP_STORG,
+    OP_STORG,
+};
+
+// -------------- COMPILER METHODS --------------
+
 void compile(program* p, astnode* root)
 {
     for (size_t i = 0; i < root->children.size; i++)
@@ -30,14 +46,38 @@ void compile_statement(program* p, astnode* statement)
 void compile_assignment(program* p, astnode* s)
 {
     vm_scope scope;
+    astnode* rhs = vector_get(&s->children, 0);
 
-    compile_expression(p, vector_get(&s->children, 0));
-    p->code[p->length].ux.op = OP_STORG;
-    p->code[p->length].ux.ux = register_variable(p, s->value, &scope);
+    if (rhs->type == AST_FUNCTION)
+        compile_function(p, rhs);
+    else
+        compile_expression(p, rhs);
+
+    p->code[p->length].sx.sx = register_variable(p, s->value, &scope);
+    p->code[p->length].sx.op = scope_store_op_map[scope];
     p->length++;
 }
 
 void compile_call(program* p, astnode* call)
+{
+    for (size_t i = 0; i < call->children.size; i++)
+    {
+        compile_expression(p, vector_get(&call->children, i));   
+    }
+    
+    vm_scope scope;
+    p->code[p->length].sx.sx = dereference_variable(p, call->value, &scope);
+    p->code[p->length].sx.op = scope_load_op_map[scope];
+    p->length++;
+
+    if (scope == VM_UNKNOWN_SCOPE) {
+        compilererr(p, call->pos, "Unknown function name!");
+    }
+
+    p->code[p->length++].stackop.op = OP_CALL;
+}
+
+void compile_function(program* p, astnode* function)
 {
 
 }
@@ -65,6 +105,13 @@ void compile_expression(program* p, astnode* expression)
             break;
         
         case AST_REFERENCE:
+            vm_scope scope;
+            p->code[p->length].sx.sx = dereference_variable(p, expression->value, &scope);
+            p->code[p->length].sx.op = scope_load_op_map[scope];
+            p->length++;
+
+            if (scope == VM_UNKNOWN_SCOPE)
+                compilererr(p, expression->pos, "Unknown variable name!");
             break;
 
         case AST_INTEGER:
@@ -80,16 +127,13 @@ void compile_expression(program* p, astnode* expression)
 
 // ---------------- MEMORY STORE ----------------
 
-size_t register_constant(program* p, Value v)
+uint16_t register_constant(program* p, Value v)
 {
     Value* address;
 
     if ((address = map_get(&p->constant_table, value_to_str(&v))) == NULL) 
     {
-        address = malloc(sizeof(Value));
-        address->type = VM_INT;
-        address->value.to_int = p->constant_table.size;
-        
+        address = vInt(p->constant_table.size);
         map_put(&p->constant_table, value_to_str(&v), address);
         p->constants[address->value.to_int] = v;
     }
@@ -97,19 +141,21 @@ size_t register_constant(program* p, Value v)
     return address->value.to_int;
 }
 
-size_t register_variable(program* p, const char* name, vm_scope* scope)
+int16_t register_variable(program* p, const char* name, vm_scope* scope)
 {
     size_t address = dereference_variable(p, name, scope);
 
-    if (address == (-1UL)) {
-        Value* a = malloc(sizeof(Value));
-        
+    if (*scope == VM_UNKNOWN_SCOPE) {
+        Value* a = vInt(p->symbol_table.size);
+        map_put(&p->symbol_table, name, a);
+        *scope = p->prev == NULL ? VM_GLOBAL_SCOPE : VM_LOCAL_SCOPE;
+        return a->value.to_int;
     } else {
         return address;
     }
 }
 
-size_t dereference_variable(program* p, const char* name, vm_scope* scope)
+int16_t dereference_variable(program* p, const char* name, vm_scope* scope)
 {
     Value* address = map_get(&p->symbol_table, name);
     program* p0 = p;
@@ -121,7 +167,10 @@ size_t dereference_variable(program* p, const char* name, vm_scope* scope)
     }
 
     // determines scope of variable
-    if (p0->prev == NULL) {
+    if (address == NULL) {
+        *scope = VM_UNKNOWN_SCOPE;
+        return 0;
+    } else if (p0->prev == NULL) {
         *scope = VM_GLOBAL_SCOPE;
     } else if (p0 == p) {
         *scope = VM_LOCAL_SCOPE;
@@ -129,7 +178,7 @@ size_t dereference_variable(program* p, const char* name, vm_scope* scope)
         *scope = VM_CLOSED_SCOPE;
     }
     
-    return address == NULL ? -1 : address->value.to_int;
+    return address->value.to_int;
 }
 
 // ------------------- UTILS --------------------
@@ -150,17 +199,20 @@ vm_op decode_op(const char* operator)
 }
 
 const char* operation_strings[] = {
-    "ADD     ",
-    "SUB     ",
-    "MUL     ",
-    "DIV     ",
-    "NEG     ",
-    "PUSHK   ",
-    "STORG   ",
-    "LOADG   ",
+    "OP_ADD      ",            // 0
+    "OP_SUB      ",
+    "OP_MUL      ",
+    "OP_DIV      ",
+    "OP_NEG      ",            // 4
+    "OP_PUSHK    ",
+    "OP_STORG    ",
+    "OP_LOADG    ",
+    "OP_STORL    ",            // 8
+    "OP_LOADL    ",
+    "OP_CALL     ",
 };
 
-const char* disassemble(instruction i) {
+const char* disassemble(program* p, instruction i) {
     char* buf = malloc(sizeof(char) * 64);
 
     switch (i.stackop.op)
@@ -170,13 +222,30 @@ const char* disassemble(instruction i) {
         case OP_MUL:
         case OP_DIV:
         case OP_NEG:
+        case OP_CALL:
             sprintf(buf, "%s", operation_strings[i.stackop.op]);
             break;
         
         case OP_PUSHK:
+            Value c = p->constants[i.ux.ux];
+            sprintf(buf, "%s %u (%s)", operation_strings[i.stackop.op], i.ux.ux, value_to_str(&c));
+            break;
+        
         case OP_STORG:
         case OP_LOADG:
-            sprintf(buf, "%s %u", operation_strings[i.stackop.op], i.ux.ux);
+        case OP_STORL:
+        case OP_LOADL:
+            const char* vname;
+
+            // decodes reference name in symbol table
+            for (size_t i0 = 0; i0 < p->symbol_table.size; i0++) {
+                if (((Value*)p->symbol_table.values[i0])->value.to_int == i.sx.sx) {
+                    vname = p->symbol_table.keys[i0];
+                    break;
+                }
+            }
+            
+            sprintf(buf, "%s %i (%s)", operation_strings[i.sx.op], i.sx.sx, vname);
             break;
 
         default:
