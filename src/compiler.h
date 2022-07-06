@@ -1,5 +1,5 @@
-#ifndef HE_EXECUTION_H
-#define HE_EXECUTION_H
+#ifndef HE_EXECUTION_HEADER
+#define HE_EXECUTION_HEADER
 
 #include <stdint.h>
 #include "common.h"
@@ -284,18 +284,5 @@ const char* disassemble_program(program* p);
  * @return String
  */
 const char* disassemble(program* p, instruction i);
-
-// --------------------- VM ---------------------
-
-typedef struct vm {
-    size_t bp;
-    size_t sp;
-    size_t tp;
-    size_t ci;
-    vector call_stack;
-    Value* heap;
-    Value* stack;
-} vm;
-
 
 #endif

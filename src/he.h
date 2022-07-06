@@ -3,8 +3,8 @@
 
 #include "common.h"
 #include "datatypes.h"
-#include "exec.h"
 #include "lex.h"
 #include "parser.h"
+#include "compiler.h"
 
 #endif
