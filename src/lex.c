@@ -158,6 +158,7 @@ lxtoken* lex(lexer* lx)
                 break;
             case '#':
                 type = LX_COMMENT;
+                while (lx->lookahead != '\n') lexadvance(lx);
                 break;
             case '@':
                 type = LX_CALL;

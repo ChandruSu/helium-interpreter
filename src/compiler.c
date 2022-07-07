@@ -375,6 +375,7 @@ const char* disassemble(program* p, instruction i) {
         case OP_CALL:
             sprintf(buf, "%s %u", operation_strings[i.stackop.op], i.ux.ux);
             break;
+        
         case OP_PUSHK:
             Value c = p->constants[i.ux.ux];
             sprintf(buf, "%s %u (%s)", operation_strings[i.stackop.op], i.ux.ux, value_to_str(&c));
@@ -384,6 +385,7 @@ const char* disassemble(program* p, instruction i) {
         case OP_LOADG:
             // uses global program to decode symbols
             while (p->prev != NULL) p = p->prev;
+        
         case OP_STORL:
         case OP_LOADL:
             const char* vname;
