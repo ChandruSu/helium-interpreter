@@ -112,6 +112,12 @@ void compile_function(program* p, astnode* function)
     // compiles program code
     compile(p0, vector_get(&function->children, 1));;
 
+    if (p0->code[p0->length-1].stackop.op != OP_RET) {
+        p0->code[p0->length].ux.op = OP_PUSHK;
+        p0->code[p0->length++].ux.ux = register_constant(p0, *vNull());
+        p0->code[p0->length++].stackop.op = OP_RET;
+    }
+
     // stores code object as local constant
     p->code[p->length].ux.op = OP_PUSHK;
     p->code[p->length].ux.ux = register_constant(p, *vCode(p0));
