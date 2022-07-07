@@ -95,6 +95,10 @@ void decode_execute(virtual_machine* vm, instruction i)
             vm->stack[call->prev->tp++] = vm->stack[--call->tp];
             break;
         
+        case OP_POP:
+            call->tp--;
+            break;
+        
         default:
             fprintf(stderr, "%s Failed to decode instruction: %s\n", ERROR, disassemble(vm->call_stack[vm->ci].program, i));
             exit(0);

@@ -104,6 +104,7 @@ typedef enum vm_op {
     OP_LOADL,
     OP_CALL,
     OP_RET,             // 12
+    OP_POP,
 } vm_op;
 
 typedef enum vm_scope {

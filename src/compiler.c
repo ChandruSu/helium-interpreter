@@ -34,6 +34,7 @@ void compile_statement(program* p, astnode* statement)
         
         case AST_CALL:
             compile_call(p, statement);
+            p->code[p->length++].stackop.op = OP_POP;
             break;
         
         case AST_RETURN:
@@ -262,6 +263,7 @@ const char* operation_strings[] = {
     "OP_LOADL    ",
     "OP_CALL     ",
     "OP_RET      ",             // 12
+    "OP_POP      ",
 };
 
 const char* disassemble_program(program* p) 
@@ -306,6 +308,7 @@ const char* disassemble(program* p, instruction i) {
         case OP_NEG:
         case OP_CALL:
         case OP_RET:
+        case OP_POP:
         case OP_NOP:
             sprintf(buf, "%s", operation_strings[i.stackop.op]);
             break;
