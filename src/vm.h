@@ -22,8 +22,22 @@ typedef struct virtual_machine {
     Value* stack;
 } virtual_machine;
 
+/**
+ * @brief Runs program or code object by pushing new call info
+ *      to call stack and simulating stack frame on vm stack.
+ * 
+ * @param vm Reference to virtual machine
+ * @param p Program to run
+ */
 void run_program(virtual_machine* vm, program* p);
 
+/**
+ * @brief Decodes instruction and executes it using the current
+ *      call information and virtual machine context.
+ * 
+ * @param vm 
+ * @param i 
+ */
 void decode_execute(virtual_machine* vm, instruction i);
 
 #endif
