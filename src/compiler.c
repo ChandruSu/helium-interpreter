@@ -296,8 +296,9 @@ vm_op decode_binary_op(const char* operator)
         return OP_GT;
     else if (streq(operator, ">="))
         return OP_GE;
-    else
-        failure("Failed to decode operator!");
+    else {
+        failure("Failed to decode binary operator!");
+    }
     return OP_NOP;
 }
 
@@ -310,7 +311,7 @@ vm_op decode_unary_op(const char* operator)
     else if (streq(operator, "!"))
         return OP_NOT;
     else
-        failure("Failed to decode operator!");
+        failure("Failed to decode unary operator!");
     return OP_NOP;
 }
 

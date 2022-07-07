@@ -1,5 +1,6 @@
 #include "he.h"
 
+#define HE_DEBUG 1
 
 int main(int argc, const char* argv[])
 {
@@ -12,20 +13,22 @@ int main(int argc, const char* argv[])
         src = read_file(argv[2]);
     }
 
+    #if HE_DEBUG
     printf("\n%s Reading code:\n\n%s\n", MESSAGE, src);
 
-    // lexical analysis
     printf("%s Beginning lexical anaylsis:\n\n", MESSAGE);
+    #endif
 
     lexer lx = lexer_new(src);
     vector tokens = vector_new(16);
     lexify(&lx, &tokens);
     
+    #if HE_DEBUG
     for (size_t i = 0; i < tokens.size; i++)
         lxtoken_display(tokens.items[i]);
 
-    // syntax parsing
     printf("\n%s Beginning syntax parsing:\n\n", MESSAGE);
+    #endif
 
     parser p = {
         .position = 0,
@@ -34,10 +37,12 @@ int main(int argc, const char* argv[])
     };
 
     astnode* tree = parse(&p);
+    
+    #if HE_DEBUG
     printf("%s\n", astnode_tostr(tree));
 
-    // byte code compilation
     printf("\n%s Beginning compilation:\n\n", MESSAGE);
+    #endif
 
     program pp = {
         .code = malloc(sizeof(instruction) * 0xff),
@@ -52,16 +57,18 @@ int main(int argc, const char* argv[])
     };
     
     compile(&pp, tree);
+
+    #if HE_DEBUG
     printf(disassemble_program(&pp));
     
-    // execution
     printf("\n%s Beginning bytecode execution:\n\n", MESSAGE);
+    #endif
     
     virtual_machine vm = {
         .ci = -1,
-        .call_stack = malloc(sizeof(call_info) * 32),
-        .heap = malloc(sizeof(Value) * 0xff),
-        .stack = malloc(sizeof(Value) * 0xff),
+        .call_stack = malloc(sizeof(call_info) * MAX_CALL_STACK),
+        .heap = malloc(sizeof(Value) * MAX_HEAP_SIZE),
+        .stack = malloc(sizeof(Value) * MAX_STACK_SIZE),
     };
 
     run_program(&vm, &pp);
@@ -78,6 +85,9 @@ int main(int argc, const char* argv[])
         printf("Heap %li = %s\n", i, value_to_str(&vm.heap[i]));
     }
 
+    #if HE_DEBUG
     printf("\n%s Program has ended successfully!\n\n", MESSAGE);
+    #endif
+
     return 0;
 }

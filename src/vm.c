@@ -17,6 +17,12 @@ void run_program(virtual_machine* vm, program* p)
 
     vm->call_stack[++vm->ci] = call;
 
+    if (vm->ci >= MAX_CALL_STACK) {
+        failure("Function call limit reached!");
+    } else if (call.tp >= MAX_STACK_SIZE) {
+        failure("Stack overflow!");
+    }
+
     while (call.pc < p->length)
     {
         decode_execute(vm, &call, call.program->code[call.pc]);
@@ -34,7 +40,7 @@ void run_program(virtual_machine* vm, program* p)
 void decode_execute(virtual_machine* vm, call_info* call, instruction i)
 {
     Value v0, v1;
-    
+
     switch (i.stackop.op)
     {
         case OP_NOP: break;
@@ -66,22 +72,32 @@ void decode_execute(virtual_machine* vm, call_info* call, instruction i)
 
         case OP_PUSHK:
             vm->stack[call->tp++] = call->program->constants[i.ux.ux];
+            
+            if (call->tp >= MAX_STACK_SIZE) failure("Stack overflow!");
             break;
 
         case OP_STORG:
             vm->heap[i.sx.sx] = vm->stack[--call->tp];
+
+            if (i.sx.sx >= MAX_HEAP_SIZE) failure("Stack overflow!");
             break;
 
         case OP_LOADG:
             vm->stack[call->tp++] = vm->heap[i.sx.sx];
+
+            if (call->tp >= MAX_STACK_SIZE) failure("Stack overflow!");
             break;
         
         case OP_STORL:
             vm->stack[call->bp + i.sx.sx] = vm->stack[--call->tp];
+
+            if (call->bp + i.sx.sx >= MAX_STACK_SIZE) failure("Stack overflow!");
             break;
         
         case OP_LOADL:
             vm->stack[call->tp++] = vm->stack[call->bp + i.sx.sx];
+
+            if (call->tp >= MAX_STACK_SIZE) failure("Stack overflow!");
             break;
 
         case OP_CALL:
@@ -128,7 +144,6 @@ Value apply_vm_op(vm_op op, Value v0, Value v1)
         case OP_MUL: return *vInt(v0.value.to_int * v1.value.to_int);
         case OP_DIV: return *vInt(v0.value.to_int / v1.value.to_int);
         case OP_MOD: return *vInt(v0.value.to_int % v1.value.to_int);
-        
         case OP_AND: return *vBool(v0.value.to_bool && v1.value.to_bool);
         case OP_OR: return *vBool(v0.value.to_bool || v1.value.to_bool);
         case OP_EQ: return *vBool(v0.value.to_int == v1.value.to_int);

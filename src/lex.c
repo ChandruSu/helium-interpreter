@@ -237,11 +237,11 @@ boolean check_pattern(lexer* lx, const char* pattern, char* buf)
     }
     
     // removes characters if match found
-    while (len-- > 0) {
-        lexadvance(lx);
+    size_t i = 0;
+    
+    while (i < len) {
+        buf[i++] = lexadvance(lx);
     }
-
-    strcat(buf, pattern);
 
     return true;
 }
