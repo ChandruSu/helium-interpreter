@@ -88,7 +88,11 @@ void decode_execute(virtual_machine* vm, instruction i)
         case OP_CALL:
             program* code = vm->stack[--call->tp].value.to_code;
             call->tp -= code->argc;
-            run_program(vm, code);
+
+            if (i.ux.ux == code->argc)
+                run_program(vm, code);
+            else
+                failure("Invalid number of arguments passed to function!");
             break;
         
         case OP_RET:

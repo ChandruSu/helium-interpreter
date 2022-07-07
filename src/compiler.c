@@ -82,7 +82,9 @@ void compile_call(program* p, astnode* call)
         compilererr(p, call->pos, "Unknown function name!");
     }
 
-    p->code[p->length++].stackop.op = OP_CALL;
+    p->code[p->length].ux.op = OP_CALL;
+    p->code[p->length].ux.ux = call->children.size;
+    p->length++;
 }
 
 void compile_function(program* p, astnode* function)
@@ -312,13 +314,15 @@ const char* disassemble(program* p, instruction i) {
         case OP_MUL:
         case OP_DIV:
         case OP_NEG:
-        case OP_CALL:
         case OP_RET:
         case OP_POP:
         case OP_NOP:
             sprintf(buf, "%s", operation_strings[i.stackop.op]);
             break;
         
+        case OP_CALL:
+            sprintf(buf, "%s %u", operation_strings[i.stackop.op], i.ux.ux);
+            break;
         case OP_PUSHK:
             Value c = p->constants[i.ux.ux];
             sprintf(buf, "%s %u (%s)", operation_strings[i.stackop.op], i.ux.ux, value_to_str(&c));
