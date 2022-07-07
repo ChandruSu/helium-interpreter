@@ -11,6 +11,16 @@ Value value_from_node(astnode* node)
             v.value.to_int = atoi(node->value);
             break;
         
+        case AST_BOOL:
+            v.type = VM_BOOL;
+            v.value.to_bool = streq(node->value, "true");
+            break;
+        
+        case AST_STRING:
+            v.type = VM_STRING;
+            v.value.to_str = node->value;
+            break;
+
         // TODO: coerce floats, strings, booleans, nulls
         default: failure("Failed to coerce node to value!");
     }
@@ -25,8 +35,8 @@ const char* value_to_str(Value* v)
     switch (v->type)
     {
         case VM_STRING:
-            free(buf);
-            return v->value.to_str;
+            sprintf(buf, "'%s'", v->value.to_str);
+            return buf;
         case VM_BOOL:
             free(buf);
             return v->value.to_bool ? "True" : "False";

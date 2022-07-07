@@ -97,6 +97,7 @@ astnode* parse_statement(parser* p)
         case LX_RETURN:
             eat(p);
             st->type = AST_RETURN;
+            st->value = "ret";
             vector_push(&st->children, parse_expression(p));
             break;
 
@@ -153,6 +154,16 @@ astnode* parse_primary(parser* p)
     {
         case LX_INTEGER:
             node->type = AST_INTEGER;
+            node->value = eat(p)->value;
+            break;
+        
+        case LX_BOOL:
+            node->type = AST_BOOL;
+            node->value = eat(p)->value;
+            break;
+        
+        case LX_STRING:
+            node->type = AST_STRING;
             node->value = eat(p)->value;
             break;
         

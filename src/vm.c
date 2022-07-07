@@ -60,6 +60,12 @@ void decode_execute(virtual_machine* vm, instruction i)
             v0 = vm->stack[--call->tp];
             vm->stack[call->tp++] = *vInt(v0.value.to_int / v1.value.to_int);
             break;
+        
+        case OP_MOD:
+            v1 = vm->stack[--call->tp];
+            v0 = vm->stack[--call->tp];
+            vm->stack[call->tp++] = *vInt(v0.value.to_int % v1.value.to_int);
+            break;
 
         case OP_NEG:
             vm->stack[call->tp - 1] = *vInt(-vm->stack[call->tp - 1].value.to_int);
@@ -104,7 +110,7 @@ void decode_execute(virtual_machine* vm, instruction i)
             break;
         
         default:
-            fprintf(stderr, "%s Failed to decode instruction: %s\n", ERROR, disassemble(vm->call_stack[vm->ci].program, i));
+            fprintf(stderr, "%s Failed to decode instruction: %s\n", ERROR, disassemble(call->program, i));
             exit(0);
             break;
     }

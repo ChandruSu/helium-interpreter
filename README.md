@@ -26,7 +26,7 @@ The interpreter executable can be found in the `out/` directory.
 1. Variable assignments
     
     ```c
-    foo <- a * 10 + 7
+    foo <- bar * 10 + 7
     ```
 
 2. Function declarations
@@ -42,13 +42,14 @@ The interpreter executable can be found in the `out/` directory.
 3. Function calls
 
     ```c
-    @foo(1, 2)
-    baz <- @bar(7)
+    @foo(2)
+    baz <- @bar(7, 3)
     ```
     Function calls must be preceeded with the `@` character
 
 ## Features
 ### Implemented
++ Bools, String literals
 + Operator order precedence
 + Integer arithmetic
 + First class functions
@@ -57,10 +58,11 @@ The interpreter executable can be found in the `out/` directory.
 + Error source printing
 
 ### Upcoming
++ Floating point arithmetic
 + Function closures
 + Control structures
     - If statements
     - While loops
-+ Bools, Floats, Strings
 + Complex data types
 + Garbage collection
++ Bitwise and boolean operations

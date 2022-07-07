@@ -159,10 +159,13 @@ void compile_expression(program* p, astnode* expression)
             break;
 
         case AST_INTEGER:
+        case AST_STRING:
+        case AST_BOOL:
             p->code[p->length].ux.op = OP_PUSHK;
             p->code[p->length].ux.ux = register_constant(p, value_from_node(expression));
             p->length++;
             break;
+        
 
         default:
             compilererr(p, expression->pos, "Failed to compile expression!");
@@ -252,6 +255,8 @@ vm_op decode_op(const char* operator)
         return OP_MUL;
     else if (streq(operator, "/"))
         return OP_DIV;
+    else if (streq(operator, "%"))
+        return OP_MOD;
     else
         failure("Failed to decode operator!");
     return 0;
@@ -263,14 +268,15 @@ const char* operation_strings[] = {
     "OP_SUB      ",
     "OP_MUL      ",
     "OP_DIV      ",             // 4
+    "OP_MOD      ",
     "OP_NEG      ",
     "OP_PUSHK    ",
-    "OP_STORG    ",
-    "OP_LOADG    ",             // 8
+    "OP_STORG    ",             // 8
+    "OP_LOADG    ",
     "OP_STORL    ",
     "OP_LOADL    ",
-    "OP_CALL     ",
-    "OP_RET      ",             // 12
+    "OP_CALL     ",             // 12
+    "OP_RET      ",
     "OP_POP      ",
 };
 
@@ -313,6 +319,7 @@ const char* disassemble(program* p, instruction i) {
         case OP_SUB:
         case OP_MUL:
         case OP_DIV:
+        case OP_MOD:
         case OP_NEG:
         case OP_RET:
         case OP_POP:
