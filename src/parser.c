@@ -93,6 +93,11 @@ astnode* parse_statement(parser* p)
             free(st);
             st = parse_function_call(p);
             break;
+        
+        case LX_LOOP:
+            free(st);
+            st = parse_loop(p);
+            break;
 
         case LX_RETURN:
             eat(p);
@@ -248,10 +253,27 @@ astnode* parse_function_definition(parser* p)
 
     // code body
     consume(p, LX_LEFT_BRACE);
-    vector_push(&func->children,parse_block(p, LX_RIGHT_BRACE));
+    vector_push(&func->children, parse_block(p, LX_RIGHT_BRACE));
     consume(p, LX_RIGHT_BRACE);
 
     return func;
+}
+
+astnode* parse_loop(parser* p)
+{
+    astnode* loop = astnode_new("loop", AST_LOOP, clone_pos(&consume(p, LX_LOOP)->pos));
+    
+    // loop condition
+    consume(p, LX_LEFT_PAREN);
+    vector_push(&loop->children, parse_expression(p));
+    consume(p, LX_RIGHT_PAREN);
+
+    // loop body
+    consume(p, LX_LEFT_BRACE);
+    vector_push(&loop->children, parse_block(p, LX_RIGHT_BRACE));
+    consume(p, LX_RIGHT_BRACE);
+
+    return loop;
 }
 
 // ------------------ UTILITY METHODS ------------------

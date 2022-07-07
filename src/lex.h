@@ -29,6 +29,7 @@ typedef enum lxtype {
     LX_BOOL,
     LX_NULL,
     LX_RETURN,
+    LX_LOOP,
 } lxtype;
 
 typedef struct lxpos {

@@ -46,7 +46,11 @@ void compile_statement(program* p, astnode* statement)
             compile_expression(p, vector_get(&statement->children, 0));
             p->code[p->length++].stackop.op = OP_RET;
             break;
-        
+
+        case AST_LOOP:
+            compile_loop(p, statement);
+            break;
+
         default:
             compilererr(p, statement->pos, "Failed to compile statement into bytecode!");
     }
@@ -56,13 +60,14 @@ void compile_assignment(program* p, astnode* s)
 {
     vm_scope scope;
     astnode* rhs = vector_get(&s->children, 0);
+    int16_t address = register_variable(p, s->value, &scope);
 
     if (rhs->type == AST_FUNCTION)
         compile_function(p, rhs);
     else
         compile_expression(p, rhs);
 
-    p->code[p->length].sx.sx = register_variable(p, s->value, &scope);
+    p->code[p->length].sx.sx = address;
     p->code[p->length].sx.op = scope_store_op_map[scope];
     p->length++;
 }
@@ -164,10 +169,30 @@ void compile_expression(program* p, astnode* expression)
             p->length++;
             break;
         
-
         default:
             compilererr(p, expression->pos, "Failed to compile expression!");
     }
+}
+
+void compile_loop(program* p, astnode* loop)
+{
+    int pos0 = p->length;
+
+    compile_expression(p, vector_get(&loop->children, 0));
+    p->code[p->length++].stackop.op = OP_JIF;
+
+    int pos1 = p->length++;
+    
+    compile(p, vector_get(&loop->children, 1));
+
+    // restart loop
+    p->code[p->length].sx.op = OP_JMP;
+    p->code[p->length].sx.sx = pos0 - p->length - 1;
+    p->length++;
+
+    // jump to end
+    p->code[pos1].sx.op = OP_JMP;
+    p->code[pos1].sx.sx = p->length - pos1 - 1;
 }
 
 // ---------------- MEMORY STORE ----------------
@@ -314,6 +339,8 @@ const char* operation_strings[] = {
     "OP_CALL     ",
     "OP_RET      ",
     "OP_POP      ",
+    "OP_JIF      ",
+    "OP_JMP      ",
 };
 
 const char* disassemble_program(program* p) 
@@ -369,11 +396,16 @@ const char* disassemble(program* p, instruction i) {
         case OP_RET:
         case OP_POP:
         case OP_NOP:
+        case OP_JIF:
             sprintf(buf, "%s", operation_strings[i.stackop.op]);
             break;
         
         case OP_CALL:
             sprintf(buf, "%s %u", operation_strings[i.stackop.op], i.ux.ux);
+            break;
+        
+        case OP_JMP:
+            sprintf(buf, "%s %i", operation_strings[i.stackop.op], i.sx.sx);
             break;
         
         case OP_PUSHK:

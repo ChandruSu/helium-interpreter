@@ -115,6 +115,8 @@ typedef enum vm_op {
     OP_CALL,
     OP_RET,
     OP_POP,
+    OP_JIF,
+    OP_JMP,
 } vm_op;
 
 typedef enum vm_scope {
@@ -218,6 +220,14 @@ void compile_call(program* p, astnode* call);
  * @param function Function definition node
  */
 void compile_function(program* p, astnode* function);
+
+/**
+ * @brief Compiles loop control structure
+ * 
+ * @param p Reference to program
+ * @param loop Loop block node
+ */
+void compile_loop(program* p, astnode* loop);
 
 /**
  * @brief Prints error message into standard error output and

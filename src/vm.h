@@ -38,6 +38,6 @@ void run_program(virtual_machine* vm, program* p);
  * @param vm 
  * @param i 
  */
-void decode_execute(virtual_machine* vm, instruction i);
+void decode_execute(virtual_machine* vm, call_info* call, instruction i);
 
 #endif

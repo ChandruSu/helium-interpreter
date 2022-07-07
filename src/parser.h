@@ -26,6 +26,7 @@ typedef enum asttype {
     AST_PARAMS,
     AST_PARAM,
     AST_RETURN,
+    AST_LOOP,
 } asttype;
 
 typedef struct astnode {
@@ -155,6 +156,14 @@ astnode* parse_primary(parser* p);
  * @return AST node
  */
 astnode* parse_function_call(parser* p);
+
+/**
+ * @brief Parses while loop control structure.
+ * 
+ * @param p Reference to parser
+ * @return AST node
+ */
+astnode* parse_loop(parser* p);
 
 /**
  * @brief Represents abstract syntax tree into a string representation

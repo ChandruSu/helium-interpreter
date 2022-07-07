@@ -26,6 +26,7 @@ const char* lxtype_strings[] = {
     "LX_BOOL             ",
     "LX_NULL             ",
     "LX_RETURN           ",
+    "LX_LOOP             ",
 };
 
 lxtoken* lxtoken_new(const char* value, lxtype type, lxpos pos)
@@ -160,6 +161,10 @@ lxtoken* lex(lexer* lx)
                 type = LX_COMMENT;
                 while (lx->lookahead != '\n') lexadvance(lx);
                 break;
+            case '?':
+                type = LX_COMMENT;
+                while (lexadvance(lx) != '?');
+                break;
             case '@':
                 type = LX_CALL;
                 break;
@@ -212,6 +217,8 @@ lxtype determine_nature(char* s)
         type = LX_NULL;
     } else if (streq(s, "return")) {
         type = LX_RETURN;
+    } else if (streq(s, "loop")) {
+        type = LX_LOOP;
     }
 
     return type;

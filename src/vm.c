@@ -19,7 +19,7 @@ void run_program(virtual_machine* vm, program* p)
 
     while (call.pc < p->length)
     {
-        decode_execute(vm, call.program->code[call.pc]);
+        decode_execute(vm, &call, call.program->code[call.pc]);
         
         if (call.program->code[call.pc].stackop.op == OP_RET) {
             break;
@@ -31,11 +31,10 @@ void run_program(virtual_machine* vm, program* p)
     vm->ci--;
 }
 
-void decode_execute(virtual_machine* vm, instruction i)
+void decode_execute(virtual_machine* vm, call_info* call, instruction i)
 {
-    call_info* call = &vm->call_stack[vm->ci];
     Value v0, v1;
-
+    
     switch (i.stackop.op)
     {
         case OP_NOP: break;
@@ -103,8 +102,18 @@ void decode_execute(virtual_machine* vm, instruction i)
             call->tp--;
             break;
         
+        case OP_JIF:
+            if (vm->stack[--call->tp].value.to_bool) {
+                call->pc++;
+            }
+            break;
+
+        case OP_JMP:
+            call->pc += i.sx.sx;
+            break;
+        
         default:
-            fprintf(stderr, "%s Failed to decode instruction: %s\n", ERROR, disassemble(call->program, i));
+            fprintf(stderr, "%s Failed to execute instruction: %s\n", ERROR, disassemble(call->program, i));
             exit(0);
             break;
     }
