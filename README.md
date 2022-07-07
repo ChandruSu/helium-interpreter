@@ -52,6 +52,7 @@ The interpreter executable can be found in the `out/` directory.
 + Bools, String literals
 + Operator order precedence
 + Integer arithmetic
++ Boolean operations
 + First class functions
 + Global/local scoping
 + Bytecode disassembly
@@ -65,4 +66,4 @@ The interpreter executable can be found in the `out/` directory.
     - While loops
 + Complex data types
 + Garbage collection
-+ Bitwise and boolean operations
++ Bitwise operations

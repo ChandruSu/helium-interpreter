@@ -1,5 +1,7 @@
 #include "vm.h"
 
+Value apply_vm_op(vm_op op, Value v0, Value v1);
+
 void run_program(virtual_machine* vm, program* p)
 {
     call_info* c = vm->ci == -1 ? NULL : &vm->call_stack[vm->ci];
@@ -38,37 +40,29 @@ void decode_execute(virtual_machine* vm, instruction i)
     {
         case OP_NOP: break;
         case OP_ADD:
-            v1 = vm->stack[--call->tp];
-            v0 = vm->stack[--call->tp];
-            vm->stack[call->tp++] = *vInt(v0.value.to_int + v1.value.to_int);
-            break;
-
         case OP_SUB:
-            v1 = vm->stack[--call->tp];
-            v0 = vm->stack[--call->tp];
-            vm->stack[call->tp++] = *vInt(v0.value.to_int - v1.value.to_int);
-            break;
-
         case OP_MUL:
-            v1 = vm->stack[--call->tp];
-            v0 = vm->stack[--call->tp];
-            vm->stack[call->tp++] = *vInt(v0.value.to_int * v1.value.to_int);
-            break;
-
         case OP_DIV:
-            v1 = vm->stack[--call->tp];
-            v0 = vm->stack[--call->tp];
-            vm->stack[call->tp++] = *vInt(v0.value.to_int / v1.value.to_int);
-            break;
-        
         case OP_MOD:
+        case OP_AND:
+        case OP_OR:
+        case OP_LT:
+        case OP_LE:
+        case OP_GT:
+        case OP_GE:
+        case OP_EQ:
+        case OP_NE:
             v1 = vm->stack[--call->tp];
             v0 = vm->stack[--call->tp];
-            vm->stack[call->tp++] = *vInt(v0.value.to_int % v1.value.to_int);
+            vm->stack[call->tp++] = apply_vm_op(i.stackop.op, v0, v1);
             break;
 
         case OP_NEG:
             vm->stack[call->tp - 1] = *vInt(-vm->stack[call->tp - 1].value.to_int);
+            break;
+
+        case OP_NOT:
+            vm->stack[call->tp - 1] = *vBool(!vm->stack[call->tp - 1].value.to_bool);
             break;
 
         case OP_PUSHK:
@@ -113,5 +107,29 @@ void decode_execute(virtual_machine* vm, instruction i)
             fprintf(stderr, "%s Failed to decode instruction: %s\n", ERROR, disassemble(call->program, i));
             exit(0);
             break;
+    }
+}
+
+Value apply_vm_op(vm_op op, Value v0, Value v1)
+{
+    switch (op)
+    {
+        case OP_ADD: return *vInt(v0.value.to_int + v1.value.to_int);
+        case OP_SUB: return *vInt(v0.value.to_int - v1.value.to_int);
+        case OP_MUL: return *vInt(v0.value.to_int * v1.value.to_int);
+        case OP_DIV: return *vInt(v0.value.to_int / v1.value.to_int);
+        case OP_MOD: return *vInt(v0.value.to_int % v1.value.to_int);
+        
+        case OP_AND: return *vBool(v0.value.to_bool && v1.value.to_bool);
+        case OP_OR: return *vBool(v0.value.to_bool || v1.value.to_bool);
+        case OP_EQ: return *vBool(v0.value.to_int == v1.value.to_int);
+        case OP_NE: return *vBool(v0.value.to_int != v1.value.to_int);
+        case OP_LE: return *vBool(v0.value.to_int <= v1.value.to_int);
+        case OP_GE: return *vBool(v0.value.to_int >= v1.value.to_int);
+        case OP_LT: return *vBool(v0.value.to_int < v1.value.to_int);
+        case OP_GT: return *vBool(v0.value.to_int > v1.value.to_int);
+        default:
+            fprintf(stderr, "%s Failed to apply binary operation: %i!\n", ERROR, op);
+            exit(0);
     }
 }

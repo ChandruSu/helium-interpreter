@@ -91,19 +91,28 @@ Value* vCode(program* p);
 // ------------------- VM IR --------------------
 
 typedef enum vm_op {
-    OP_NOP,             // 0
+    OP_NOP,
     OP_ADD,
     OP_SUB,
     OP_MUL,
-    OP_DIV,             // 4
+    OP_DIV,
     OP_MOD,
     OP_NEG,
+    OP_NOT,
+    OP_AND,
+    OP_OR,
+    OP_EQ,
+    OP_NE,
+    OP_LT,
+    OP_LE,
+    OP_GT,
+    OP_GE,
     OP_PUSHK,
-    OP_STORG,           // 8
+    OP_STORG,
     OP_LOADG,
     OP_STORL,
     OP_LOADL,
-    OP_CALL,            // 12
+    OP_CALL,
     OP_RET,
     OP_POP,
 } vm_op;

@@ -1,6 +1,7 @@
 #include "compiler.h"
 
-vm_op decode_op(const char* operator);
+vm_op decode_binary_op(const char* operator);
+vm_op decode_unary_op(const char* operator);
 
 vm_op scope_load_op_map[] = {
     OP_LOADL,
@@ -133,15 +134,12 @@ void compile_expression(program* p, astnode* expression)
         case AST_BINARY_EXPRESSION:
             compile_expression(p, vector_get(&expression->children, 0));
             compile_expression(p, vector_get(&expression->children, 1));
-            p->code[p->length++].stackop.op = decode_op(expression->value);
+            p->code[p->length++].stackop.op = decode_binary_op(expression->value);
             break;
         
         case AST_UNARY_EXPRESSION:
             compile_expression(p, vector_get(&expression->children, 0));
-
-            if (streq(expression->value, "-")) {
-                p->code[p->length++].stackop.op = OP_NEG;
-            }
+            p->code[p->length++].stackop.op = decode_unary_op(expression->value);
             break;
 
         case AST_CALL:
@@ -245,9 +243,9 @@ int16_t dereference_variable(program* p, const char* name, vm_scope* scope)
 
 // ------------------- UTILS --------------------
 
-vm_op decode_op(const char* operator)
+vm_op decode_binary_op(const char* operator)
 {
-    if (streq(operator, "+"))
+    if (streq(operator, "+")) // arithmetic
         return OP_ADD;
     else if (streq(operator, "-"))
         return OP_SUB;
@@ -257,25 +255,63 @@ vm_op decode_op(const char* operator)
         return OP_DIV;
     else if (streq(operator, "%"))
         return OP_MOD;
+    else if (streq(operator, "&&")) // boolean
+        return OP_AND;
+    else if (streq(operator, "||"))
+        return OP_OR;
+    else if (streq(operator, "=="))
+        return OP_EQ;
+    else if (streq(operator, "!="))
+        return OP_NE;
+    else if (streq(operator, "<"))
+        return OP_LT;
+    else if (streq(operator, "<="))
+        return OP_LE;
+    else if (streq(operator, ">"))
+        return OP_GT;
+    else if (streq(operator, ">="))
+        return OP_GE;
     else
         failure("Failed to decode operator!");
-    return 0;
+    return OP_NOP;
+}
+
+vm_op decode_unary_op(const char* operator)
+{
+    if (streq(operator, "+"))
+        return OP_NOP;
+    else if (streq(operator, "-"))
+        return OP_NEG;
+    else if (streq(operator, "!"))
+        return OP_NOT;
+    else
+        failure("Failed to decode operator!");
+    return OP_NOP;
 }
 
 const char* operation_strings[] = {
-    "OP_NOP      ",             // 0
+    "OP_NOP      ",
     "OP_ADD      ",
     "OP_SUB      ",
     "OP_MUL      ",
-    "OP_DIV      ",             // 4
+    "OP_DIV      ",
     "OP_MOD      ",
     "OP_NEG      ",
+    "OP_NOT      ",
+    "OP_AND      ",
+    "OP_OR       ",
+    "OP_EQ       ",
+    "OP_NE       ",
+    "OP_LT       ",
+    "OP_LE       ",
+    "OP_GT       ",
+    "OP_GE       ",
     "OP_PUSHK    ",
-    "OP_STORG    ",             // 8
+    "OP_STORG    ",
     "OP_LOADG    ",
     "OP_STORL    ",
     "OP_LOADL    ",
-    "OP_CALL     ",             // 12
+    "OP_CALL     ",
     "OP_RET      ",
     "OP_POP      ",
 };
@@ -321,6 +357,15 @@ const char* disassemble(program* p, instruction i) {
         case OP_DIV:
         case OP_MOD:
         case OP_NEG:
+        case OP_NOT:
+        case OP_AND:
+        case OP_OR:
+        case OP_EQ:
+        case OP_NE:
+        case OP_LT:
+        case OP_LE:
+        case OP_GT:
+        case OP_GE:
         case OP_RET:
         case OP_POP:
         case OP_NOP:

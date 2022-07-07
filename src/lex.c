@@ -3,7 +3,7 @@
 // forward declarations
 char* reduce_string_buffer(char* buffer);
 lxtype determine_nature(char* s);
-boolean check_pattern(lexer* lx, const char* pattern);
+boolean check_pattern(lexer* lx, const char* pattern, char* buf);
 
 const char* lxtype_strings[] = {
     "LX_SYMBOL           ",
@@ -98,17 +98,20 @@ lxtoken* lex(lexer* lx)
     }
     else if (lx->lookahead == '"')
     {
-        char c =lexadvance(lx);
+        char c = lexadvance(lx);
         while ((c = lexadvance(lx)) != '"') buf[len++] = c;
         type = LX_STRING;
     }
-    else if (check_pattern(lx, "<-"))
+    else if (check_pattern(lx, "<-", buf))
     {
         type = LX_ASSIGN;
+        len += 2;
     }
-    else if (check_pattern(lx, "<=") || check_pattern(lx, ">="))
+    else if (check_pattern(lx, "<=", buf) || check_pattern(lx, ">=", buf) || check_pattern(lx, "==", buf)
+            || check_pattern(lx, "&&", buf) || check_pattern(lx, "||", buf) || check_pattern(lx, "!=", buf))
     {
         type = LX_OPERATOR;
+        len += 2;
     }
     else
     {
@@ -139,6 +142,7 @@ lxtoken* lex(lexer* lx)
             case '%':
             case '<': // boolean operations
             case '>':
+            case '!':
             case '&': // bitwise operations
             case '|':
             case '^':
@@ -214,7 +218,7 @@ lxtype determine_nature(char* s)
 
 // Checks for patterns against current lexer position - should
 // only be used for non-whitespace dependent patterns.
-boolean check_pattern(lexer* lx, const char* pattern)
+boolean check_pattern(lexer* lx, const char* pattern, char* buf)
 {
     size_t len = strlen(pattern);
     for (size_t i = 0; i < len; i++)
@@ -224,9 +228,12 @@ boolean check_pattern(lexer* lx, const char* pattern)
         }
     }
     
+    // removes characters if match found
     while (len-- > 0) {
         lexadvance(lx);
     }
+
+    strcat(buf, pattern);
 
     return true;
 }

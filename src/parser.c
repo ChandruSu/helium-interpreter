@@ -185,8 +185,9 @@ astnode* parse_primary(parser* p)
             break;
 
         case LX_OPERATOR:
-            // validates operator
-            if (strcmp(peek(p)->value, "-") && strcmp(peek(p)->value, "+")) {
+            // validates operator as unary
+            if (strcmp(peek(p)->value, "-") && strcmp(peek(p)->value, "+") 
+                    && strcmp(peek(p)->value, "!") && strcmp(peek(p)->value, "~")) {
                 parsererror(p, "Invalid unary operator");
             }
 
@@ -270,19 +271,33 @@ astnode* astnode_new(const char* value, asttype type, lxpos pos) {
  */
 int precedence(parser* p, lxtoken* op)
 {
+    if (streq(op->value, "<=") || streq(op->value, ">="))
+        return 8;
+    else if (streq(op->value, "==") || streq(op->value, "!="))
+        return 7;
+    else if (streq(op->value, "&&"))
+        return 3;
+    else if (streq(op->value, "||"))
+        return 2;
+    
     switch (op->value[0])
     {
         case '|':
-            return 1;
+            return 4;
+        case '^':
+            return 5;
         case '&':
-            return 2;
+            return 6;
+        case '<':
+        case '>':
+            return 8;
         case '+':
         case '-':
-            return 3;
+            return 9;
         case '*':    
         case '/':    
         case '%':
-            return 4;    
+            return 10;    
         default:
             parsererror(p, "Unknown operator recieved");
     }
