@@ -2,7 +2,7 @@
 
 void run_program(virtual_machine* vm, program* p)
 {
-    call_info* c = vm->ci == -1 ? NULL : &vm->call_stack[vm->ci++];
+    call_info* c = vm->ci == -1 ? NULL : &vm->call_stack[vm->ci];
 
     call_info call = {
         .program = p,
@@ -13,13 +13,20 @@ void run_program(virtual_machine* vm, program* p)
         .prev = c,
     };
 
-    vm->call_stack[vm->ci] = call;
+    vm->call_stack[++vm->ci] = call;
 
     while (call.pc < p->length)
     {
         decode_execute(vm, call.program->code[call.pc]);
+        
+        if (call.program->code[call.pc].stackop.op == OP_RET) {
+            break;
+        }
+        
         call.pc++;
     }
+
+    vm->ci--;
 }
 
 void decode_execute(virtual_machine* vm, instruction i)
@@ -31,26 +38,26 @@ void decode_execute(virtual_machine* vm, instruction i)
     {
         case OP_NOP: break;
         case OP_ADD:
-            v0 = vm->stack[--call->tp];
             v1 = vm->stack[--call->tp];
+            v0 = vm->stack[--call->tp];
             vm->stack[call->tp++] = *vInt(v0.value.to_int + v1.value.to_int);
             break;
 
         case OP_SUB:
-            v0 = vm->stack[--call->tp];
             v1 = vm->stack[--call->tp];
+            v0 = vm->stack[--call->tp];
             vm->stack[call->tp++] = *vInt(v0.value.to_int - v1.value.to_int);
             break;
 
         case OP_MUL:
-            v0 = vm->stack[--call->tp];
             v1 = vm->stack[--call->tp];
+            v0 = vm->stack[--call->tp];
             vm->stack[call->tp++] = *vInt(v0.value.to_int * v1.value.to_int);
             break;
 
         case OP_DIV:
-            v0 = vm->stack[--call->tp];
             v1 = vm->stack[--call->tp];
+            v0 = vm->stack[--call->tp];
             vm->stack[call->tp++] = *vInt(v0.value.to_int / v1.value.to_int);
             break;
 
@@ -70,18 +77,22 @@ void decode_execute(virtual_machine* vm, instruction i)
             vm->stack[call->tp++] = vm->heap[i.sx.sx];
             break;
         
-        case OP_STORL: 
+        case OP_STORL:
             vm->stack[call->bp + i.sx.sx] = vm->stack[--call->tp];
             break;
         
-        case OP_LOADL: 
+        case OP_LOADL:
             vm->stack[call->tp++] = vm->stack[call->bp + i.sx.sx];
             break;
 
-        case OP_CALL: 
+        case OP_CALL:
+            program* code = vm->stack[--call->tp].value.to_code;
+            call->tp -= code->argc;
+            run_program(vm, code);
             break;
         
-        case OP_RET: 
+        case OP_RET:
+            vm->stack[call->prev->tp++] = vm->stack[--call->tp];
             break;
         
         default:

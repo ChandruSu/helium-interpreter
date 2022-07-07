@@ -66,11 +66,17 @@ int main(int argc, const char* argv[])
 
     run_program(&vm, &pp);
 
+    printf("\n");
+    for (size_t i = 0; i < 0xf; i++)
+    {
+        printf("Stack %li = %s\n", i, value_to_str(&vm.stack[i]));
+    }
+
+    printf("\n");
     for (size_t i = 0; i < 0xf; i++)
     {
         printf("Heap %li = %s\n", i, value_to_str(&vm.heap[i]));
     }
-    
 
     printf("\n%s Program has ended successfully!\n\n", MESSAGE);
     return 0;
