@@ -8,11 +8,10 @@ int main(int argc, const char* argv[])
 {
     const char* src;
 
-    if (argc < 3) {
-        fprintf(stderr, "%s Invalid number of arguments recieved!", ERROR);
-        exit(0);
+    if (argc < 2) {
+        failure("File not specified!");
     } else {
-        src = read_file(argv[2]);
+        src = read_file(argv[1]);
     }
 
 #if HE_DEBUG
@@ -26,8 +25,9 @@ int main(int argc, const char* argv[])
     lexify(&lx, &tokens);
     
 #if HE_DEBUG
-    for (size_t i = 0; i < tokens.size; i++)
+    for (size_t i = 0; i < tokens.size; i++) {
         lxtoken_display(tokens.items[i]);
+    }
 
     printf("\n%s Beginning syntax parsing:\n\n", MESSAGE);
 #endif
