@@ -27,6 +27,8 @@ const char* lxtype_strings[] = {
     "LX_NULL             ",
     "LX_RETURN           ",
     "LX_LOOP             ",
+    "LX_IF               ",
+    "LX_ELSE             ",
 };
 
 lxtoken* lxtoken_new(const char* value, lxtype type, lxpos pos)
@@ -208,20 +210,22 @@ char lexadvance(lexer* lx)
 // Determines the lex type of a string symbol
 lxtype determine_nature(char* s)
 {
-    lxtype type = LX_SYMBOL;
-
     // checks against reserved keywords.
     if (streq(s, "false") || streq(s, "true")) {
-        type = LX_BOOL;
+        return LX_BOOL;
     } else if (streq(s, "null")) {
-        type = LX_NULL;
+        return LX_NULL;
     } else if (streq(s, "return")) {
-        type = LX_RETURN;
+        return LX_RETURN;
     } else if (streq(s, "loop")) {
-        type = LX_LOOP;
+        return LX_LOOP;
+    } else if (streq(s, "if")) {
+        return LX_IF;
+    } else if (streq(s, "else")) {
+        return LX_ELSE;
+    } else {
+        return LX_SYMBOL;
     }
-
-    return type;
 }
 
 // Checks for patterns against current lexer position - should

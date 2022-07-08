@@ -51,6 +51,10 @@ void compile_statement(program* p, astnode* statement)
             compile_loop(p, statement);
             break;
 
+        case AST_BRANCHES:
+            compile_branches(p, statement);
+            break;
+
         default:
             compilererr(p, statement->pos, "Failed to compile statement into bytecode!");
     }
@@ -192,6 +196,33 @@ void compile_loop(program* p, astnode* loop)
     p->length++;
 
     // jump to end
+    p->code[pos1].sx.op = OP_JMP;
+    p->code[pos1].sx.sx = p->length - pos1 - 1;
+}
+
+void compile_branches(program* p, astnode* branches)
+{
+    compile_expression(p, vector_get(&branches->children, 0));
+    p->code[p->length++].stackop.op = OP_JIF;
+    int pos0 = p->length++;
+
+    compile(p, vector_get(&branches->children, 1));
+    int pos1 = p->length++;
+
+    // skip body if condition not met
+    p->code[pos0].sx.op = OP_JMP;
+    p->code[pos0].sx.sx = p->length - pos0 - 1;
+
+    astnode* alt = vector_get(&branches->children, 2);
+
+    if (alt != NULL) {
+        if (streq(alt->value, "conditional")) {
+            compile_branches(p, alt);
+        } else {
+            compile(p, vector_get(&alt->children, 0));
+        }
+    }
+
     p->code[pos1].sx.op = OP_JMP;
     p->code[pos1].sx.sx = p->length - pos1 - 1;
 }

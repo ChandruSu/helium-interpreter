@@ -230,6 +230,15 @@ void compile_function(program* p, astnode* function);
 void compile_loop(program* p, astnode* loop);
 
 /**
+ * @brief Compiles if-else_if_else control flow block into intermediate
+ *      assembly.
+ * 
+ * @param p Reference to program
+ * @param branches Branching nodes
+ */
+void compile_branches(program* p, astnode* branches);
+
+/**
  * @brief Prints error message into standard error output and
  *      displays location in source raising the error.
  * 

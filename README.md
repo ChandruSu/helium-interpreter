@@ -31,7 +31,39 @@ The interpreter executable can be found in the `out/` directory.
     foo <- 10 * bar + 7
     ```
 
-2. Function declarations
+2. If, else if, else blocks
+
+    ```c
+    if a && b {
+        # block 1
+    } else if c || d {
+        # block 2
+    } else if !e {
+        # block 3
+    } else {
+        # block 4
+    }
+    ```
+
+3. While loops
+
+    ```rust
+    loop (a < 100) {
+        a <- a + 1
+    }
+    ```
+
+4. Comments
+
+    ```c
+    # this is a oneline comment
+    
+    ? This is 
+    a multiline 
+    comment ?
+    ```
+
+5. Function declarations
 
     ```c
     bar <- $(x, y) {
@@ -41,35 +73,21 @@ The interpreter executable can be found in the `out/` directory.
     The helium interpreter treats functions as first-class objects which can be stored in variables and passed as arguments
 
 
-3. Function calls
+6. Function calls
 
     ```c
     @foo(2)
     baz <- @bar(7, 3)
 
-    bee <- $() {
-        @bee()
+    factorial <- $(n) {
+        if n > 0 {
+            return n * @factorial(n - 1)
+        } else {
+            return 1
+        }
     }
     ```
     Function calls must be preceeded with the `@` character. Recursive function calls are allowed
-
-4. While loops
-
-    ```rust
-    loop (a < 100) {
-        a <- a + 1
-    }
-    ```
-
-5. Comments
-
-    ```c
-    # this is a oneline comment
-    
-    ? This is 
-    a multiline 
-    comment ?
-    ```
 
 ## Features
 

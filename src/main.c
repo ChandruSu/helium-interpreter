@@ -1,6 +1,8 @@
 #include "he.h"
 
-#define HE_DEBUG 0
+#include <time.h>
+
+#define HE_DEBUG 1
 
 int main(int argc, const char* argv[])
 {
@@ -71,7 +73,14 @@ int main(int argc, const char* argv[])
         .stack = calloc(MAX_STACK_SIZE, sizeof(Value)),
     };
 
+    clock_t begin = clock();
+
     run_program(&vm, NULL, &pp);
+
+    clock_t end = clock();
+    double time_spent = 1000 * (double)(end - begin) / CLOCKS_PER_SEC;
+    printf("%s Execution took %f milliseconds!\n", MESSAGE, time_spent);
+
 
     for (size_t i = 0; i < 0xf; i++)
     {

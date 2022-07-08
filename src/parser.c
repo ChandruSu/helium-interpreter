@@ -98,6 +98,11 @@ astnode* parse_statement(parser* p)
             free(st);
             st = parse_loop(p);
             break;
+        
+        case LX_IF:
+            free(st);
+            st = parse_branching(p);
+            break;
 
         case LX_RETURN:
             eat(p);
@@ -277,6 +282,40 @@ astnode* parse_loop(parser* p)
     consume(p, LX_RIGHT_BRACE);
 
     return loop;
+}
+
+astnode* parse_branching(parser* p)
+{
+    astnode* branch0 = astnode_new("conditional", AST_BRANCHES, clone_pos(&consume(p, LX_IF)->pos));
+
+    // if condition { ... } branch
+    vector_push(&branch0->children, parse_expression(p));
+    consume(p, LX_LEFT_BRACE);
+    vector_push(&branch0->children, parse_block(p, LX_RIGHT_BRACE));
+    consume(p, LX_RIGHT_BRACE);
+
+    astnode* branchx = branch0;
+    while (peek(p)->type == LX_ELSE)
+    {
+        astnode* branch = astnode_new(NULL, AST_BRANCHES, clone_pos(&eat(p)->pos));
+
+        if (consume_optional(p, LX_IF)) {
+            branch->value = "conditional";
+            vector_push(&branch->children, parse_expression(p));
+        } else {
+            branch->value = "alt";
+        }
+        
+        consume(p, LX_LEFT_BRACE);
+        vector_push(&branch->children, parse_block(p, LX_RIGHT_BRACE));
+        consume(p, LX_RIGHT_BRACE);
+
+        vector_push(&branchx->children, branch);
+        branchx = branch;
+        if (streq(branch->value, "alt")) break;
+    }
+
+    return branch0;   
 }
 
 // ------------------ UTILITY METHODS ------------------

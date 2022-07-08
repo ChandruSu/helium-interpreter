@@ -30,6 +30,7 @@ typedef enum asttype {
     AST_PARAM,
     AST_RETURN,
     AST_LOOP,
+    AST_BRANCHES,
 } asttype;
 
 typedef struct astnode {
@@ -167,6 +168,14 @@ astnode* parse_function_call(parser* p);
  * @return AST node
  */
 astnode* parse_loop(parser* p);
+
+/**
+ * @brief Parses if-else_if-else block, branching control structure.
+ * 
+ * @param p Reference to parser
+ * @return AST node
+ */
+astnode* parse_branching(parser* p);
 
 /**
  * @brief Represents abstract syntax tree into a string representation
