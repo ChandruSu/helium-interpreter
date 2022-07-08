@@ -171,6 +171,11 @@ astnode* parse_primary(parser* p)
             node->type = AST_STRING;
             node->value = eat(p)->value;
             break;
+
+        case LX_NULL:
+            node->type = AST_NULL;
+            node->value = eat(p)->value;
+            break;
         
         case LX_SYMBOL:
             node->type = AST_REFERENCE;
@@ -264,9 +269,7 @@ astnode* parse_loop(parser* p)
     astnode* loop = astnode_new("loop", AST_LOOP, clone_pos(&consume(p, LX_LOOP)->pos));
     
     // loop condition
-    consume(p, LX_LEFT_PAREN);
     vector_push(&loop->children, parse_expression(p));
-    consume(p, LX_RIGHT_PAREN);
 
     // loop body
     consume(p, LX_LEFT_BRACE);

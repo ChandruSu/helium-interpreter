@@ -20,6 +20,11 @@ Value value_from_node(astnode* node)
             v.type = VM_STRING;
             v.value.to_str = node->value;
             break;
+        
+        case AST_NULL:
+            v.type = VM_NULL;
+            v.value.to_code = NULL;
+            break;
 
         // TODO: coerce floats, strings, booleans, nulls
         default: failure("Failed to coerce node to value!");

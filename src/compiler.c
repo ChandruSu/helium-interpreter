@@ -164,6 +164,7 @@ void compile_expression(program* p, astnode* expression)
         case AST_INTEGER:
         case AST_STRING:
         case AST_BOOL:
+        case AST_NULL:
             p->code[p->length].ux.op = OP_PUSHK;
             p->code[p->length].ux.ux = register_constant(p, value_from_node(expression));
             p->length++;

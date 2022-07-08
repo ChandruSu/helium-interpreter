@@ -1,6 +1,6 @@
 #include "he.h"
 
-#define HE_DEBUG 1
+#define HE_DEBUG 0
 
 int main(int argc, const char* argv[])
 {
@@ -67,13 +67,12 @@ int main(int argc, const char* argv[])
     virtual_machine vm = {
         .ci = -1,
         .call_stack = malloc(sizeof(call_info) * MAX_CALL_STACK),
-        .heap = malloc(sizeof(Value) * MAX_HEAP_SIZE),
-        .stack = malloc(sizeof(Value) * MAX_STACK_SIZE),
+        .heap = calloc(MAX_HEAP_SIZE, sizeof(Value)),
+        .stack = calloc(MAX_STACK_SIZE, sizeof(Value)),
     };
 
-    run_program(&vm, &pp);
+    run_program(&vm, NULL, &pp);
 
-    printf("\n");
     for (size_t i = 0; i < 0xf; i++)
     {
         printf("Stack %li = %s\n", i, value_to_str(&vm.stack[i]));

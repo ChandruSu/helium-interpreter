@@ -2,17 +2,15 @@
 
 Value apply_vm_op(vm_op op, Value v0, Value v1);
 
-void run_program(virtual_machine* vm, program* p)
+void run_program(virtual_machine* vm, call_info* prev, program* p)
 {
-    call_info* c = vm->ci == -1 ? NULL : &vm->call_stack[vm->ci];
-
     call_info call = {
         .program = p,
         .pc = 0,
-        .bp = c == NULL ? 0 : c->tp,
-        .sp = c == NULL ? 0 : c->tp + p->symbol_table.size,
-        .tp = c == NULL ? 0 : c->tp + p->symbol_table.size,
-        .prev = c,
+        .bp = prev == NULL ? 0 : prev->tp,
+        .sp = prev == NULL ? 0 : prev->tp + p->symbol_table.size,
+        .tp = prev == NULL ? 0 : prev->tp + p->symbol_table.size,
+        .prev = prev,
     };
 
     vm->call_stack[++vm->ci] = call;
@@ -105,7 +103,7 @@ void decode_execute(virtual_machine* vm, call_info* call, instruction i)
             call->tp -= code->argc;
 
             if (i.ux.ux == code->argc)
-                run_program(vm, code);
+                run_program(vm, call, code);
             else
                 failure("Invalid number of arguments passed to function!");
             break;

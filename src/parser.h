@@ -5,6 +5,8 @@
 #include "datatypes.h"
 #include "lex.h"
 
+#define PV2S(x) printf("%s\n", value_to_str(x));
+
 typedef struct parser {
     int position;
     vector tokens;
@@ -16,6 +18,7 @@ typedef enum asttype {
     AST_INTEGER,
     AST_BOOL,
     AST_STRING,
+    AST_NULL,
     AST_REFERENCE,
     AST_CALL,
     AST_UNARY_EXPRESSION,
