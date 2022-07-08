@@ -81,12 +81,7 @@ astnode* parse_statement(parser* p)
             st->type = AST_ASSIGN;
             st->value = eat(p)->value;
             consume(p, LX_ASSIGN);
-            
-            if (peek(p)->type == LX_FUNCTION) {
-                vector_push(&st->children, parse_function_definition(p));
-            } else {
-                vector_push(&st->children, parse_expression(p));
-            }
+            vector_push(&st->children, parse_expression(p));
             break;
 
         case LX_CALL:
@@ -185,6 +180,11 @@ astnode* parse_primary(parser* p)
         case LX_SYMBOL:
             node->type = AST_REFERENCE;
             node->value = eat(p)->value;
+            break;
+            
+        case LX_FUNCTION:
+            free(node);
+            node = parse_function_definition(p);
             break;
         
         case LX_CALL:
@@ -294,6 +294,7 @@ astnode* parse_branching(parser* p)
     vector_push(&branch0->children, parse_block(p, LX_RIGHT_BRACE));
     consume(p, LX_RIGHT_BRACE);
 
+    // else and else if { ... } branches
     astnode* branchx = branch0;
     while (peek(p)->type == LX_ELSE)
     {
@@ -309,9 +310,11 @@ astnode* parse_branching(parser* p)
         consume(p, LX_LEFT_BRACE);
         vector_push(&branch->children, parse_block(p, LX_RIGHT_BRACE));
         consume(p, LX_RIGHT_BRACE);
-
+        
+        // recursive if statement
         vector_push(&branchx->children, branch);
         branchx = branch;
+
         if (streq(branch->value, "alt")) break;
     }
 
@@ -320,7 +323,8 @@ astnode* parse_branching(parser* p)
 
 // ------------------ UTILITY METHODS ------------------
 
-astnode* astnode_new(const char* value, asttype type, lxpos pos) {
+astnode* astnode_new(const char* value, asttype type, lxpos pos) 
+{
     astnode* node = (astnode*)malloc(sizeof(astnode));
     node->value = value;
     node->type = type;

@@ -65,12 +65,7 @@ void compile_assignment(program* p, astnode* s)
     vm_scope scope;
     astnode* rhs = vector_get(&s->children, 0);
     int16_t address = register_variable(p, s->value, &scope);
-
-    if (rhs->type == AST_FUNCTION)
-        compile_function(p, rhs);
-    else
-        compile_expression(p, rhs);
-
+    compile_expression(p, rhs);
     p->code[p->length].sx.sx = address;
     p->code[p->length].sx.op = scope_store_op_map[scope];
     p->length++;
@@ -155,6 +150,10 @@ void compile_expression(program* p, astnode* expression)
             compile_call(p, expression);
             break;
         
+        case AST_FUNCTION:
+            compile_function(p, expression);
+            break;
+
         case AST_REFERENCE:
             vm_scope scope;
             p->code[p->length].sx.sx = dereference_variable(p, expression->value, &scope);

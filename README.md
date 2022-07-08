@@ -48,7 +48,7 @@ The interpreter executable can be found in the `out/` directory.
 3. While loops
 
     ```rust
-    loop (a < 100) {
+    loop a < 100 {
         a <- a + 1
     }
     ```
