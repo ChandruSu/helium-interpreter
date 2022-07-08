@@ -159,6 +159,7 @@ typedef struct program {
     Value* constants;
     struct program* prev;
     const char* src_code;
+    Value (*native)(Value);
 
     map symbol_table;
     map constant_table;
@@ -237,6 +238,8 @@ void compile_loop(program* p, astnode* loop);
  * @param branches Branching nodes
  */
 void compile_branches(program* p, astnode* branches);
+
+void create_native(program* p, const char* name, Value (*f)(Value));
 
 /**
  * @brief Prints error message into standard error output and

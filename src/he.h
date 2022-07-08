@@ -7,5 +7,6 @@
 #include "parser.h"
 #include "compiler.h"
 #include "vm.h"
+#include "lib.h"
 
 #endif

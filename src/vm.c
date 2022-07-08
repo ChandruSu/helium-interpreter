@@ -21,6 +21,12 @@ void run_program(virtual_machine* vm, call_info* prev, program* p)
         failure("Stack overflow!");
     }
 
+    if (call.program->native != NULL) 
+    {
+        vm->stack[call.tp++] = call.program->native(vm->stack[call.bp]);
+        vm->stack[call.prev->tp++] = vm->stack[--call.tp];
+    }
+
     while (call.pc < p->length)
     {
         decode_execute(vm, &call, call.program->code[call.pc]);

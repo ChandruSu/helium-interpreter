@@ -2,7 +2,7 @@
 
 #include <time.h>
 
-#define HE_DEBUG 1
+#define HE_DEBUG 0
 
 int main(int argc, const char* argv[])
 {
@@ -15,22 +15,22 @@ int main(int argc, const char* argv[])
         src = read_file(argv[2]);
     }
 
-    #if HE_DEBUG
+#if HE_DEBUG
     printf("\n%s Reading code:\n\n%s\n", MESSAGE, src);
 
     printf("%s Beginning lexical anaylsis:\n\n", MESSAGE);
-    #endif
+#endif
 
     lexer lx = lexer_new(src);
     vector tokens = vector_new(16);
     lexify(&lx, &tokens);
     
-    #if HE_DEBUG
+#if HE_DEBUG
     for (size_t i = 0; i < tokens.size; i++)
         lxtoken_display(tokens.items[i]);
 
     printf("\n%s Beginning syntax parsing:\n\n", MESSAGE);
-    #endif
+#endif
 
     parser p = {
         .position = 0,
@@ -40,17 +40,17 @@ int main(int argc, const char* argv[])
 
     astnode* tree = parse(&p);
     
-    #if HE_DEBUG
+#if HE_DEBUG
     printf("%s\n", astnode_tostr(tree));
 
     printf("\n%s Beginning compilation:\n\n", MESSAGE);
-    #endif
+#endif
 
     program pp = {
-        .code = malloc(sizeof(instruction) * 0xff),
+        .code = malloc(sizeof(instruction) * MAX_LOCAL_VARIABLES),
         .length = 0,
         .argc = 0,
-        .constants = malloc(sizeof(Value) * 0xff),
+        .constants = malloc(sizeof(Value) * MAX_LOCAL_CONSTANTS),
         .src_code = src,
         .prev = NULL,
 
@@ -58,13 +58,15 @@ int main(int argc, const char* argv[])
         .symbol_table = map_new(37)
     };
     
+    register_all_natives(&pp);
     compile(&pp, tree);
 
-    #if HE_DEBUG
+#if HE_DEBUG
     printf(disassemble_program(&pp));
     
     printf("\n%s Beginning bytecode execution:\n\n", MESSAGE);
-    #endif
+#endif
+    clock_t begin = clock();
     
     virtual_machine vm = {
         .ci = -1,
@@ -73,15 +75,17 @@ int main(int argc, const char* argv[])
         .stack = calloc(MAX_STACK_SIZE, sizeof(Value)),
     };
 
-    clock_t begin = clock();
 
+    // runs program
     run_program(&vm, NULL, &pp);
 
     clock_t end = clock();
     double time_spent = 1000 * (double)(end - begin) / CLOCKS_PER_SEC;
-    printf("%s Execution took %f milliseconds!\n", MESSAGE, time_spent);
 
 
+#if HE_DEBUG
+    printf("\n%s Execution took %f milliseconds!\n", MESSAGE, time_spent);
+    
     for (size_t i = 0; i < 0xf; i++)
     {
         printf("Stack %li = %s\n", i, value_to_str(&vm.stack[i]));
@@ -92,10 +96,9 @@ int main(int argc, const char* argv[])
     {
         printf("Heap %li = %s\n", i, value_to_str(&vm.heap[i]));
     }
-
-    #if HE_DEBUG
+    
     printf("\n%s Program has ended successfully!\n\n", MESSAGE);
-    #endif
+#endif
 
     return 0;
 }

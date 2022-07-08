@@ -3,11 +3,11 @@ SOURCE  := $(wildcard src/*.c src/*/*.c)
 HEADER  := $(wildcard src/*.h src/*/*.h)
 OBJECTS := $(SOURCE:src/%.c=bin/%.o)
 
-EXEC := out/helium.exe
+EXEC := out/helium
 TEST_FLAGS := -f test.he
 
 CC := gcc
-CC_FLAGS := -g -c -Wall
+CC_FLAGS := -g -c -Wall -Wno-unused-variable
 DB := gdb
 DB_FLAGS := $(EXEC)
 

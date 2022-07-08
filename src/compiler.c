@@ -65,6 +65,11 @@ void compile_assignment(program* p, astnode* s)
     vm_scope scope;
     astnode* rhs = vector_get(&s->children, 0);
     int16_t address = register_variable(p, s->value, &scope);
+
+    if (address >= MAX_LOCAL_VARIABLES) {
+        compilererr(p, s->pos, "Maxmum variables in local scope achieved!");
+    }
+
     compile_expression(p, rhs);
     p->code[p->length].sx.sx = address;
     p->code[p->length].sx.op = scope_store_op_map[scope];
@@ -102,6 +107,7 @@ void compile_function(program* p, astnode* function)
     p0->prev = p;
     p0->constant_table = map_new(37);
     p0->symbol_table = map_new(37);
+    p0->native = NULL;
 
     // register parameter names
     astnode* params = vector_get(&function->children, 0);
@@ -214,16 +220,52 @@ void compile_branches(program* p, astnode* branches)
 
     astnode* alt = vector_get(&branches->children, 2);
 
-    if (alt != NULL) {
+    if (alt != NULL) 
+    {
         if (streq(alt->value, "conditional")) {
             compile_branches(p, alt);
         } else {
             compile(p, vector_get(&alt->children, 0));
         }
+
+        p->code[pos1].sx.op = OP_JMP;
+        p->code[pos1].sx.sx = p->length - pos1 - 1;
+    } 
+    else 
+    {
+        p->length--;
+    }
+}
+
+void create_native(program* p, const char* name, Value (*f)(Value))
+{
+    program* p0 = (program*) malloc(sizeof(program));
+    p0->code = NULL;
+    p0->length = 0;
+    p0->argc = 1;
+    p0->src_code = NULL;
+    p0->constants = NULL;
+    p0->symbol_table = map_new(0);
+    p0->constant_table = map_new(0);
+    p0->prev = p;
+    p0->native = f;
+
+    p->code[p->length].ux.op = OP_PUSHK;
+    p->code[p->length].ux.ux = register_constant(p, *vCode(p0));
+    p->length++;
+
+    vm_scope scope;
+    uint16_t address = register_variable(p, name, &scope);
+    
+    if (address >= MAX_LOCAL_VARIABLES) {
+        lxpos pos = { .col_pos = 0, .line_pos = 0, .line_offset = 0, .char_offset = 0};
+        compilererr(p, pos, "Maxmum variables in local scope achieved!");
     }
 
-    p->code[pos1].sx.op = OP_JMP;
-    p->code[pos1].sx.sx = p->length - pos1 - 1;
+    // stores code at address
+    p->code[p->length].sx.sx = address;
+    p->code[p->length].sx.op = scope_store_op_map[scope];
+    p->length++;
 }
 
 // ---------------- MEMORY STORE ----------------
@@ -235,6 +277,11 @@ uint16_t register_constant(program* p, Value v)
     if ((address = map_get(&p->constant_table, value_to_str(&v))) == NULL) 
     {
         address = vInt(p->constant_table.size);
+
+        if (address->value.to_int >= MAX_LOCAL_CONSTANTS) {
+            failure("Max constants in local scope!");
+        }
+
         map_put(&p->constant_table, value_to_str(&v), address);
         p->constants[address->value.to_int] = v;
     }
