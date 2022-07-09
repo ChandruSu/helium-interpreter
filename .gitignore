@@ -2,4 +2,3 @@ bin/
 out/
 .vscode/
 *.stackdump
-*.he

@@ -1,0 +1,21 @@
+? --------------------------------
+    Title:      Prime number Demo
+    Author:     Chandru Suresh
+    Date:       09.07.2022
+  -------------------------------- ?
+
+is_prime <- $(x) {
+    c <- 2
+    p <- true
+
+    loop c < x {
+        p <- p && (x % c > 0)
+        c <- c + 1
+    }
+
+    return p
+}
+
+in <- @int(@input("Input: "))
+
+@print(@is_prime(in))

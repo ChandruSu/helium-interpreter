@@ -5,12 +5,29 @@ Value native_print(Value v) {
     return *vNull();
 }
 
-Value native_sin(Value v) {
-    return *vInt((int)(100 * sin(v.value.to_int * 3.1415 / 180)));
+Value native_input(Value v) {
+    printf("%s", value_to_str(&v));
+    char* buffer = malloc(sizeof(char) * 1000);
+    fscanf(stdin, "%s", buffer);
+    return *vString(buffer);
+}
+
+Value native_int_cast(Value v) {
+    switch (v.type)
+    {
+        case VM_INT: return v;
+        case VM_FLOAT: return *vInt((int)v.value.to_float);
+        case VM_STRING: return *vInt(atoi(v.value.to_str));
+        case VM_BOOL: return *vInt(v.value.to_bool);
+        case VM_NULL: return *vInt(0);
+        case VM_PROGRAM: return *vInt(0);
+    }
+    return *vNull();
 }
 
 void register_all_natives(program* p)
 {
     create_native(p, "print", native_print);
-    create_native(p, "sin", native_sin);
+    create_native(p, "input", native_input);
+    create_native(p, "int", native_int_cast);
 }

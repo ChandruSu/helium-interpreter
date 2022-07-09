@@ -1,0 +1,18 @@
+? --------------------------------
+    Title:      Factorial Demo
+    Author:     Chandru Suresh
+    Date:       08.07.2022
+  -------------------------------- ?
+
+
+# Factorial function implementation using tail recursion.
+factorial <- $(n) {
+    if n <= 0 {
+        return 1
+    } else {
+        return n * @factorial(n - 1)
+    }
+}
+
+@print("The factorial of 10 is: ")
+@print(@factorial(10))

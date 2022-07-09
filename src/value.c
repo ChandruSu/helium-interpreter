@@ -40,8 +40,7 @@ const char* value_to_str(Value* v)
     switch (v->type)
     {
         case VM_STRING:
-            sprintf(buf, "'%s'", v->value.to_str);
-            return buf;
+            return v->value.to_str;
         case VM_BOOL:
             free(buf);
             return v->value.to_bool ? "True" : "False";

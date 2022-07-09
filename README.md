@@ -9,7 +9,6 @@ The helium language is dynamically typed, follows a procedural programming parad
 GNU build-tools are required to build the interpreter, the following binaries are required:
 + make
 + gcc
-+ gdb (for debugging)
 
 To build the interpreter, download the source code and run the following commands in sequence:
 
@@ -60,17 +59,7 @@ helium filename.he
     }
     ```
 
-4. Comments
-
-    ```c
-    # this is a oneline comment
-    
-    ? This is 
-    a multiline 
-    comment ?
-    ```
-
-5. Function declarations
+4. Function declarations
 
     ```c
     bar <- $(x, y) {
@@ -80,7 +69,7 @@ helium filename.he
     The helium interpreter treats functions as first-class objects which can be stored in variables and passed as arguments
 
 
-6. Function calls
+5. Function calls
 
     ```c
     @foo(2)
@@ -95,6 +84,16 @@ helium filename.he
     }
     ```
     Function calls must be preceeded with the `@` character. Recursive function calls are allowed
+
+6. Comments
+
+    ```c
+    # this is a oneline comment
+    
+    ? This is 
+    a multiline 
+    comment ?
+    ```
 
 ## Features
 

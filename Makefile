@@ -13,7 +13,10 @@ DB_FLAGS := $(EXEC)
 
 
 all: $(EXEC)
-	./$(EXEC) $(TEST_FLAGS)
+
+
+test: $(EXEC)
+	$(EXEC) demo/test.he
 
 
 bin/%.o: src/%.c
