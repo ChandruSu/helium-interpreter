@@ -127,13 +127,13 @@ void compile_function(program* p, astnode* function)
 
     if (p0->code[p0->length-1].stackop.op != OP_RET) {
         p0->code[p0->length].ux.op = OP_PUSHK;
-        p0->code[p0->length++].ux.ux = register_constant(p0, *vNull());
+        p0->code[p0->length++].ux.ux = register_constant(p0, vNull());
         p0->code[p0->length++].stackop.op = OP_RET;
     }
 
     // stores code object as local constant
     p->code[p->length].ux.op = OP_PUSHK;
-    p->code[p->length].ux.ux = register_constant(p, *vCode(p0));
+    p->code[p->length].ux.ux = register_constant(p, vCode(p0));
     p->length++;
 }
 
@@ -251,7 +251,7 @@ void create_native(program* p, const char* name, Value (*f)(Value))
     p0->native = f;
 
     p->code[p->length].ux.op = OP_PUSHK;
-    p->code[p->length].ux.ux = register_constant(p, *vCode(p0));
+    p->code[p->length].ux.ux = register_constant(p, vCode(p0));
     p->length++;
 
     vm_scope scope;
@@ -276,7 +276,8 @@ uint16_t register_constant(program* p, Value v)
 
     if ((address = map_get(&p->constant_table, value_to_str(&v))) == NULL) 
     {
-        address = vInt(p->constant_table.size);
+        address = malloc(sizeof(Value));
+        *address = vInt(p->constant_table.size);
 
         if (address->value.to_int >= MAX_LOCAL_CONSTANTS) {
             failure("Max constants in local scope!");
@@ -294,7 +295,8 @@ int16_t register_variable(program* p, const char* name, vm_scope* scope)
     size_t address = dereference_variable(p, name, scope);
 
     if (*scope == VM_UNKNOWN_SCOPE) {
-        Value* a = vInt(p->symbol_table.size);
+        Value* a = malloc(sizeof(Value)); 
+        *a = vInt(p->symbol_table.size);
         map_put(&p->symbol_table, name, a);
         *scope = p->prev == NULL ? VM_GLOBAL_SCOPE : VM_LOCAL_SCOPE;
         return a->value.to_int;
@@ -308,7 +310,8 @@ int16_t register_unique_variable_local(program* p, const char* name, vm_scope* s
     Value* address = map_get(&p->symbol_table, name);
 
     if (address == NULL) {
-        address = vInt(p->symbol_table.size);
+        address = malloc(sizeof(Value));
+        *address = vInt(p->symbol_table.size);
         map_put(&p->symbol_table, name, address);
         *scope = p->prev == NULL ? VM_GLOBAL_SCOPE : VM_LOCAL_SCOPE;
         return address->value.to_int;

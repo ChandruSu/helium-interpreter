@@ -59,50 +59,53 @@ const char* value_to_str(Value* v)
     return NULL;
 }
 
-Value* vNull()
+Value vNull()
 {
-    Value* v = malloc(sizeof(Value));
-    v->type = VM_NULL;
-    v->value.to_code = NULL;
+    Value v = {};
     return v;
 }
 
-Value* vInt(int i)
+Value vInt(int i)
 {
-    Value* v = vNull();
-    v->type = VM_INT;
-    v->value.to_int = i;
+    Value v = {
+        .type = VM_INT,
+        .value.to_int = i
+    };
     return v;
 }
 
-Value* vFloat(float f)
+Value vFloat(float f)
 {
-    Value* v = vNull();
-    v->type = VM_FLOAT;
-    v->value.to_float = f;
+    Value v = {
+        .type = VM_FLOAT,
+        .value.to_float = f
+    };
     return v;
 }
 
-Value* vString(const char* s)
+Value vString(const char* s)
 {
-    Value* v = vNull();
-    v->type = VM_STRING;
-    v->value.to_str = s;
+    Value v = {
+        .type = VM_STRING,
+        .value.to_str = s
+    };
     return v;
 }
 
-Value* vBool(boolean b)
+Value vBool(boolean b)
 {
-    Value* v = vNull();
-    v->type = VM_BOOL;
-    v->value.to_bool = b;
+    Value v = {
+        .type = VM_BOOL,
+        .value.to_bool = b
+    };
     return v;
 }
 
-Value* vCode(program* p)
+Value vCode(program* p)
 {
-    Value* v = vNull();
-    v->type = VM_PROGRAM;
-    v->value.to_code = p;
+    Value v = {
+        .type = VM_PROGRAM,
+        .value.to_code = p
+    };
     return v;
 }

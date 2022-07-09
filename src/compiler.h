@@ -49,44 +49,44 @@ const char* value_to_str(Value* v);
 /**
  * @brief Constructor for null value.
  * 
- * @return Pointer to null Value
+ * @return Value
  */
-Value* vNull();
+Value vNull();
 
 /**
  * @brief Constructor for int value.
  * 
- * @return Pointer to int Value
+ * @return Value
  */
-Value* vInt(int i);
+Value vInt(int i);
 
 /**
  * @brief Constructor for float value.
  * 
- * @return Pointer to float Value
+ * @return Value
  */
-Value* vFloat(float f);
+Value vFloat(float f);
 
 /**
  * @brief Constructor for string value.
  * 
- * @return Pointer to string Value
+ * @return Value
  */
-Value* vString(const char* s);
+Value vString(const char* s);
 
 /**
  * @brief Constructor for bool value.
  * 
- * @return Pointer to bool Value
+ * @return Value
  */
-Value* vBool(boolean b);
+Value vBool(boolean b);
 
 /**
  * @brief Constructor for code object value.
  * 
- * @return Pointer to code Value
+ * @return Value
  */
-Value* vCode(program* p);
+Value vCode(program* p);
 
 // ------------------- VM IR --------------------
 

@@ -97,24 +97,10 @@ helium filename.he
 
 ## Features
 
-### Implemented
-
-+ Bools, String literals
-+ Operator order precedence
-+ Integer arithmetic
-+ Boolean operations
-+ First class functions
-+ Global/local scoping
-+ Bytecode disassembly
-+ Error source printing
-+ While loops
-
 ### Upcoming
 
 + Floating point arithmetic
 + Function closures
-+ Control structures
-    - If statements
 + Complex data types
 + Garbage collection
 + Bitwise operations

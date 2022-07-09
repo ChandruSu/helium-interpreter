@@ -67,11 +67,11 @@ void decode_execute(virtual_machine* vm, call_info* call, instruction i)
             break;
 
         case OP_NEG:
-            vm->stack[call->tp - 1] = *vInt(-vm->stack[call->tp - 1].value.to_int);
+            vm->stack[call->tp - 1] = vInt(-vm->stack[call->tp - 1].value.to_int);
             break;
 
         case OP_NOT:
-            vm->stack[call->tp - 1] = *vBool(!vm->stack[call->tp - 1].value.to_bool);
+            vm->stack[call->tp - 1] = vBool(!vm->stack[call->tp - 1].value.to_bool);
             break;
 
         case OP_PUSHK:
@@ -143,19 +143,19 @@ Value apply_vm_op(vm_op op, Value v0, Value v1)
 {
     switch (op)
     {
-        case OP_ADD: return *vInt(v0.value.to_int + v1.value.to_int);
-        case OP_SUB: return *vInt(v0.value.to_int - v1.value.to_int);
-        case OP_MUL: return *vInt(v0.value.to_int * v1.value.to_int);
-        case OP_DIV: return *vInt(v0.value.to_int / v1.value.to_int);
-        case OP_MOD: return *vInt(v0.value.to_int % v1.value.to_int);
-        case OP_AND: return *vBool(v0.value.to_int && v1.value.to_int);
-        case OP_OR: return *vBool(v0.value.to_int || v1.value.to_int);
-        case OP_EQ: return *vBool(v0.value.to_int == v1.value.to_int);
-        case OP_NE: return *vBool(v0.value.to_int != v1.value.to_int);
-        case OP_LE: return *vBool(v0.value.to_int <= v1.value.to_int);
-        case OP_GE: return *vBool(v0.value.to_int >= v1.value.to_int);
-        case OP_LT: return *vBool(v0.value.to_int < v1.value.to_int);
-        case OP_GT: return *vBool(v0.value.to_int > v1.value.to_int);
+        case OP_ADD: return vInt(v0.value.to_int + v1.value.to_int);
+        case OP_SUB: return vInt(v0.value.to_int - v1.value.to_int);
+        case OP_MUL: return vInt(v0.value.to_int * v1.value.to_int);
+        case OP_DIV: return vInt(v0.value.to_int / v1.value.to_int);
+        case OP_MOD: return vInt(v0.value.to_int % v1.value.to_int);
+        case OP_AND: return vBool(v0.value.to_int && v1.value.to_int);
+        case OP_OR: return vBool(v0.value.to_int || v1.value.to_int);
+        case OP_EQ: return vBool(v0.value.to_int == v1.value.to_int);
+        case OP_NE: return vBool(v0.value.to_int != v1.value.to_int);
+        case OP_LE: return vBool(v0.value.to_int <= v1.value.to_int);
+        case OP_GE: return vBool(v0.value.to_int >= v1.value.to_int);
+        case OP_LT: return vBool(v0.value.to_int < v1.value.to_int);
+        case OP_GT: return vBool(v0.value.to_int > v1.value.to_int);
         default:
             fprintf(stderr, "%s Failed to apply binary operation: %i!\n", ERROR, op);
             exit(0);
