@@ -6,6 +6,9 @@
 #include "datatypes.h"
 #include "parser.h"
 
+#define TYPEPAIR(a, b) (a << 4) | b
+#define TYPEMATCH(a) (a << 4) | a
+
 // ------------------ VM TYPES ------------------
 
 typedef struct program program;
@@ -88,10 +91,48 @@ Value vBool(unsigned long b);
  */
 Value vCode(program* p);
 
-
+/**
+ * @brief Performs addition between two Value operands.
+ * 
+ * @param a Operand 1
+ * @param b Operand 2
+ * @return Result value
+ */
 Value vAdd(Value a, Value b);
+
+/**
+ * @brief Performs subtraction between two Value operands.
+ * 
+ * @param a Operand 1
+ * @param b Operand 2
+ * @return Result value
+ */
 Value vSub(Value a, Value b);
+
+/**
+ * @brief Performs multiplication between two Value operands.
+ * 
+ * @param a Operand 1
+ * @param b Operand 2
+ * @return Result value
+ */
 Value vMul(Value a, Value b);
+
+/**
+ * @brief Returns the negated form of a generic tagged value.
+ * 
+ * @param a Operand
+ * @return Result value 
+ */
+Value vNegate(Value a);
+
+/**
+ * @brief Performs division between two Value operands.
+ * 
+ * @param a Operand 1
+ * @param b Operand 2
+ * @return Result value
+ */
 Value vDiv(Value a, Value b);
 
 // ------------------- VM IR --------------------
@@ -165,7 +206,7 @@ typedef struct program {
     Value* constants;
     struct program* prev;
     const char* src_code;
-    Value (*native)(Value);
+    Value (*native)(Value[]);
 
     map symbol_table;
     map constant_table;
@@ -245,7 +286,16 @@ void compile_loop(program* p, astnode* loop);
  */
 void compile_branches(program* p, astnode* branches);
 
-void create_native(program* p, const char* name, Value (*f)(Value));
+/**
+ * @brief Registers native method with C-wrapper as an accessible symbol to program
+ *      local scope.
+ * 
+ * @param p Reference to program
+ * @param name Name of method
+ * @param f Pointer to wrapper function
+ * @param argc Number of arguments for native method
+ */
+void create_native(program* p, const char* name, Value (*f)(Value[]), int argc);
 
 /**
  * @brief Prints error message into standard error output and

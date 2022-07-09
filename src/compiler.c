@@ -238,12 +238,12 @@ void compile_branches(program* p, astnode* branches)
     }
 }
 
-void create_native(program* p, const char* name, Value (*f)(Value))
+void create_native(program* p, const char* name, Value (*f)(Value[]), int argc)
 {
     program* p0 = (program*) malloc(sizeof(program));
     p0->code = NULL;
     p0->length = 0;
-    p0->argc = 1;
+    p0->argc = argc;
     p0->src_code = NULL;
     p0->constants = NULL;
     p0->symbol_table = map_new(0);

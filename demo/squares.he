@@ -8,9 +8,7 @@ n <- @int(@input("How many? "))
 
 @print("Calculating square numbers: ")
 
-
 a <- 1
-
 loop a <= n {
     @print(a * a)
     a <- a + 1

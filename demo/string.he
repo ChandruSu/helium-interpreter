@@ -1,0 +1,16 @@
+? --------------------------------
+    Title:      String demo
+    Author:     Chandru Suresh
+    Date:       09.07.2022
+  -------------------------------- ?
+
+# Calculates length of input string.
+string <- @input("Enter a string: ")
+@print("The length of your string is " + @str(@len(string)))
+
+# Calculates power from user input.
+a <- @float(@input("Number A = "))
+b <- @float(@input("Number B = "))
+c <- @pow(a, b)
+
+@print(@str(a) + " to the power of " + @str(b) + " = " + @str(c))

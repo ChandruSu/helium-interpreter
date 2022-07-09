@@ -3,6 +3,7 @@
 
 #include <inttypes.h>
 #include "compiler.h"
+#include "lib.h"
 
 // --------------------- VM ---------------------
 

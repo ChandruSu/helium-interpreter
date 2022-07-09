@@ -1,6 +1,7 @@
 
 SOURCE  := $(wildcard src/*.c src/*/*.c)
 HEADER  := $(wildcard src/*.h src/*/*.h)
+DEMOS  := $(wildcard demo/*.he)
 OBJECTS := $(SOURCE:src/%.c=bin/%.o)
 
 EXEC := out/helium
@@ -16,7 +17,7 @@ all: $(EXEC)
 
 
 test: $(EXEC)
-	$(EXEC) $(TEST_FLAGS)
+	$@ demo/test.he
 
 
 bin/%.o: src/%.c

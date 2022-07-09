@@ -1,8 +1,5 @@
 #include "compiler.h"
 
-#define TYPEPAIR(a, b) (a << 4) | b
-#define TYPEMATCH(a) (a << 4) | a
-
 const char* vm_type_strings[] = {
     "Null",
     "Int",
@@ -184,8 +181,6 @@ Value vSub(Value a, Value b)
 
 Value vMul(Value a, Value b)
 {
-    char* buf;
-
     switch (TYPEPAIR(a.type, b.type))
     {
         case TYPEMATCH(VM_BOOL): return vBool(a.value.to_bool && b.value.to_bool);
@@ -207,8 +202,6 @@ Value vMul(Value a, Value b)
 
 Value vDiv(Value a, Value b)
 {
-    char* buf;
-
     if (b.value.to_int == 0 || b.value.to_float == 0) {
         failure("Zero division error!");
     }
@@ -226,6 +219,21 @@ Value vDiv(Value a, Value b)
         case TYPEPAIR(VM_BOOL, VM_FLOAT): return vFloat(a.value.to_bool / b.value.to_float);
         default:
             fprintf(stderr, "%s Cannot multiply values of types %s and %s\n", ERROR, vm_type_strings[a.type], vm_type_strings[b.type]);
+            exit(0);
+    }
+
+    return vNull();
+}
+
+Value vNegate(Value a)
+{
+    switch (a.type)
+    {
+        case VM_BOOL: return vBool(1 - a.value.to_bool);
+        case VM_INT: return vInt(-a.value.to_int);
+        case VM_FLOAT: return vFloat(-a.value.to_float);
+        default:
+            fprintf(stderr, "%s Cannot negate values of types %s\n", ERROR, vm_type_strings[a.type]);
             exit(0);
     }
 

@@ -29,6 +29,8 @@ To execute a helium script file, first install the binary to your system or have
 helium filename.he
 ```
 
+Use the demo scripts in the `demo/` directory to test the interpreter.
+
 ## Language Syntax
 
 1. Variable assignments
@@ -95,11 +97,26 @@ helium filename.he
     comment ?
     ```
 
+7. In-built functions and string concatenation
+
+    ```python
+    a <- @float(@input("Enter a number: "))
+    @print("Square root of " + @str(a) + " is " + @str(@sqrt(a)))
+    ```
+
+    Available methods:
+    + **print** - writes message string to standard output
+    + **input** - reads line from standard input and returns string
+    + **int** - casts value to integer value
+    + **str** - casts value to string value
+    + **float** - casts value to floating point value
+    + **bool** - casts value to boolean value
+    + **len** - returns the length of a string
+
 ## Features
 
 ### Upcoming
 
-+ Floating point arithmetic
 + Function closures
 + Complex data types
 + Garbage collection

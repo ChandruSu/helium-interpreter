@@ -23,7 +23,7 @@ void run_program(virtual_machine* vm, call_info* prev, program* p)
 
     if (call.program->native != NULL) 
     {
-        vm->stack[call.tp++] = call.program->native(vm->stack[call.bp]);
+        vm->stack[call.tp++] = call.program->native(&vm->stack[call.bp]);
         vm->stack[call.prev->tp++] = vm->stack[--call.tp];
     }
 
@@ -67,7 +67,7 @@ void decode_execute(virtual_machine* vm, call_info* call, instruction i)
             break;
 
         case OP_NEG:
-            vm->stack[call->tp - 1] = vInt(-vm->stack[call->tp - 1].value.to_int);
+            vm->stack[call->tp - 1] = vNegate(vm->stack[call->tp - 1]);
             break;
 
         case OP_NOT:
@@ -123,7 +123,7 @@ void decode_execute(virtual_machine* vm, call_info* call, instruction i)
             break;
         
         case OP_JIF:
-            if (vm->stack[--call->tp].value.to_bool) {
+            if (native_bool_cast(&vm->stack[--call->tp]).value.to_bool) {
                 call->pc++;
             }
             break;
