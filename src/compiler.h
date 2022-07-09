@@ -90,6 +90,9 @@ Value vCode(program* p);
 
 
 Value vAdd(Value a, Value b);
+Value vSub(Value a, Value b);
+Value vMul(Value a, Value b);
+Value vDiv(Value a, Value b);
 
 // ------------------- VM IR --------------------
 

@@ -16,7 +16,7 @@
 
 #define MAX_CALL_STACK 0x8f
 #define MAX_STACK_SIZE 0xff
-#define MAX_HEAP_SIZE 0xff
+#define MAX_HEAP_SIZE 0xfff
 #define MAX_LOCAL_CONSTANTS 0xff
 #define MAX_LOCAL_VARIABLES 0xff
 

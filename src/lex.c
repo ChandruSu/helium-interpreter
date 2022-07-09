@@ -29,6 +29,7 @@ const char* lxtype_strings[] = {
     "LX_LOOP             ",
     "LX_IF               ",
     "LX_ELSE             ",
+    "LX_FLOAT            ",
 };
 
 lxtoken* lxtoken_new(const char* value, lxtype type, lxpos pos)
@@ -104,7 +105,6 @@ lxtoken* lex(lexer* lx)
         } 
         while (isdigit((int) lx->lookahead) || (!point && lx->lookahead == '.'));
 
-        
         type = point ? LX_FLOAT : LX_INTEGER;
     }
     else if (lx->lookahead == '"')

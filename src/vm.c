@@ -144,9 +144,9 @@ Value apply_vm_op(vm_op op, Value v0, Value v1)
     switch (op)
     {
         case OP_ADD: return vAdd(v0, v1);
-        case OP_SUB: return vInt(v0.value.to_int - v1.value.to_int);
-        case OP_MUL: return vInt(v0.value.to_int * v1.value.to_int);
-        case OP_DIV: return vInt(v0.value.to_int / v1.value.to_int);
+        case OP_SUB: return vSub(v0, v1);
+        case OP_MUL: return vMul(v0, v1);
+        case OP_DIV: return vDiv(v0, v1);
         case OP_MOD: return vInt(v0.value.to_int % v1.value.to_int);
         case OP_EQ: return vBool(v0.value.to_int == v1.value.to_int);
         case OP_NE: return vBool(v0.value.to_int != v1.value.to_int);

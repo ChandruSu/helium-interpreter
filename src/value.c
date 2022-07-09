@@ -140,8 +140,12 @@ Value vAdd(Value a, Value b)
         case TYPEMATCH(VM_BOOL): return vBool(a.value.to_bool || b.value.to_bool);
         case TYPEMATCH(VM_INT): return vInt(a.value.to_int + b.value.to_int);
         case TYPEMATCH(VM_FLOAT): return vFloat(a.value.to_float + b.value.to_float);
+        case TYPEPAIR(VM_INT, VM_BOOL): return vInt(a.value.to_int + b.value.to_bool);
+        case TYPEPAIR(VM_BOOL, VM_INT): return vInt(a.value.to_bool + b.value.to_int);
         case TYPEPAIR(VM_INT, VM_FLOAT): return vFloat(a.value.to_int + b.value.to_float);
         case TYPEPAIR(VM_FLOAT, VM_INT): return vFloat(a.value.to_float + b.value.to_int);
+        case TYPEPAIR(VM_FLOAT, VM_BOOL): return vFloat(a.value.to_float + b.value.to_bool);
+        case TYPEPAIR(VM_BOOL, VM_FLOAT): return vFloat(a.value.to_bool + b.value.to_float);
         case TYPEMATCH(VM_STRING):
             buf = malloc(sizeof(char) * (strlen(a.value.to_str) + strlen(b.value.to_str)));
             strcpy(buf, a.value.to_str);
@@ -149,6 +153,79 @@ Value vAdd(Value a, Value b)
             return vString(buf);
         default:
             fprintf(stderr, "%s Cannot add values of types %s and %s\n", ERROR, vm_type_strings[a.type], vm_type_strings[b.type]);
+            exit(0);
+    }
+
+    return vNull();
+}
+
+Value vSub(Value a, Value b)
+{
+    char* buf;
+
+    switch (TYPEPAIR(a.type, b.type))
+    {
+        case TYPEMATCH(VM_BOOL): return vBool(a.value.to_bool - b.value.to_bool);
+        case TYPEMATCH(VM_INT): return vInt(a.value.to_int - b.value.to_int);
+        case TYPEMATCH(VM_FLOAT): return vFloat(a.value.to_float - b.value.to_float);
+        case TYPEPAIR(VM_INT, VM_BOOL): return vInt(a.value.to_int - b.value.to_bool);
+        case TYPEPAIR(VM_BOOL, VM_INT): return vInt(a.value.to_bool - b.value.to_int);
+        case TYPEPAIR(VM_INT, VM_FLOAT): return vFloat(a.value.to_int - b.value.to_float);
+        case TYPEPAIR(VM_FLOAT, VM_INT): return vFloat(a.value.to_float - b.value.to_int);
+        case TYPEPAIR(VM_FLOAT, VM_BOOL): return vFloat(a.value.to_float - b.value.to_bool);
+        case TYPEPAIR(VM_BOOL, VM_FLOAT): return vFloat(a.value.to_bool - b.value.to_float);
+        default:
+            fprintf(stderr, "%s Cannot subtract values of types %s and %s\n", ERROR, vm_type_strings[a.type], vm_type_strings[b.type]);
+            exit(0);
+    }
+
+    return vNull();
+}
+
+Value vMul(Value a, Value b)
+{
+    char* buf;
+
+    switch (TYPEPAIR(a.type, b.type))
+    {
+        case TYPEMATCH(VM_BOOL): return vBool(a.value.to_bool && b.value.to_bool);
+        case TYPEMATCH(VM_INT): return vInt(a.value.to_int * b.value.to_int);
+        case TYPEMATCH(VM_FLOAT): return vFloat(a.value.to_float * b.value.to_float);
+        case TYPEPAIR(VM_INT, VM_BOOL): return vInt(a.value.to_int * b.value.to_bool);
+        case TYPEPAIR(VM_BOOL, VM_INT): return vInt(a.value.to_bool * b.value.to_int);
+        case TYPEPAIR(VM_INT, VM_FLOAT): return vFloat(a.value.to_int * b.value.to_float);
+        case TYPEPAIR(VM_FLOAT, VM_INT): return vFloat(a.value.to_float * b.value.to_int);
+        case TYPEPAIR(VM_FLOAT, VM_BOOL): return vFloat(a.value.to_float * b.value.to_bool);
+        case TYPEPAIR(VM_BOOL, VM_FLOAT): return vFloat(a.value.to_bool * b.value.to_float);
+        default:
+            fprintf(stderr, "%s Cannot multiply values of types %s and %s\n", ERROR, vm_type_strings[a.type], vm_type_strings[b.type]);
+            exit(0);
+    }
+
+    return vNull();
+}
+
+Value vDiv(Value a, Value b)
+{
+    char* buf;
+
+    if (b.value.to_int == 0 || b.value.to_float == 0) {
+        failure("Zero division error!");
+    }
+
+    switch (TYPEPAIR(a.type, b.type))
+    {
+        case TYPEMATCH(VM_BOOL): return vBool(a.value.to_bool / b.value.to_bool);
+        case TYPEMATCH(VM_INT): return vInt(a.value.to_int / b.value.to_int);
+        case TYPEMATCH(VM_FLOAT): return vFloat(a.value.to_float / b.value.to_float);
+        case TYPEPAIR(VM_INT, VM_BOOL): return vInt(a.value.to_int / b.value.to_bool);
+        case TYPEPAIR(VM_BOOL, VM_INT): return vInt(a.value.to_bool / b.value.to_int);
+        case TYPEPAIR(VM_INT, VM_FLOAT): return vFloat(a.value.to_int / b.value.to_float);
+        case TYPEPAIR(VM_FLOAT, VM_INT): return vFloat(a.value.to_float / b.value.to_int);
+        case TYPEPAIR(VM_FLOAT, VM_BOOL): return vFloat(a.value.to_float / b.value.to_bool);
+        case TYPEPAIR(VM_BOOL, VM_FLOAT): return vFloat(a.value.to_bool / b.value.to_float);
+        default:
+            fprintf(stderr, "%s Cannot multiply values of types %s and %s\n", ERROR, vm_type_strings[a.type], vm_type_strings[b.type]);
             exit(0);
     }
 
