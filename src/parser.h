@@ -16,6 +16,7 @@ typedef struct parser {
 typedef enum asttype {
     AST_ROOT,
     AST_INTEGER,
+    AST_FLOAT,
     AST_BOOL,
     AST_STRING,
     AST_NULL,

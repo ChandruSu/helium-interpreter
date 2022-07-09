@@ -24,10 +24,10 @@ The interpreter executable can be found in the `out/` directory.
 ## Installing & Running
 
 To execute a helium script file, first install the binary to your system or have the executable in the same directory as the target file, then run the following command on your terminal:
+
 ```bash
 helium filename.he
 ```
-
 
 ## Language Syntax
 

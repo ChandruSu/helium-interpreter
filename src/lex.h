@@ -32,6 +32,7 @@ typedef enum lxtype {
     LX_LOOP,            // 20
     LX_IF,
     LX_ELSE,
+    LX_FLOAT,
 } lxtype;
 
 typedef struct lxpos {

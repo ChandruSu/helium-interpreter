@@ -1,5 +1,17 @@
 #include "compiler.h"
 
+#define TYPEPAIR(a, b) (a << 4) | b
+#define TYPEMATCH(a) (a << 4) | a
+
+const char* vm_type_strings[] = {
+    "Null",
+    "Int",
+    "Boolean",
+    "Float",
+    "String",
+    "Code",
+};
+
 Value value_from_node(astnode* node)
 {
     Value v;
@@ -9,6 +21,11 @@ Value value_from_node(astnode* node)
         case AST_INTEGER:
             v.type = VM_INT;
             v.value.to_int = atoi(node->value);
+            break;
+        
+        case AST_FLOAT:
+            v.type = VM_FLOAT;
+            v.value.to_float = atof(node->value);
             break;
         
         case AST_BOOL:
@@ -59,6 +76,8 @@ const char* value_to_str(Value* v)
     return NULL;
 }
 
+// --------------- Constructors ---------------
+
 Value vNull()
 {
     Value v = {};
@@ -92,11 +111,11 @@ Value vString(const char* s)
     return v;
 }
 
-Value vBool(boolean b)
+Value vBool(unsigned long b)
 {
     Value v = {
         .type = VM_BOOL,
-        .value.to_bool = b
+        .value.to_bool = b != 0
     };
     return v;
 }
@@ -108,4 +127,30 @@ Value vCode(program* p)
         .value.to_code = p
     };
     return v;
+}
+
+// ---------------- Arithmetic ----------------
+
+Value vAdd(Value a, Value b)
+{
+    char* buf;
+
+    switch (TYPEPAIR(a.type, b.type))
+    {
+        case TYPEMATCH(VM_BOOL): return vBool(a.value.to_bool || b.value.to_bool);
+        case TYPEMATCH(VM_INT): return vInt(a.value.to_int + b.value.to_int);
+        case TYPEMATCH(VM_FLOAT): return vFloat(a.value.to_float + b.value.to_float);
+        case TYPEPAIR(VM_INT, VM_FLOAT): return vFloat(a.value.to_int + b.value.to_float);
+        case TYPEPAIR(VM_FLOAT, VM_INT): return vFloat(a.value.to_float + b.value.to_int);
+        case TYPEMATCH(VM_STRING):
+            buf = malloc(sizeof(char) * (strlen(a.value.to_str) + strlen(b.value.to_str)));
+            strcpy(buf, a.value.to_str);
+            strcat(buf, b.value.to_str);
+            return vString(buf);
+        default:
+            fprintf(stderr, "%s Cannot add values of types %s and %s\n", ERROR, vm_type_strings[a.type], vm_type_strings[b.type]);
+            exit(0);
+    }
+
+    return vNull();
 }

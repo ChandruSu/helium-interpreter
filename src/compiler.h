@@ -79,7 +79,7 @@ Value vString(const char* s);
  * 
  * @return Value
  */
-Value vBool(boolean b);
+Value vBool(unsigned long b);
 
 /**
  * @brief Constructor for code object value.
@@ -87,6 +87,9 @@ Value vBool(boolean b);
  * @return Value
  */
 Value vCode(program* p);
+
+
+Value vAdd(Value a, Value b);
 
 // ------------------- VM IR --------------------
 

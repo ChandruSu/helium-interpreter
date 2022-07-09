@@ -2,7 +2,7 @@
 
 #include <time.h>
 
-#define HE_DEBUG 0
+#define HE_DEBUG 1
 
 int main(int argc, const char* argv[])
 {

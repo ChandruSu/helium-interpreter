@@ -4,7 +4,7 @@ HEADER  := $(wildcard src/*.h src/*/*.h)
 OBJECTS := $(SOURCE:src/%.c=bin/%.o)
 
 EXEC := out/helium
-TEST_FLAGS := demo/squares.he
+TEST_FLAGS := demo/test.he
 
 CC := gcc
 CC_FLAGS := -g -c -Wall -Wno-unused-variable

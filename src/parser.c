@@ -161,6 +161,11 @@ astnode* parse_primary(parser* p)
             node->type = AST_INTEGER;
             node->value = eat(p)->value;
             break;
+
+        case LX_FLOAT:
+            node->type = AST_FLOAT;
+            node->value = eat(p)->value;
+            break;
         
         case LX_BOOL:
             node->type = AST_BOOL;

@@ -96,8 +96,16 @@ lxtoken* lex(lexer* lx)
     } 
     else if (isdigit((int) lx->lookahead))
     {
-        type = LX_INTEGER;
-        do buf[len++] = lexadvance(lx); while (isdigit((int) lx->lookahead));
+        int point = 0;
+        
+        do {
+            point += lx->lookahead == '.'; 
+            buf[len++] = lexadvance(lx); 
+        } 
+        while (isdigit((int) lx->lookahead) || (!point && lx->lookahead == '.'));
+
+        
+        type = point ? LX_FLOAT : LX_INTEGER;
     }
     else if (lx->lookahead == '"')
     {

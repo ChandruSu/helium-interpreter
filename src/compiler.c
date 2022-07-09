@@ -171,6 +171,7 @@ void compile_expression(program* p, astnode* expression)
             break;
 
         case AST_INTEGER:
+        case AST_FLOAT:
         case AST_STRING:
         case AST_BOOL:
         case AST_NULL:
