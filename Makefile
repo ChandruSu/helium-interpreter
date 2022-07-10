@@ -17,7 +17,7 @@ all: $(EXEC)
 
 
 test: $(EXEC)
-	$@ demo/test.he
+	$(EXEC) demo/test.he
 
 
 bin/%.o: src/%.c

@@ -2,6 +2,8 @@
 #define HE_EXECUTION_HEADER
 
 #include <stdint.h>
+#include <stdlib.h>
+#include <stdio.h>
 #include "common.h"
 #include "datatypes.h"
 #include "parser.h"
@@ -210,6 +212,7 @@ typedef struct program {
 
     map symbol_table;
     map constant_table;
+    map line_address_table;
 } program;
 
 /**
@@ -373,5 +376,9 @@ const char* disassemble_program(program* p);
  * @return String
  */
 const char* disassemble(program* p, instruction i);
+
+void recordaddress(program* p, lxpos* pos);
+
+lxpos* getaddresspos(program* p, int pos);
 
 #endif

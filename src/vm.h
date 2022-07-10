@@ -42,4 +42,6 @@ void run_program(virtual_machine* vm, call_info* prev, program* p);
  */
 void decode_execute(virtual_machine* vm, call_info* call, instruction i);
 
+void runtimeerr(virtual_machine* vm, const char* msg);
+
 #endif

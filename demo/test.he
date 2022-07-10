@@ -1,14 +1,10 @@
-? --------------------------------
-    Title:      Circle radius demo
-    Author:     Chandru Suresh
-    Date:       09.07.2022
-  -------------------------------- ?
 
-PI <- 3.14159265359
 
-circle_area <- $(r) {
-    return PI * @pow(r, 2)
+func <- $(a, b) {
+    a <- a * b
+    @print("Hello world")
+    return a * 2 * 3
 }
 
-radius <- @float(@input("Radius = "))
-@print("Area = " + @str(@circle_area(radius)))
+@func(1, 2)
+

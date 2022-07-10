@@ -27,6 +27,8 @@ void compile(program* p, astnode* block)
 
 void compile_statement(program* p, astnode* statement)
 {
+    recordaddress(p, &statement->pos);
+
     switch (statement->type)
     {
         case AST_ASSIGN:
@@ -107,6 +109,7 @@ void compile_function(program* p, astnode* function)
     p0->prev = p;
     p0->constant_table = map_new(37);
     p0->symbol_table = map_new(37);
+    p0->line_address_table = map_new(37);
     p0->native = NULL;
 
     // register parameter names
@@ -248,6 +251,7 @@ void create_native(program* p, const char* name, Value (*f)(Value[]), int argc)
     p0->constants = NULL;
     p0->symbol_table = map_new(0);
     p0->constant_table = map_new(0);
+    p0->line_address_table = map_new(0);
     p0->prev = p;
     p0->native = f;
 
@@ -529,4 +533,28 @@ void compilererr(program* p, lxpos pos, const char* msg)
     fprintf(stderr, "\t| %04i %s\n", pos.line_pos + 1, get_line(p->src_code, pos.line_offset));
     fprintf(stderr, "\t| %s'\n%s", paddchar('~', 5 + pos.col_pos), DEF_COL);
     exit(0);
+}
+
+void recordaddress(program* p, lxpos* pos)
+{
+    lxpos* last = p->line_address_table.values[p->line_address_table.size - 1];
+
+    if (p->line_address_table.size == 0 || last->line_pos < pos->line_pos) {
+        char* buf = malloc(sizeof(char) * 8);
+        sprintf(buf, "%li", p->length);
+        map_put(&p->line_address_table, buf, pos);
+    }
+}
+
+lxpos* getaddresspos(program* p, int pos)
+{
+    for (size_t i = p->line_address_table.size - 1; i >= 0; i--)
+    {
+        size_t pos0 = atoi(p->line_address_table.keys[i]);
+
+        if (pos0 <= pos) {
+            return p->line_address_table.values[i];
+        }
+    }
+    return NULL;
 }

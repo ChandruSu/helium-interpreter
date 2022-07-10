@@ -55,7 +55,8 @@ int main(int argc, const char* argv[])
         .prev = NULL,
 
         .constant_table = map_new(37),
-        .symbol_table = map_new(37)
+        .symbol_table = map_new(37),
+        .line_address_table = map_new(37)
     };
     
     register_all_natives(&pp);
@@ -66,6 +67,7 @@ int main(int argc, const char* argv[])
     
     printf("\n%s Beginning bytecode execution:\n\n", MESSAGE);
 #endif
+
     clock_t begin = clock();
     
     virtual_machine vm = {
