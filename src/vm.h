@@ -8,7 +8,7 @@
 // --------------------- VM ---------------------
 
 typedef struct call_info {
-    program* program;
+    code_object* program;
     size_t bp;              // registers
     size_t sp;
     size_t tp;
@@ -29,9 +29,9 @@ typedef struct virtual_machine {
  * 
  * @param vm Reference to virtual machine
  * @param prev Previous call information
- * @param p Program to run
+ * @param code Code value containing program to run
  */
-void run_program(virtual_machine* vm, call_info* prev, program* p);
+void run_program(virtual_machine* vm, call_info* prev, code_object* code);
 
 /**
  * @brief Decodes instruction and executes it using the current

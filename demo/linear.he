@@ -1,0 +1,27 @@
+? --------------------------------
+    Title:      Linear equation demo
+    Author:     Chandru Suresh
+    Date:       09.07.2022
+  -------------------------------- ?
+
+linear <- $(m, c) {
+    
+    ? uses function closure to store the
+      local values of vars m, c ?
+
+    return $(x) {
+        return m * x + c
+    }  
+}
+
+# linear equation.
+f <- @linear(2, 1)
+
+@print("First 10 values of y=2x+1")
+
+# prints first 10 values of linear equation
+a <- 1
+loop a <= 10 {
+    @print("f(" + @str(a) + ") = " + @str(@f(a)))
+    a <- a + 1
+}

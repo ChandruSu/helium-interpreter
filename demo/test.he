@@ -1,8 +1,2 @@
-include "include.he"
 
-methodB <- $() {
-    @print("This method is in demo/test.he")
-}
-
-@methodA()
-@methodB()
+@print("Hello World!")

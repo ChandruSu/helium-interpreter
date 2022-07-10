@@ -1,14 +1,14 @@
 
 SOURCE  := $(wildcard src/*.c src/*/*.c)
 HEADER  := $(wildcard src/*.h src/*/*.h)
-DEMOS  := $(wildcard demo/*.he)
 OBJECTS := $(SOURCE:src/%.c=bin/%.o)
 
 EXEC := out/helium
 TEST_FLAGS := demo/test.he
 
+DEBUG := -g
 CC := gcc
-CC_FLAGS := -g -c -Wall -Wno-unused-variable
+CC_FLAGS := $(DEBUG) -c -Wall -Wno-unused-variable
 DB := gdb
 DB_FLAGS := $(EXEC)
 
@@ -25,7 +25,7 @@ bin/%.o: src/%.c
 
 
 $(EXEC): $(OBJECTS)
-	$(CC) -g $^ -o $@
+	$(CC) $(DEBUG) $^ -o $@
 
 
 clean:

@@ -6,12 +6,14 @@ vm_op decode_unary_op(const char* operator);
 vm_op scope_load_op_map[] = {
     OP_LOADL,
     OP_LOADG,
+    OP_LOADC,
     OP_NOP,
 };
 
 vm_op scope_store_op_map[] = {
     OP_STORL,
     OP_STORG,
+    OP_NOP,
     OP_NOP,
 };
 
@@ -140,8 +142,23 @@ void compile_function(program* p, astnode* function)
 
     // stores code object as local constant
     p->code[p->length].ux.op = OP_PUSHK;
-    p->code[p->length].ux.ux = register_constant(p, vCode(p0));
+    p->code[p->length].ux.ux = register_constant(p, vCode(p0, NULL));
     p->length++;
+
+    if (p0->closure_table.size) {
+
+        // loads closure values to create closure object
+        for (size_t i = 0; i < p0->closure_table.size; i++) {
+            vm_scope scope;
+            p->code[p->length].sx.sx = dereference_variable(p, p0->closure_table.keys[i], &scope);
+            p->code[p->length].sx.op = scope_load_op_map[scope];
+            p->length++;
+        }
+        
+        p->code[p->length].ux.op = OP_CLOSE;
+        p->code[p->length].ux.ux = p0->closure_table.size;
+        p->length++;
+    }
 }
 
 void compile_expression(program* p, astnode* expression)
@@ -254,12 +271,13 @@ void create_native(program* p, const char* name, Value (*f)(Value[]), int argc)
     p0->constants = NULL;
     p0->symbol_table = map_new(0);
     p0->constant_table = map_new(0);
+    p0->closure_table = map_new(0);
     p0->line_address_table = map_new(0);
     p0->prev = p;
     p0->native = f;
 
     p->code[p->length].ux.op = OP_PUSHK;
-    p->code[p->length].ux.ux = register_constant(p, vCode(p0));
+    p->code[p->length].ux.ux = register_constant(p, vCode(p0, NULL));
     p->length++;
 
     vm_scope scope;
@@ -343,6 +361,7 @@ int16_t register_variable(program* p, const char* name, vm_scope* scope)
     }
 }
 
+// TODO: change this, poorly implemented
 int16_t register_unique_variable_local(program* p, const char* name, vm_scope* scope)
 {
     Value* address = map_get(&p->symbol_table, name);
@@ -380,6 +399,16 @@ int16_t dereference_variable(program* p, const char* name, vm_scope* scope)
         *scope = VM_LOCAL_SCOPE;
     } else {
         *scope = VM_CLOSED_SCOPE;
+
+        // retrieves or registers closure address
+        if (map_has(&p->closure_table, name)) {
+            address = map_get(&p->closure_table, name);
+        } else {
+            Value* a = malloc(sizeof(Value)); 
+            *a = vInt(p->closure_table.size);
+            map_put(&p->closure_table, name, a);
+            address = a;
+        }
     }
     
     return address->value.to_int;
@@ -456,11 +485,13 @@ const char* operation_strings[] = {
     "OP_LOADG    ",
     "OP_STORL    ",
     "OP_LOADL    ",
+    "OP_LOADC    ",
     "OP_CALL     ",
     "OP_RET      ",
     "OP_POP      ",
     "OP_JIF      ",
     "OP_JMP      ",
+    "OP_CLOSE    ",
 };
 
 const char* disassemble_program(program* p) 
@@ -481,12 +512,12 @@ const char* disassemble_program(program* p)
         Value* index = p->constant_table.values[i];
         Value program = p->constants[index->value.to_int];
 
-        if (program.type == VM_PROGRAM)
+        if (program.type == VM_PROGRAM && program.value.to_code->p->native == NULL)
         {
             strcat(buf, "\n");
             strcat(buf, value_to_str(&program));
             strcat(buf, ":\n");
-            strcat(buf, disassemble_program(p->constants[index->value.to_int].value.to_code));
+            strcat(buf, disassemble_program(p->constants[index->value.to_int].value.to_code->p));
         }
     }
     
@@ -521,6 +552,7 @@ const char* disassemble(program* p, instruction i) {
             break;
         
         case OP_CALL:
+        case OP_CLOSE:
             sprintf(buf, "%s %u", operation_strings[i.stackop.op], i.ux.ux);
             break;
         
@@ -529,10 +561,15 @@ const char* disassemble(program* p, instruction i) {
             break;
         
         case OP_PUSHK:
-            Value c = p->constants[i.ux.ux];
-            sprintf(buf, "%s %u (%s)", operation_strings[i.stackop.op], i.ux.ux, value_to_str(&c));
+            Value k = p->constants[i.ux.ux];
+            sprintf(buf, "%s %u (%s)", operation_strings[i.stackop.op], i.ux.ux, value_to_str(&k));
             break;
         
+        case OP_LOADC:
+            const char* c = p->closure_table.keys[i.ux.ux];
+            sprintf(buf, "%s %u (%s)", operation_strings[i.stackop.op], i.ux.ux, c);
+            break;
+
         case OP_STORG:
         case OP_LOADG:
             // uses global program to decode symbols

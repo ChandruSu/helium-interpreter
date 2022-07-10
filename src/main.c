@@ -26,7 +26,6 @@ int main(int argc, const char* argv[])
 #endif
 
     vector tokens = vector_new(64);
-
     lexer lx = lexer_new(src, fpath);
     lexify(&lx, &tokens);
     
@@ -61,7 +60,8 @@ int main(int argc, const char* argv[])
 
         .constant_table = map_new(37),
         .symbol_table = map_new(37),
-        .line_address_table = map_new(37)
+        .closure_table = map_new(37),
+        .line_address_table = map_new(37),
     };
     
     register_all_natives(&pp);
@@ -71,10 +71,10 @@ int main(int argc, const char* argv[])
     printf(disassemble_program(&pp));
     
     printf("\n%s Beginning bytecode execution:\n\n", MESSAGE);
-#endif
-
-    clock_t begin = clock();
     
+    clock_t begin = clock();
+#endif
+  
     virtual_machine vm = {
         .ci = -1,
         .call_stack = malloc(sizeof(call_info) * MAX_CALL_STACK),
@@ -83,13 +83,16 @@ int main(int argc, const char* argv[])
     };
 
     // runs program
-    run_program(&vm, NULL, &pp);
-
-    clock_t end = clock();
-    double time_spent = 1000 * (double)(end - begin) / CLOCKS_PER_SEC;
-
+    code_object c = {
+        .closure = NULL,
+        .p = &pp
+    };
+    run_program(&vm, NULL, &c);
 
 #ifdef HE_DEBUG_MODE
+    clock_t end = clock();
+    double time_spent = 1000 * (double)(end - begin) / CLOCKS_PER_SEC;
+    
     printf("\n%s Execution took %f milliseconds!\n", MESSAGE, time_spent);
     
     for (size_t i = 0; i < 0xf; i++)
@@ -105,6 +108,5 @@ int main(int argc, const char* argv[])
     
     printf("\n%s Program has ended successfully!\n\n", MESSAGE);
 #endif
-
     return 0;
 }

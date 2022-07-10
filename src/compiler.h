@@ -11,6 +11,12 @@
 // ------------------ VM TYPES ------------------
 
 typedef struct program program;
+typedef struct Value Value;
+
+typedef struct code_object {
+    program* p;
+    Value* closure;
+} code_object;
 
 typedef enum vm_type {
     VM_NULL,
@@ -28,7 +34,7 @@ typedef struct Value {
         int32_t to_int;
         float to_float;
         const char* to_str;
-        program* to_code;
+        code_object* to_code;
     } value;
 } Value;
 
@@ -86,9 +92,12 @@ Value vBool(unsigned long b);
 /**
  * @brief Constructor for code object value.
  * 
+ * @param p Reference to program
+ * @param closure Closure object containing constants
+ * 
  * @return Value
  */
-Value vCode(program* p);
+Value vCode(program* p, Value* closure);
 
 /**
  * @brief Performs addition between two Value operands.
@@ -158,12 +167,13 @@ typedef enum vm_op {
     OP_LOADG,
     OP_STORL,
     OP_LOADL,
+    OP_LOADC,
     OP_CALL,
     OP_RET,
     OP_POP,
     OP_JIF,
     OP_JMP,
-    OP_IMP
+    OP_CLOSE
 } vm_op;
 
 typedef enum vm_scope {
@@ -178,13 +188,6 @@ typedef union instruction {
     struct {
         vm_op op;
     } stackop;
-    
-    struct {
-        vm_op op;
-        uint8_t r0;
-        uint8_t r1;
-        uint8_t r2;
-    } r0r1r2;
 
     struct {
         vm_op op;
@@ -209,6 +212,7 @@ typedef struct program {
 
     map symbol_table;
     map constant_table;
+    map closure_table;
     map line_address_table;
 } program;
 

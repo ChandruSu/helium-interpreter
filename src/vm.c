@@ -2,15 +2,15 @@
 
 Value apply_vm_op(vm_op op, Value v0, Value v1);
 
-void run_program(virtual_machine* vm, call_info* prev, program* p)
+void run_program(virtual_machine* vm, call_info* prev, code_object* code)
 {
     size_t ci = ++vm->ci;
 
-    vm->call_stack[ci].program = p;
+    vm->call_stack[ci].program = code;
     vm->call_stack[ci].pc = 0;
     vm->call_stack[ci].bp = prev == NULL ? 0 : prev->tp;
-    vm->call_stack[ci].sp = prev == NULL ? 0 : prev->tp + p->symbol_table.size;
-    vm->call_stack[ci].tp = prev == NULL ? 0 : prev->tp + p->symbol_table.size;
+    vm->call_stack[ci].sp = prev == NULL ? 0 : prev->tp + code->p->symbol_table.size;
+    vm->call_stack[ci].tp = prev == NULL ? 0 : prev->tp + code->p->symbol_table.size;
     vm->call_stack[ci].prev = prev;
 
     call_info* call = &vm->call_stack[ci];
@@ -21,17 +21,17 @@ void run_program(virtual_machine* vm, call_info* prev, program* p)
         runtimeerr(vm, "Stack overflow!");
     }
 
-    if (call->program->native != NULL) 
+    if (code->p->native != NULL) 
     {
-        vm->stack[call->tp++] = call->program->native(&vm->stack[call->bp]);
+        vm->stack[call->tp++] = code->p->native(&vm->stack[call->bp]);
         vm->stack[call->prev->tp++] = vm->stack[--call->tp];
     }
 
-    while (call->pc < p->length)
+    while (call->pc < code->p->length)
     {
-        decode_execute(vm, call, call->program->code[call->pc]);
+        decode_execute(vm, call, code->p->code[call->pc]);
         
-        if (call->program->code[call->pc].stackop.op == OP_RET) {
+        if (code->p->code[call->pc].stackop.op == OP_RET) {
             break;
         }
         
@@ -75,7 +75,7 @@ void decode_execute(virtual_machine* vm, call_info* call, instruction i)
             break;
 
         case OP_PUSHK:
-            vm->stack[call->tp++] = call->program->constants[i.ux.ux];
+            vm->stack[call->tp++] = call->program->p->constants[i.ux.ux];
             
             if (call->tp >= MAX_STACK_SIZE) runtimeerr(vm, "Stack overflow!");
             break;
@@ -104,11 +104,25 @@ void decode_execute(virtual_machine* vm, call_info* call, instruction i)
             if (call->tp >= MAX_STACK_SIZE) runtimeerr(vm, "Stack overflow!");
             break;
 
-        case OP_CALL:
-            program* code = vm->stack[--call->tp].value.to_code;
-            call->tp -= code->argc;
+        case OP_LOADC:
+            vm->stack[call->tp++] = call->program->closure[i.ux.ux];
 
-            if (i.ux.ux == code->argc)
+            if (call->tp >= MAX_STACK_SIZE) runtimeerr(vm, "Stack overflow!");
+            break;
+
+        case OP_CALL:
+            if (vm->stack[--call->tp].type != VM_PROGRAM) {
+                char msg[1000];
+                msg[0] = '\0';
+                sprintf(msg, "Cannot call value %s, expected function type!", value_to_str(&vm->stack[--call->tp]));
+                runtimeerr(vm, msg);
+            }
+
+            code_object* code = vm->stack[call->tp].value.to_code;
+
+            call->tp -= code->p->argc;
+
+            if (i.ux.ux == code->p->argc)
                 run_program(vm, call, code);
             else {
                 runtimeerr(vm, "Invalid number of arguments passed to function!");
@@ -133,8 +147,19 @@ void decode_execute(virtual_machine* vm, call_info* call, instruction i)
             call->pc += i.sx.sx;
             break;
         
+        case OP_CLOSE:
+            Value* closure = malloc(sizeof(Value) * i.ux.ux);
+            call->tp -= i.ux.ux;
+            
+            for (size_t i0 = 0; i0 < i.ux.ux; i0++) {
+                closure[i0] = vm->stack[call->tp + i0];
+            }
+
+            vm->stack[call->tp - 1] = vCode(vm->stack[call->tp - 1].value.to_code->p, closure);
+            break;
+        
         default:
-            fprintf(stderr, "%s Failed to execute instruction: %s\n", ERROR, disassemble(call->program, i));
+            fprintf(stderr, "%s Failed to execute instruction: %s\n", ERROR, disassemble(call->program->p, i));
             exit(0);
             break;
     }
@@ -172,9 +197,9 @@ void runtimeerr(virtual_machine* vm, const char* msg)
     for (size_t i = 0; i <= vm->ci; i++)
     {
         call_info call = vm->call_stack[i];
-        lxpos* pos = getaddresspos(call.program, call.pc);
+        lxpos* pos = getaddresspos(call.program->p, call.pc);
         
-        Value v = vCode(call.program);
+        Value v = vCode(call.program->p, NULL);
         fprintf(stderr, "\t%s In file %s at line %i:\n", value_to_str(&v), pos->origin, pos->line_pos + 1);
         fprintf(stderr, "\t\t| %04i %s\n", pos->line_pos + 1, get_line(pos->src, pos->line_offset));
     }

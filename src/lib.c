@@ -87,7 +87,7 @@ Value native_length(Value v[])
         case VM_STRING: return vInt(strlen(v[0].value.to_str));
         case VM_BOOL: return v[0];
         case VM_NULL: return vInt(0);
-        case VM_PROGRAM: return vInt(v[0].value.to_code->argc);
+        case VM_PROGRAM: return vInt(v[0].value.to_code->p->argc);
     }
     return vNull();
 }
@@ -121,7 +121,7 @@ void register_all_natives(program* p)
     create_native(p, "str", native_str_cast, 1);
     create_native(p, "float", native_float_cast, 1);
     create_native(p, "bool", native_bool_cast, 1);
-    create_native(p, "sqrt", native_sqrt, 1);
     create_native(p, "len", native_length, 1);
+    create_native(p, "sqrt", native_sqrt, 1);
     create_native(p, "pow", native_pow, 2);
 }

@@ -35,13 +35,13 @@ Use the demo scripts in the `demo/` directory to test the interpreter.
 
 1. Variable assignments
     
-    ```c
+    ```c++
     foo <- 10 * bar + 7
     ```
 
 2. If, else if, else blocks
 
-    ```c
+    ```c++
     if a && b {
         # block 1
     } else if c || d {
@@ -63,7 +63,7 @@ Use the demo scripts in the `demo/` directory to test the interpreter.
 
 4. Function declarations
 
-    ```c
+    ```c++
     bar <- $(x, y) {
         return 5 * x * y
     }
@@ -73,10 +73,11 @@ Use the demo scripts in the `demo/` directory to test the interpreter.
 
 5. Function calls
 
-    ```c
+    ```c++
     @foo(2)
     baz <- @bar(7, 3)
 
+    # recursive function
     factorial <- $(n) {
         if n > 0 {
             return n * @factorial(n - 1)
@@ -84,12 +85,16 @@ Use the demo scripts in the `demo/` directory to test the interpreter.
             return 1
         }
     }
+
+    # function closure
+    multiplier <- $(n) { return $(x) { return x * n } }
+    mul2 <- @multiplier(2)
     ```
-    Function calls must be preceeded with the `@` character. Recursive function calls are allowed
+    Function calls must be preceeded with the `@` character. Recursive function calls are allowed and function closures are also possible
 
 6. Comments
 
-    ```c
+    ```c++
     # this is a oneline comment
     
     ? This is 
@@ -99,7 +104,7 @@ Use the demo scripts in the `demo/` directory to test the interpreter.
 
 7. In-built functions and string concatenation
 
-    ```python
+    ```c++
     a <- @float(@input("Enter a number: "))
     @print("Square root of " + @str(a) + " is " + @str(@sqrt(a)))
     ```
@@ -112,10 +117,12 @@ Use the demo scripts in the `demo/` directory to test the interpreter.
     + **float** - casts value to floating point value
     + **bool** - casts value to boolean value
     + **len** - returns the length of a string
+    + **pow** - calculates argument 1 raised to the power of argument 2 
+    + **sqrt** - calculates the square root of a value
 
 8. Importing other files
 
-    ```c
+    ```c++
     include "relative/path/to/file.he"
 
     @methodFromFile()
@@ -124,9 +131,23 @@ Use the demo scripts in the `demo/` directory to test the interpreter.
 
 ## Features
 
+### Implemented
+
++ Primitive types:
+    - Integers
+    - Floating points
+    - Booleans
+    - Strings
++ Iteration, branching, functions
++ Functions are first class objects
++ Function closures
++ Lambda functions (anonymous methods)
++ Recursion
++ File imports
+
 ### Upcoming
 
-+ Function closures
 + Complex data types
 + Garbage collection
 + Bitwise operations
++ File IO

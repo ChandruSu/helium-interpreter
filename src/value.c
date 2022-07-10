@@ -117,12 +117,14 @@ Value vBool(unsigned long b)
     return v;
 }
 
-Value vCode(program* p)
+Value vCode(program* p, Value* closure)
 {
     Value v = {
         .type = VM_PROGRAM,
-        .value.to_code = p
+        .value.to_code = malloc(sizeof(code_object))
     };
+    v.value.to_code->p = p;
+    v.value.to_code->closure = closure;
     return v;
 }
 
