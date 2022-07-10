@@ -113,6 +113,15 @@ Use the demo scripts in the `demo/` directory to test the interpreter.
     + **bool** - casts value to boolean value
     + **len** - returns the length of a string
 
+8. Importing other files
+
+    ```c
+    include "path/to/file.he"
+
+    @methodFromFile()
+    ```
+    Include statements can only be executed at global scope. Currently, the filepaths must be relative to interpreter, not relative to file.
+
 ## Features
 
 ### Upcoming

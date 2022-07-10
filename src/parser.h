@@ -32,6 +32,7 @@ typedef enum asttype {
     AST_RETURN,
     AST_LOOP,
     AST_BRANCHES,
+    AST_INCLUDE,
 } asttype;
 
 typedef struct astnode {

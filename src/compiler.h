@@ -166,6 +166,7 @@ typedef enum vm_op {
     OP_POP,
     OP_JIF,
     OP_JMP,
+    OP_IMP
 } vm_op;
 
 typedef enum vm_scope {
@@ -207,7 +208,6 @@ typedef struct program {
     size_t argc;
     Value* constants;
     struct program* prev;
-    const char* src_code;
     Value (*native)(Value[]);
 
     map symbol_table;
@@ -301,6 +301,15 @@ void compile_branches(program* p, astnode* branches);
 void create_native(program* p, const char* name, Value (*f)(Value[]), int argc);
 
 /**
+ * @brief Executes import statement - lexes, parses and compiles bytecode inline
+ *      within current program.
+ * 
+ * @param p Reference to program
+ * @param filepath String node with path to file
+ */
+void run_import(program* p, astnode* filepath);
+
+/**
  * @brief Prints error message into standard error output and
  *      displays location in source raising the error.
  * 
@@ -377,8 +386,23 @@ const char* disassemble_program(program* p);
  */
 const char* disassemble(program* p, instruction i);
 
+/**
+ * @brief Registers the current bytecode instruction position
+ *      in source file when newline reached.
+ * 
+ * @param p Reference to program
+ * @param pos Lex position
+ */
 void recordaddress(program* p, lxpos* pos);
 
+/**
+ * @brief Retrieves the position in source file using the index
+ *      of bytecode instruction in provided program.
+ * 
+ * @param p Reference to program
+ * @param pos Instruction position
+ * @return Source position
+ */
 lxpos* getaddresspos(program* p, int pos);
 
 #endif

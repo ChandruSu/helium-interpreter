@@ -1,3 +1,8 @@
+include "demo/include.he"
 
+methodB <- $() {
+    @print("This method is in demo/test.he")
+}
 
-@print(@test(4, 3))
+@methodA()
+@methodB()

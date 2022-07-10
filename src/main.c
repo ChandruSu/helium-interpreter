@@ -22,10 +22,6 @@ int main(int argc, const char* argv[])
 
     vector tokens = vector_new(64);
 
-    lexer lx2 = lexer_new(read_file("demo/include.he"), "demo/include.he");
-    lexify(&lx2, &tokens);
-    vector_pop(&tokens);
-
     lexer lx = lexer_new(src, argv[1]);
     lexify(&lx, &tokens);
     
@@ -56,7 +52,6 @@ int main(int argc, const char* argv[])
         .length = 0,
         .argc = 0,
         .constants = malloc(sizeof(Value) * MAX_LOCAL_CONSTANTS),
-        .src_code = src,
         .prev = NULL,
 
         .constant_table = map_new(37),

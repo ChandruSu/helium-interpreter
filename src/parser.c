@@ -98,6 +98,19 @@ astnode* parse_statement(parser* p)
             free(st);
             st = parse_branching(p);
             break;
+        
+        case LX_INCLUDE:
+            eat(p);
+            st->type = AST_INCLUDE;
+            st->value = "include";
+            
+            astnode* fp = parse_primary(p);
+            if (fp->type != AST_STRING) {
+                parsererror(p, "Expected string in include statement!");
+            }
+
+            vector_push(&st->children, fp);
+            break;
 
         case LX_RETURN:
             eat(p);
@@ -267,6 +280,7 @@ astnode* parse_function_definition(parser* p)
     consume(p, LX_RIGHT_PAREN);
 
     // code body
+    strip_newlines(p);
     consume(p, LX_LEFT_BRACE);
     vector_push(&func->children, parse_block(p, LX_RIGHT_BRACE));
     consume(p, LX_RIGHT_BRACE);
@@ -282,6 +296,7 @@ astnode* parse_loop(parser* p)
     vector_push(&loop->children, parse_expression(p));
 
     // loop body
+    strip_newlines(p);
     consume(p, LX_LEFT_BRACE);
     vector_push(&loop->children, parse_block(p, LX_RIGHT_BRACE));
     consume(p, LX_RIGHT_BRACE);
@@ -295,6 +310,8 @@ astnode* parse_branching(parser* p)
 
     // if condition { ... } branch
     vector_push(&branch0->children, parse_expression(p));
+    
+    strip_newlines(p);
     consume(p, LX_LEFT_BRACE);
     vector_push(&branch0->children, parse_block(p, LX_RIGHT_BRACE));
     consume(p, LX_RIGHT_BRACE);
@@ -312,6 +329,7 @@ astnode* parse_branching(parser* p)
             branch->value = "alt";
         }
         
+        strip_newlines(p);
         consume(p, LX_LEFT_BRACE);
         vector_push(&branch->children, parse_block(p, LX_RIGHT_BRACE));
         consume(p, LX_RIGHT_BRACE);

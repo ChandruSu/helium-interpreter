@@ -30,6 +30,7 @@ const char* lxtype_strings[] = {
     "LX_IF               ",
     "LX_ELSE             ",
     "LX_FLOAT            ",
+    "LX_INCLUDE          ",
 };
 
 lxtoken* lxtoken_new(const char* value, lxtype type, lxpos pos)
@@ -54,7 +55,8 @@ lexer lexer_new(const char* src, const char* file_path)
             .line_pos = 0,
             .char_offset = -1,
             .line_offset = 0,
-            .origin = file_path
+            .origin = file_path,
+            .src = src
         },
         .source = src,
         .current = '\0',
@@ -220,21 +222,22 @@ char lexadvance(lexer* lx)
 lxtype determine_nature(char* s)
 {
     // checks against reserved keywords.
-    if (streq(s, "false") || streq(s, "true")) {
+    if (streq(s, "false") || streq(s, "true"))
         return LX_BOOL;
-    } else if (streq(s, "null")) {
+    else if (streq(s, "null"))
         return LX_NULL;
-    } else if (streq(s, "return")) {
+    else if (streq(s, "return"))
         return LX_RETURN;
-    } else if (streq(s, "loop")) {
+    else if (streq(s, "loop"))
         return LX_LOOP;
-    } else if (streq(s, "if")) {
+    else if (streq(s, "if"))
         return LX_IF;
-    } else if (streq(s, "else")) {
+    else if (streq(s, "else"))
         return LX_ELSE;
-    } else {
+    else if (streq(s, "include"))
+        return LX_INCLUDE;
+    else
         return LX_SYMBOL;
-    }
 }
 
 // Checks for patterns against current lexer position - should
@@ -286,7 +289,8 @@ lxpos clone_pos(lxpos* original)
         .line_pos = original->line_pos,
         .char_offset = original->char_offset,
         .line_offset = original->line_offset,
-        .origin = original->origin
+        .origin = original->origin,
+        .src = original->src
     };
     return pos;
 }

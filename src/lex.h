@@ -33,6 +33,7 @@ typedef enum lxtype {
     LX_IF,
     LX_ELSE,
     LX_FLOAT,
+    LX_INCLUDE,         // 24
 } lxtype;
 
 typedef struct lxpos {
@@ -41,6 +42,7 @@ typedef struct lxpos {
     int char_offset;
     int line_offset;
     const char* origin;
+    const char* src;
 } lxpos;
 
 typedef struct lxtoken {

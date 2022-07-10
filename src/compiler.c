@@ -49,6 +49,11 @@ void compile_statement(program* p, astnode* statement)
             p->code[p->length++].stackop.op = OP_RET;
             break;
 
+        case AST_INCLUDE:
+            astnode* fp = vector_get(&statement->children, 0);
+            run_import(p, fp);
+            break;
+
         case AST_LOOP:
             compile_loop(p, statement);
             break;
@@ -105,7 +110,6 @@ void compile_function(program* p, astnode* function)
     p0->code = malloc(sizeof(instruction) * 0xff);
     p0->length = 0;
     p0->constants = malloc(sizeof(Value) * 0xff);
-    p0->src_code = p->src_code;
     p0->prev = p;
     p0->constant_table = map_new(37);
     p0->symbol_table = map_new(37);
@@ -247,7 +251,6 @@ void create_native(program* p, const char* name, Value (*f)(Value[]), int argc)
     p0->code = NULL;
     p0->length = 0;
     p0->argc = argc;
-    p0->src_code = NULL;
     p0->constants = NULL;
     p0->symbol_table = map_new(0);
     p0->constant_table = map_new(0);
@@ -271,6 +274,29 @@ void create_native(program* p, const char* name, Value (*f)(Value[]), int argc)
     p->code[p->length].sx.sx = address;
     p->code[p->length].sx.op = scope_store_op_map[scope];
     p->length++;
+}
+
+void run_import(program* p, astnode* filepath)
+{
+    if (p->prev != NULL) {
+        compilererr(p, filepath->pos, "Cannot import in local scope!");
+    }
+
+    const char* src = read_file(filepath->value);
+    
+    vector tokens = vector_new(64);
+    lexer lx = lexer_new(src, filepath->value);
+    lexify(&lx, &tokens);
+
+    parser p0 = {
+        .position = 0,
+        .source = src,
+        .tokens = tokens
+    };
+
+    astnode* tree = parse(&p0);
+    
+    compile(p, tree);
 }
 
 // ---------------- MEMORY STORE ----------------
@@ -530,7 +556,7 @@ void compilererr(program* p, lxpos pos, const char* msg)
 {
     fprintf(stderr, "%s[err] %s (%d, %d):\n", ERR_COL, msg, pos.line_pos + 1, pos.col_pos + 1);
     fprintf(stderr, "\t|\n");
-    fprintf(stderr, "\t| %04i %s\n", pos.line_pos + 1, get_line(p->src_code, pos.line_offset));
+    fprintf(stderr, "\t| %04i %s\n", pos.line_pos + 1, get_line(pos.src, pos.line_offset));
     fprintf(stderr, "\t| %s'\n%s", paddchar('~', 5 + pos.col_pos), DEF_COL);
     exit(0);
 }
