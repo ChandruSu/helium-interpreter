@@ -40,6 +40,7 @@ typedef struct lxpos {
     int line_pos;
     int char_offset;
     int line_offset;
+    const char* origin;
 } lxpos;
 
 typedef struct lxtoken {
@@ -77,9 +78,10 @@ void lxtoken_display(lxtoken* tk);
  * @brief Lexer constructor method.
  * 
  * @param src Source code string
+ * @param src Origin of source code
  * @return lexer 
  */
-lexer lexer_new(const char* src);
+lexer lexer_new(const char* src, const char* file_path);
 
 /**
  * @brief Converts character buffer into a stream of lexer

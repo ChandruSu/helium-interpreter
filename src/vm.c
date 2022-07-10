@@ -174,7 +174,7 @@ void runtimeerr(virtual_machine* vm, const char* msg)
         call_info call = vm->call_stack[i];
         lxpos* pos = getaddresspos(call.program, call.pc);
         Value v = vCode(call.program);
-        fprintf(stderr, "\tIn %s at line %i ->\n", value_to_str(&v), pos->line_pos + 1);
+        fprintf(stderr, "\t%s In file %s at line %i:\n", value_to_str(&v), pos->origin, pos->line_pos + 1);
         fprintf(stderr, "\t\t| %04i %s\n", pos->line_pos + 1, get_line(call.program->src_code, pos->line_offset));
     }
 

@@ -46,14 +46,15 @@ void lxtoken_display(lxtoken* tk)
     printf("(%03i, %03i) %s %s\n", tk->pos.line_pos + 1, tk->pos.col_pos + 1, lxtype_strings[tk->type], tk->value);   
 }
 
-lexer lexer_new(const char* src)
+lexer lexer_new(const char* src, const char* file_path)
 {
     lexer lx = {
         .pos = {
             .col_pos = -1,
             .line_pos = 0,
             .char_offset = -1,
-            .line_offset = 0
+            .line_offset = 0,
+            .origin = file_path
         },
         .source = src,
         .current = '\0',
@@ -284,7 +285,8 @@ lxpos clone_pos(lxpos* original)
         .col_pos = original->col_pos,
         .line_pos = original->line_pos,
         .char_offset = original->char_offset,
-        .line_offset = original->line_offset
+        .line_offset = original->line_offset,
+        .origin = original->origin
     };
     return pos;
 }

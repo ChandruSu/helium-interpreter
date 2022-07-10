@@ -1,0 +1,5 @@
+
+test <- $(a, b) {
+    @print("test was called", "lol")
+    return a * a - b * b
+}

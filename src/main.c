@@ -20,8 +20,13 @@ int main(int argc, const char* argv[])
     printf("%s Beginning lexical anaylsis:\n\n", MESSAGE);
 #endif
 
-    lexer lx = lexer_new(src);
-    vector tokens = vector_new(16);
+    vector tokens = vector_new(64);
+
+    lexer lx2 = lexer_new(read_file("demo/include.he"), "demo/include.he");
+    lexify(&lx2, &tokens);
+    vector_pop(&tokens);
+
+    lexer lx = lexer_new(src, argv[1]);
     lexify(&lx, &tokens);
     
 #if HE_DEBUG
@@ -39,7 +44,7 @@ int main(int argc, const char* argv[])
     };
 
     astnode* tree = parse(&p);
-    
+
 #if HE_DEBUG
     printf("%s\n", astnode_tostr(tree));
 
