@@ -1,9 +1,6 @@
 #ifndef HE_EXECUTION_HEADER
 #define HE_EXECUTION_HEADER
 
-#include <stdint.h>
-#include <stdlib.h>
-#include <stdio.h>
 #include "common.h"
 #include "datatypes.h"
 #include "parser.h"

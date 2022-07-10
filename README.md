@@ -116,11 +116,11 @@ Use the demo scripts in the `demo/` directory to test the interpreter.
 8. Importing other files
 
     ```c
-    include "path/to/file.he"
+    include "relative/path/to/file.he"
 
     @methodFromFile()
     ```
-    Include statements can only be executed at global scope. Currently, the filepaths must be relative to interpreter, not relative to file.
+    Include statements can only be executed at global scope. Filepaths are relative to the current script file.
 
 ## Features
 

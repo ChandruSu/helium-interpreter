@@ -3,7 +3,10 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
 #include <string.h>
+#include <unistd.h>
+#include <libgen.h>
 
 #define ERR_COL "\033[31m"
 #define WAR_COL "\033[33m"

@@ -1,20 +1,25 @@
-#include "he.h"
+// #define HE_DEBUG_MODE
 
+#include "he.h"
 #include <time.h>
 
-#define HE_DEBUG 0
 
 int main(int argc, const char* argv[])
 {
     const char* src;
 
+    char fpath[256];
+    getcwd(fpath, sizeof(fpath));
+
     if (argc < 2) {
         failure("File not specified!");
     } else {
-        src = read_file(argv[1]);
+        strcat(fpath, "/");
+        strcat(fpath, argv[1]);
+        src = read_file(fpath);
     }
 
-#if HE_DEBUG
+#ifdef HE_DEBUG_MODE
     printf("\n%s Reading code:\n\n%s\n", MESSAGE, src);
 
     printf("%s Beginning lexical anaylsis:\n\n", MESSAGE);
@@ -22,10 +27,10 @@ int main(int argc, const char* argv[])
 
     vector tokens = vector_new(64);
 
-    lexer lx = lexer_new(src, argv[1]);
+    lexer lx = lexer_new(src, fpath);
     lexify(&lx, &tokens);
     
-#if HE_DEBUG
+#ifdef HE_DEBUG_MODE
     for (size_t i = 0; i < tokens.size; i++) {
         lxtoken_display(tokens.items[i]);
     }
@@ -41,7 +46,7 @@ int main(int argc, const char* argv[])
 
     astnode* tree = parse(&p);
 
-#if HE_DEBUG
+#ifdef HE_DEBUG_MODE
     printf("%s\n", astnode_tostr(tree));
 
     printf("\n%s Beginning compilation:\n\n", MESSAGE);
@@ -62,7 +67,7 @@ int main(int argc, const char* argv[])
     register_all_natives(&pp);
     compile(&pp, tree);
 
-#if HE_DEBUG
+#ifdef HE_DEBUG_MODE
     printf(disassemble_program(&pp));
     
     printf("\n%s Beginning bytecode execution:\n\n", MESSAGE);
@@ -77,7 +82,6 @@ int main(int argc, const char* argv[])
         .stack = calloc(MAX_STACK_SIZE, sizeof(Value)),
     };
 
-
     // runs program
     run_program(&vm, NULL, &pp);
 
@@ -85,7 +89,7 @@ int main(int argc, const char* argv[])
     double time_spent = 1000 * (double)(end - begin) / CLOCKS_PER_SEC;
 
 
-#if HE_DEBUG
+#ifdef HE_DEBUG_MODE
     printf("\n%s Execution took %f milliseconds!\n", MESSAGE, time_spent);
     
     for (size_t i = 0; i < 0xf; i++)

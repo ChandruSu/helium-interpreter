@@ -282,10 +282,17 @@ void run_import(program* p, astnode* filepath)
         compilererr(p, filepath->pos, "Cannot import in local scope!");
     }
 
-    const char* src = read_file(filepath->value);
-    
+    // determines absolute system path of include
+    char path[512];
+    path[0] = '\0';
+    strcat(path, dirname((char*)filepath->pos.origin));
+    strcat(path, "/");
+    strcat(path, filepath->value);
+
+    const char* src = read_file(path);
+
     vector tokens = vector_new(64);
-    lexer lx = lexer_new(src, filepath->value);
+    lexer lx = lexer_new(src, path);
     lexify(&lx, &tokens);
 
     parser p0 = {
