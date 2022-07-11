@@ -232,10 +232,12 @@ void compile_loop(program* p, astnode* loop)
 
 void compile_branches(program* p, astnode* branches)
 {
+    // compile condition
     compile_expression(p, vector_get(&branches->children, 0));
     p->code[p->length++].stackop.op = OP_JIF;
     int pos0 = p->length++;
 
+    // compile body
     compile(p, vector_get(&branches->children, 1));
     int pos1 = p->length++;
 
@@ -258,7 +260,7 @@ void compile_branches(program* p, astnode* branches)
     } 
     else 
     {
-        p->length--;
+        p->code[pos1].stackop.op = OP_NOP;
     }
 }
 
@@ -502,6 +504,9 @@ const char* disassemble_program(program* p)
     // disassembles instructions
     for (size_t i = 0; i < p->length; i++)
     {
+        char b[5];
+        sprintf(b, "%03li", i);
+        strcat(buf, b);
         strcat(buf, "\t");
         strcat(buf, disassemble(p, p->code[i]));
         strcat(buf, "\n");

@@ -90,7 +90,7 @@ int main(int argc, const char* argv[])
     clock_t end = clock();
     double time_spent = 1000 * (double)(end - begin) / CLOCKS_PER_SEC;
     
-    printf("\n%s Execution took %f milliseconds!\n", MESSAGE, time_spent);
+    printf("\n%s Execution took %f milliseconds!\n\n", MESSAGE, time_spent);
     
     for (size_t i = 0; i < 0x20; i++)
     {
