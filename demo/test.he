@@ -1,2 +1,7 @@
+A <- false
 
-@print("Hello World!")
+loop !A {
+    b <- @input("Say stop: ")
+    @print(b)
+    A <- b == "stop"
+}

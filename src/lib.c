@@ -25,9 +25,10 @@ Value native_input(Value v[])
         extra = 0;
         while (((ch = getchar()) != '\n') && (ch != EOF))
             extra = 1;
-        return (extra == 1) ? vNull() : vString(buf);
+        if (extra) vNull();
     }
 
+    buf[strlen(buf)-1] = '\0';
     return vString(buf);
 }
 

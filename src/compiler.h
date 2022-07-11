@@ -143,6 +143,26 @@ Value vNegate(Value a);
  */
 Value vDiv(Value a, Value b);
 
+/**
+ * @brief Compares two generic values and returns boolean value True
+ *      if they are equal.
+ * 
+ * @param a Operand 1
+ * @param b Operand 2
+ * @return Boolean result value
+ */
+Value vEqual(Value a, Value b);
+
+/**
+ * @brief Compares two generic values and returns boolean value False
+ *      if they are equal.
+ * 
+ * @param a Operand 1
+ * @param b Operand 2
+ * @return Boolean result value
+ */
+Value vNotEqual(Value a, Value b);
+
 // ------------------- VM IR --------------------
 
 typedef enum vm_op {

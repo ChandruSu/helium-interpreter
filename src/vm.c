@@ -174,8 +174,8 @@ Value apply_vm_op(vm_op op, Value v0, Value v1)
         case OP_MUL: return vMul(v0, v1);
         case OP_DIV: return vDiv(v0, v1);
         case OP_MOD: return vInt(v0.value.to_int % v1.value.to_int);
-        case OP_EQ: return vBool(v0.value.to_int == v1.value.to_int);
-        case OP_NE: return vBool(v0.value.to_int != v1.value.to_int);
+        case OP_EQ: return vEqual(v0, v1);
+        case OP_NE: return vNotEqual(v0, v1);
         case OP_LE: return vBool(v0.value.to_int <= v1.value.to_int);
         case OP_GE: return vBool(v0.value.to_int >= v1.value.to_int);
         case OP_LT: return vBool(v0.value.to_int < v1.value.to_int);

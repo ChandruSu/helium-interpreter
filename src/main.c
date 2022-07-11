@@ -7,15 +7,12 @@
 int main(int argc, const char* argv[])
 {
     const char* src;
-
     char fpath[256];
-    getcwd(fpath, sizeof(fpath));
 
     if (argc < 2) {
         failure("File not specified!");
     } else {
-        strcat(fpath, "/");
-        strcat(fpath, argv[1]);
+        sprintf(fpath, "%s/%s", getcwd(fpath, sizeof(fpath)), argv[1]);
         src = read_file(fpath);
     }
 
@@ -74,7 +71,7 @@ int main(int argc, const char* argv[])
     
     clock_t begin = clock();
 #endif
-  
+
     virtual_machine vm = {
         .ci = -1,
         .call_stack = malloc(sizeof(call_info) * MAX_CALL_STACK),
@@ -82,11 +79,11 @@ int main(int argc, const char* argv[])
         .stack = calloc(MAX_STACK_SIZE, sizeof(Value)),
     };
 
-    // runs program
     code_object c = {
         .closure = NULL,
         .p = &pp
     };
+
     run_program(&vm, NULL, &c);
 
 #ifdef HE_DEBUG_MODE
@@ -95,13 +92,13 @@ int main(int argc, const char* argv[])
     
     printf("\n%s Execution took %f milliseconds!\n", MESSAGE, time_spent);
     
-    for (size_t i = 0; i < 0xf; i++)
+    for (size_t i = 0; i < 0x20; i++)
     {
         printf("Stack %li = %s\n", i, value_to_str(&vm.stack[i]));
     }
 
     printf("\n");
-    for (size_t i = 0; i < 0xf; i++)
+    for (size_t i = 0; i < 0x20; i++)
     {
         printf("Heap %li = %s\n", i, value_to_str(&vm.heap[i]));
     }

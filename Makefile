@@ -10,7 +10,7 @@ DEBUG := -g
 CC := gcc
 CC_FLAGS := $(DEBUG) -c -Wall -Wno-unused-variable
 DB := gdb
-DB_FLAGS := $(EXEC)
+DB_FLAGS := $(EXEC) -ex "lay src" -ex "break main" -ex "run $(TEST_FLAGS)"
 
 
 all: $(EXEC)
