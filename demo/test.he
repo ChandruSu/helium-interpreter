@@ -1,7 +1,5 @@
-A <- false
 
-loop !A {
-    b <- @input("Say stop: ")
-    @print(b)
-    A <- b == "stop"
-}
+@print(1 >= 10)
+@print(1 >= 1)
+@print(1 > 1)
+@print(2 >= 1)

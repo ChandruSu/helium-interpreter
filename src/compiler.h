@@ -144,6 +144,15 @@ Value vNegate(Value a);
 Value vDiv(Value a, Value b);
 
 /**
+ * @brief Performs the modulus operation between two Value operands.
+ * 
+ * @param a Operand 1
+ * @param b Operand 2
+ * @return Result value
+ */
+Value vMod(Value a, Value b);
+
+/**
  * @brief Compares two generic values and returns boolean value True
  *      if they are equal.
  * 
@@ -162,6 +171,10 @@ Value vEqual(Value a, Value b);
  * @return Boolean result value
  */
 Value vNotEqual(Value a, Value b);
+
+Value vLess(Value a, Value b);
+
+Value vLessEqual(Value a, Value b);
 
 // ------------------- VM IR --------------------
 

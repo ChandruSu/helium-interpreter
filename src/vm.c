@@ -173,16 +173,16 @@ Value apply_vm_op(vm_op op, Value v0, Value v1)
         case OP_SUB: return vSub(v0, v1);
         case OP_MUL: return vMul(v0, v1);
         case OP_DIV: return vDiv(v0, v1);
-        case OP_MOD: return vInt(v0.value.to_int % v1.value.to_int);
+        case OP_MOD: return vMod(v0, v1);
         case OP_EQ: return vEqual(v0, v1);
         case OP_NE: return vNotEqual(v0, v1);
-        case OP_LE: return vBool(v0.value.to_int <= v1.value.to_int);
-        case OP_GE: return vBool(v0.value.to_int >= v1.value.to_int);
-        case OP_LT: return vBool(v0.value.to_int < v1.value.to_int);
-        case OP_GT: return vBool(v0.value.to_int > v1.value.to_int);
+        case OP_LE: return vLessEqual(v0, v1);
+        case OP_LT: return vLess(v0, v1);
+        case OP_GE: return vLessEqual(v1, v0);
+        case OP_GT: return vLess(v1, v0);
         
-        case OP_AND: return vBool(v0.value.to_bool && v1.value.to_bool);
-        case OP_OR: return vBool(v0.value.to_bool || v1.value.to_bool);
+        case OP_AND: return vBool(native_bool_cast(&v0).value.to_bool && native_bool_cast(&v1).value.to_bool);
+        case OP_OR: return vBool(native_bool_cast(&v0).value.to_bool || native_bool_cast(&v1).value.to_bool);
         default:
             fprintf(stderr, "%s Failed to apply binary operation: %i!\n", ERROR, op);
             exit(0);

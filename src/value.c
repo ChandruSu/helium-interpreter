@@ -227,6 +227,18 @@ Value vDiv(Value a, Value b)
     return vNull();
 }
 
+Value vMod(Value a, Value b)
+{
+    if (a.type == VM_INT && b.type == VM_INT) {
+        return vInt(a.value.to_int % b.value.to_int);
+    } else {
+        fprintf(stderr, "%s Cannot apply modulo between values of types %s and %s\n", ERROR, vm_type_strings[a.type], vm_type_strings[b.type]);
+        exit(0);
+    }
+
+    return vNull();
+}
+
 Value vEqual(Value a, Value b)
 {
     switch (TYPEPAIR(a.type, b.type))
@@ -254,7 +266,6 @@ Value vNotEqual(Value a, Value b)
     return vBool(!vEqual(a,b).value.to_bool);
 }
 
-
 Value vNegate(Value a)
 {
     switch (a.type)
@@ -264,6 +275,48 @@ Value vNegate(Value a)
         case VM_FLOAT: return vFloat(-a.value.to_float);
         default:
             fprintf(stderr, "%s Cannot negate values of types %s\n", ERROR, vm_type_strings[a.type]);
+            exit(0);
+    }
+
+    return vNull();
+}
+
+Value vLess(Value a, Value b)
+{
+    switch (TYPEPAIR(a.type, b.type))
+    {
+        case TYPEMATCH(VM_BOOL): return vBool(a.value.to_bool < b.value.to_bool);
+        case TYPEMATCH(VM_INT): return vBool(a.value.to_int < b.value.to_int);
+        case TYPEMATCH(VM_FLOAT): return vBool(a.value.to_float < b.value.to_float);
+        case TYPEPAIR(VM_INT, VM_BOOL): return vBool(a.value.to_int < b.value.to_bool);
+        case TYPEPAIR(VM_BOOL, VM_INT): return vBool(a.value.to_bool < b.value.to_int);
+        case TYPEPAIR(VM_INT, VM_FLOAT): return vBool(a.value.to_int < b.value.to_float);
+        case TYPEPAIR(VM_FLOAT, VM_INT): return vBool(a.value.to_float < b.value.to_int);
+        case TYPEPAIR(VM_FLOAT, VM_BOOL): return vBool(a.value.to_float < b.value.to_bool);
+        case TYPEPAIR(VM_BOOL, VM_FLOAT): return vBool(a.value.to_bool < b.value.to_float);
+        default:
+            fprintf(stderr, "%s Cannot multiply values of types %s and %s\n", ERROR, vm_type_strings[a.type], vm_type_strings[b.type]);
+            exit(0);
+    }
+
+    return vNull();
+}
+
+Value vLessEqual(Value a, Value b)
+{
+    switch (TYPEPAIR(a.type, b.type))
+    {
+        case TYPEMATCH(VM_BOOL): return vBool(a.value.to_bool <= b.value.to_bool);
+        case TYPEMATCH(VM_INT): return vBool(a.value.to_int <= b.value.to_int);
+        case TYPEMATCH(VM_FLOAT): return vBool(a.value.to_float <= b.value.to_float);
+        case TYPEPAIR(VM_INT, VM_BOOL): return vBool(a.value.to_int <= b.value.to_bool);
+        case TYPEPAIR(VM_BOOL, VM_INT): return vBool(a.value.to_bool <= b.value.to_int);
+        case TYPEPAIR(VM_INT, VM_FLOAT): return vBool(a.value.to_int <= b.value.to_float);
+        case TYPEPAIR(VM_FLOAT, VM_INT): return vBool(a.value.to_float <= b.value.to_int);
+        case TYPEPAIR(VM_FLOAT, VM_BOOL): return vBool(a.value.to_float <= b.value.to_bool);
+        case TYPEPAIR(VM_BOOL, VM_FLOAT): return vBool(a.value.to_bool <= b.value.to_float);
+        default:
+            fprintf(stderr, "%s Cannot multiply values of types %s and %s\n", ERROR, vm_type_strings[a.type], vm_type_strings[b.type]);
             exit(0);
     }
 
