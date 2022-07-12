@@ -102,11 +102,14 @@ Use the demo scripts in the `demo/` directory to test the interpreter.
     comment ?
     ```
 
-7. In-built functions and string concatenation
+7. In-built functions, string concatenation and character extraction
 
     ```c++
     a <- @float(@input("Enter a number: "))
     @print("Square root of " + @str(a) + " is " + @str(@sqrt(a)))
+
+    # retrieves fifth character "o"
+    char5 <- "Hello World!" % 4
     ```
 
     Available methods:

@@ -1,4 +1,4 @@
-#include "compiler.h"
+#include "value.h"
 
 void runtimeerr(virtual_machine* vm, const char* msg);
 
@@ -59,7 +59,7 @@ const char* value_to_str(Value* v)
             return v->value.to_str;
         case VM_BOOL:
             free(buf);
-            return v->value.to_bool ? "True" : "False";
+            return v->value.to_bool ? "true" : "false";
         case VM_INT:
             sprintf(buf, "%i", v->value.to_int);
             return buf;
@@ -70,7 +70,7 @@ const char* value_to_str(Value* v)
             sprintf(buf, "<code at %p>", v->value.to_code->p);
             return buf;
         case VM_NULL:
-            return "Null";
+            return "null";
     }
     return NULL;
 }
@@ -210,7 +210,7 @@ Value vDiv(Value a, Value b)
     char buf[100];
     
     if (b.value.to_int == 0 || b.value.to_float == 0) {
-        sprintf(buf, "Cannot subtract values of types %s and %s!", vm_type_strings[a.type], vm_type_strings[b.type]);
+        sprintf(buf, "Zero division error!");
         runtimeerr(current_vm, buf);
     }
 
@@ -235,10 +235,32 @@ Value vDiv(Value a, Value b)
 
 Value vMod(Value a, Value b)
 {
-    if (a.type == VM_INT && b.type == VM_INT) {
-        return vInt(a.value.to_int % b.value.to_int);
-    } else {
-        runtimeerr(current_vm, "Cannot apply modulo between non-integer values!");
+    char buf[100];
+
+    if (a.type != VM_STRING && b.value.to_int == 0) {
+        sprintf(buf, "Zero modulus error!");
+        runtimeerr(current_vm, buf);
+    }
+
+    switch (TYPEPAIR(a.type, b.type))
+    {
+        case TYPEMATCH(VM_BOOL): return vBool(a.value.to_bool % b.value.to_bool);
+        case TYPEMATCH(VM_INT): return vInt(a.value.to_int % b.value.to_int);
+        case TYPEPAIR(VM_INT, VM_BOOL): return vInt(a.value.to_int % b.value.to_bool);
+        case TYPEPAIR(VM_BOOL, VM_INT): return vInt(a.value.to_bool % b.value.to_int);
+        case TYPEPAIR(VM_STRING, VM_INT):
+            if (b.value.to_int < 0 && b.value.to_int >= strlen(a.value.to_str)) {
+                sprintf(buf, "String index [%i] out of bounds!", b.value.to_int);
+                runtimeerr(current_vm, buf);
+            }
+
+            char* c = malloc(sizeof(char) * 2);
+            c[0] = a.value.to_str[b.value.to_int];
+            c[1] = '\0';
+            return vString(c);
+        default:
+            sprintf(buf, "Cannot apply modulo values of types %s and %s!", vm_type_strings[a.type], vm_type_strings[b.type]);
+            runtimeerr(current_vm, buf);
     }
 
     return vNull();
