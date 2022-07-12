@@ -5,6 +5,7 @@
 #include "compiler.h"
 
 #include <math.h>
+#include <time.h>
 
 /**
  * @brief Registers all native, in-built methods to the specified

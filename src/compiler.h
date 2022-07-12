@@ -8,10 +8,16 @@
 #define TYPEPAIR(a, b) (a << 4) | b
 #define TYPEMATCH(a) (a << 4) | a
 
-// ------------------ VM TYPES ------------------
+// ------------ Forward Declarations ------------
 
 typedef struct program program;
 typedef struct Value Value;
+typedef struct virtual_machine virtual_machine;
+
+// Globally accessible virtual machine instance
+extern virtual_machine* current_vm;
+
+// ------------------ VM TYPES ------------------
 
 typedef struct code_object {
     program* p;

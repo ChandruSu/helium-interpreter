@@ -3,6 +3,7 @@
 #include "he.h"
 #include <time.h>
 
+virtual_machine* current_vm;
 
 int main(int argc, const char* argv[])
 {
@@ -79,6 +80,8 @@ int main(int argc, const char* argv[])
         .stack = calloc(MAX_STACK_SIZE, sizeof(Value)),
     };
 
+    current_vm = &vm;
+
     code_object c = {
         .closure = NULL,
         .p = &pp
@@ -89,7 +92,6 @@ int main(int argc, const char* argv[])
 #ifdef HE_DEBUG_MODE
     clock_t end = clock();
     double time_spent = 1000 * (double)(end - begin) / CLOCKS_PER_SEC;
-    
     printf("\n%s Execution took %f milliseconds!\n\n", MESSAGE, time_spent);
     
     for (size_t i = 0; i < 0x20; i++)

@@ -1,5 +1,7 @@
 #include "compiler.h"
 
+void runtimeerr(virtual_machine* vm, const char* msg);
+
 const char* vm_type_strings[] = {
     "Null",
     "Int",
@@ -65,7 +67,7 @@ const char* value_to_str(Value* v)
             sprintf(buf, "%f", v->value.to_float);
             return buf;
         case VM_PROGRAM:
-            sprintf(buf, "<code at %p>", v->value.to_code);
+            sprintf(buf, "<code at %p>", v->value.to_code->p);
             return buf;
         case VM_NULL:
             return "Null";
@@ -151,8 +153,9 @@ Value vAdd(Value a, Value b)
             strcat(buf, b.value.to_str);
             return vString(buf);
         default:
-            fprintf(stderr, "%s Cannot add values of types %s and %s\n", ERROR, vm_type_strings[a.type], vm_type_strings[b.type]);
-            exit(0);
+            char buf0[100];
+            sprintf(buf0, "Cannot add values of types %s and %s!", vm_type_strings[a.type], vm_type_strings[b.type]);
+            runtimeerr(current_vm, buf0);
     }
 
     return vNull();
@@ -160,8 +163,6 @@ Value vAdd(Value a, Value b)
 
 Value vSub(Value a, Value b)
 {
-    char* buf;
-
     switch (TYPEPAIR(a.type, b.type))
     {
         case TYPEMATCH(VM_BOOL): return vBool(a.value.to_bool - b.value.to_bool);
@@ -174,8 +175,9 @@ Value vSub(Value a, Value b)
         case TYPEPAIR(VM_FLOAT, VM_BOOL): return vFloat(a.value.to_float - b.value.to_bool);
         case TYPEPAIR(VM_BOOL, VM_FLOAT): return vFloat(a.value.to_bool - b.value.to_float);
         default:
-            fprintf(stderr, "%s Cannot subtract values of types %s and %s\n", ERROR, vm_type_strings[a.type], vm_type_strings[b.type]);
-            exit(0);
+            char buf[100];
+            sprintf(buf, "Cannot subtract values of types %s and %s!", vm_type_strings[a.type], vm_type_strings[b.type]);
+            runtimeerr(current_vm, buf);
     }
 
     return vNull();
@@ -195,8 +197,9 @@ Value vMul(Value a, Value b)
         case TYPEPAIR(VM_FLOAT, VM_BOOL): return vFloat(a.value.to_float * b.value.to_bool);
         case TYPEPAIR(VM_BOOL, VM_FLOAT): return vFloat(a.value.to_bool * b.value.to_float);
         default:
-            fprintf(stderr, "%s Cannot multiply values of types %s and %s\n", ERROR, vm_type_strings[a.type], vm_type_strings[b.type]);
-            exit(0);
+            char buf[100];
+            sprintf(buf, "Cannot multiply values of types %s and %s!", vm_type_strings[a.type], vm_type_strings[b.type]);
+            runtimeerr(current_vm, buf);
     }
 
     return vNull();
@@ -204,8 +207,11 @@ Value vMul(Value a, Value b)
 
 Value vDiv(Value a, Value b)
 {
+    char buf[100];
+    
     if (b.value.to_int == 0 || b.value.to_float == 0) {
-        failure("Zero division error!");
+        sprintf(buf, "Cannot subtract values of types %s and %s!", vm_type_strings[a.type], vm_type_strings[b.type]);
+        runtimeerr(current_vm, buf);
     }
 
     switch (TYPEPAIR(a.type, b.type))
@@ -220,8 +226,8 @@ Value vDiv(Value a, Value b)
         case TYPEPAIR(VM_FLOAT, VM_BOOL): return vFloat(a.value.to_float / b.value.to_bool);
         case TYPEPAIR(VM_BOOL, VM_FLOAT): return vFloat(a.value.to_bool / b.value.to_float);
         default:
-            fprintf(stderr, "%s Cannot multiply values of types %s and %s\n", ERROR, vm_type_strings[a.type], vm_type_strings[b.type]);
-            exit(0);
+            sprintf(buf, "Cannot divide values of types %s and %s!", vm_type_strings[a.type], vm_type_strings[b.type]);
+            runtimeerr(current_vm, buf);
     }
 
     return vNull();
@@ -232,8 +238,7 @@ Value vMod(Value a, Value b)
     if (a.type == VM_INT && b.type == VM_INT) {
         return vInt(a.value.to_int % b.value.to_int);
     } else {
-        fprintf(stderr, "%s Cannot apply modulo between values of types %s and %s\n", ERROR, vm_type_strings[a.type], vm_type_strings[b.type]);
-        exit(0);
+        runtimeerr(current_vm, "Cannot apply modulo between non-integer values!");
     }
 
     return vNull();
@@ -254,8 +259,9 @@ Value vEqual(Value a, Value b)
         case TYPEPAIR(VM_FLOAT, VM_BOOL): return vBool(a.value.to_float == b.value.to_bool);
         case TYPEPAIR(VM_BOOL, VM_FLOAT): return vBool(a.value.to_bool == b.value.to_float);
         default:
-            fprintf(stderr, "%s Cannot multiply values of types %s and %s\n", ERROR, vm_type_strings[a.type], vm_type_strings[b.type]);
-            exit(0);
+            char buf[100];
+            sprintf(buf, "Cannot perform that operation between values of types %s and %s!", vm_type_strings[a.type], vm_type_strings[b.type]);
+            runtimeerr(current_vm, buf);
     }
 
     return vNull();
@@ -274,8 +280,9 @@ Value vNegate(Value a)
         case VM_INT: return vInt(-a.value.to_int);
         case VM_FLOAT: return vFloat(-a.value.to_float);
         default:
-            fprintf(stderr, "%s Cannot negate values of types %s\n", ERROR, vm_type_strings[a.type]);
-            exit(0);
+            char buf[100];
+            sprintf(buf, "Cannot negate value of type %s!", vm_type_strings[a.type]);
+            runtimeerr(current_vm, buf);
     }
 
     return vNull();
@@ -295,8 +302,9 @@ Value vLess(Value a, Value b)
         case TYPEPAIR(VM_FLOAT, VM_BOOL): return vBool(a.value.to_float < b.value.to_bool);
         case TYPEPAIR(VM_BOOL, VM_FLOAT): return vBool(a.value.to_bool < b.value.to_float);
         default:
-            fprintf(stderr, "%s Cannot multiply values of types %s and %s\n", ERROR, vm_type_strings[a.type], vm_type_strings[b.type]);
-            exit(0);
+            char buf[100];
+            sprintf(buf, "Cannot perform that operation between values of types %s and %s!", vm_type_strings[a.type], vm_type_strings[b.type]);
+            runtimeerr(current_vm, buf);
     }
 
     return vNull();
@@ -316,8 +324,9 @@ Value vLessEqual(Value a, Value b)
         case TYPEPAIR(VM_FLOAT, VM_BOOL): return vBool(a.value.to_float <= b.value.to_bool);
         case TYPEPAIR(VM_BOOL, VM_FLOAT): return vBool(a.value.to_bool <= b.value.to_float);
         default:
-            fprintf(stderr, "%s Cannot multiply values of types %s and %s\n", ERROR, vm_type_strings[a.type], vm_type_strings[b.type]);
-            exit(0);
+            char buf[100];
+            sprintf(buf, "Cannot perform that operation between values of types %s and %s!", vm_type_strings[a.type], vm_type_strings[b.type]);
+            runtimeerr(current_vm, buf);
     }
 
     return vNull();

@@ -2,6 +2,7 @@
 
 vm_op decode_binary_op(const char* operator);
 vm_op decode_unary_op(const char* operator);
+void runtimeerr(virtual_machine* vm, const char* msg);
 
 vm_op scope_load_op_map[] = {
     OP_LOADL,
@@ -338,7 +339,7 @@ uint16_t register_constant(program* p, Value v)
         *address = vInt(p->constant_table.size);
 
         if (address->value.to_int >= MAX_LOCAL_CONSTANTS) {
-            failure("Max constants in local scope!");
+            failure("Max constants in local scope reached!");
         }
 
         map_put(&p->constant_table, value_to_str(&v), address);

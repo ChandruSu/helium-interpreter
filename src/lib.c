@@ -114,6 +114,11 @@ Value native_pow(Value v[])
     }
 }
 
+Value native_time(Value v[])
+{
+    return vInt(1000 * clock() / CLOCKS_PER_SEC);
+}
+
 void register_all_natives(program* p)
 {
     create_native(p, "print", native_print, 1);
@@ -125,4 +130,5 @@ void register_all_natives(program* p)
     create_native(p, "len", native_length, 1);
     create_native(p, "sqrt", native_sqrt, 1);
     create_native(p, "pow", native_pow, 2);
+    create_native(p, "time", native_time, 0);
 }

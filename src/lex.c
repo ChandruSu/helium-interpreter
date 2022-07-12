@@ -4,6 +4,7 @@
 char* reduce_string_buffer(char* buffer);
 lxtype determine_nature(char* s);
 boolean check_pattern(lexer* lx, const char* pattern, char* buf);
+char escapechar(char c);
 
 const char* lxtype_strings[] = {
     "LX_SYMBOL           ",
@@ -113,7 +114,10 @@ lxtoken* lex(lexer* lx)
     else if (lx->lookahead == '"')
     {
         char c = lexadvance(lx);
-        while ((c = lexadvance(lx)) != '"') buf[len++] = c;
+        while ((c = lexadvance(lx)) != '"') {
+            buf[len++] = c == '\\' ? escapechar(lexadvance(lx)) : c;
+        }
+        
         type = LX_STRING;
     }
     else if (check_pattern(lx, "<-", buf))
@@ -260,6 +264,23 @@ boolean check_pattern(lexer* lx, const char* pattern, char* buf)
     }
 
     return true;
+}
+
+char escapechar(char c)
+{
+    switch (c)
+    {
+        case 'a': return '\a';
+        case 'b': return '\b';
+        case 'e': return '\e';
+        case 'f': return '\f';
+        case 'r': return '\r';
+        case 'n': return '\n';
+        case '"': return '\"';
+        case 't': return '\t';
+        case 'v': return '\v';
+        default: return '?';
+    }
 }
 
 // Reduces memory allocated for a terminated character buffer

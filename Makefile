@@ -1,12 +1,13 @@
+.PHONY: test
 
 SOURCE  := $(wildcard src/*.c src/*/*.c)
 HEADER  := $(wildcard src/*.h src/*/*.h)
 OBJECTS := $(SOURCE:src/%.c=bin/%.o)
 
 EXEC := out/helium
-TEST_FLAGS := demo/test.he
+TEST_FLAGS := test/test.he
 
-DEBUG :=
+DEBUG := -g
 CC := gcc
 CC_FLAGS := $(DEBUG) -c -Wall -Wno-unused-variable
 DB := gdb
@@ -17,7 +18,7 @@ all: $(EXEC)
 
 
 test: $(EXEC)
-	$(EXEC) demo/test.he
+	$(EXEC) $(TEST_FLAGS)
 
 
 bin/%.o: src/%.c

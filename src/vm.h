@@ -1,7 +1,7 @@
 #ifndef HE_VM_HEADER
 #define HE_VM_HEADER
 
-#include <inttypes.h>
+#include "common.h"
 #include "compiler.h"
 #include "lib.h"
 
@@ -9,7 +9,7 @@
 
 typedef struct call_info {
     code_object* program;
-    size_t bp;              // registers
+    size_t bp;
     size_t sp;
     size_t tp;
     size_t pc;
@@ -42,6 +42,25 @@ void run_program(virtual_machine* vm, call_info* prev, code_object* code);
  */
 void decode_execute(virtual_machine* vm, call_info* call, instruction i);
 
+/**
+ * @brief Applies a virtual machine operation between two generic tagged
+ *      values.
+ * 
+ * @param op Operation code
+ * @param v0 Operand 1
+ * @param v1 Operand 2
+ * @return Result value
+ */
+Value apply_vm_op(vm_op op, Value v0, Value v1);
+
+/**
+ * @brief Throws a runtime error when an issue occurs during
+ *      bytecode execution. Stack trace is used to determine the
+ *      source of the error.
+ * 
+ * @param vm Reference to virtual machine
+ * @param msg Error message
+ */
 void runtimeerr(virtual_machine* vm, const char* msg);
 
 #endif

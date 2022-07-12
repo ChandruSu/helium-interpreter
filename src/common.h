@@ -17,7 +17,7 @@
 #define ERROR "[\033[1;31merror\033[0m]"
 #define WARNING "[\033[1;33mwarning\033[0m]"
 
-#define MAX_CALL_STACK 0x8f
+#define MAX_CALL_STACK 0xff
 #define MAX_STACK_SIZE 0xff
 #define MAX_HEAP_SIZE 0xfff
 #define MAX_LOCAL_CONSTANTS 0xff

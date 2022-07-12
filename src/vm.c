@@ -1,7 +1,5 @@
 #include "vm.h"
 
-Value apply_vm_op(vm_op op, Value v0, Value v1);
-
 void run_program(virtual_machine* vm, call_info* prev, code_object* code)
 {
     size_t ci = ++vm->ci;
@@ -71,7 +69,7 @@ void decode_execute(virtual_machine* vm, call_info* call, instruction i)
             break;
 
         case OP_NOT:
-            vm->stack[call->tp - 1] = vBool(!vm->stack[call->tp - 1].value.to_bool);
+            vm->stack[call->tp - 1] = vBool(!native_bool_cast(&vm->stack[call->tp - 1]).value.to_bool);
             break;
 
         case OP_PUSHK:
@@ -204,6 +202,6 @@ void runtimeerr(virtual_machine* vm, const char* msg)
         fprintf(stderr, "\t\t| %04i %s\n", pos->line_pos + 1, get_line(pos->src, pos->line_offset));
     }
 
-    fprintf(stderr, "Error: %s%s\n", msg, DEF_COL);
+    fprintf(stderr, "Runtime error: %s%s\n", msg, DEF_COL);
     exit(0);
 }
