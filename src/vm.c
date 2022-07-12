@@ -195,8 +195,13 @@ void runtimeerr(virtual_machine* vm, const char* msg)
     for (size_t i = 0; i <= vm->ci; i++)
     {
         call_info call = vm->call_stack[i];
+
+        // native methods have no instructions
+        if (call.program->p->native) {
+            continue;
+        }
+
         lxpos* pos = getaddresspos(call.program->p, call.pc);
-        
         Value v = vCode(call.program->p, NULL);
         fprintf(stderr, "\t%s In file %s at line %i:\n", value_to_str(&v), pos->origin, pos->line_pos + 1);
         fprintf(stderr, "\t\t| %04i %s\n", pos->line_pos + 1, get_line(pos->src, pos->line_offset));

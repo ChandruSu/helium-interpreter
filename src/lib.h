@@ -3,6 +3,7 @@
 
 #include "common.h"
 #include "compiler.h"
+#include "vm.h"
 
 #include <math.h>
 #include <time.h>

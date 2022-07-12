@@ -117,8 +117,10 @@ Use the demo scripts in the `demo/` directory to test the interpreter.
     + **float** - casts value to floating point value
     + **bool** - casts value to boolean value
     + **len** - returns the length of a string
-    + **pow** - calculates argument 1 raised to the power of argument 2 
-    + **sqrt** - calculates the square root of a value
+    + **pow** - calculates *x* raised to the power of *y*
+    + **sqrt** - calculates the square root of a *x*
+    + **time** - returns the current time since the program began in milliseconds
+    + **delay** - sleeps the program by *x* millseconds
 
 8. Importing other files
 

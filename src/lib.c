@@ -11,7 +11,7 @@ Value native_input(Value v[])
     int ch, extra;
 
     if (v->value.to_str != NULL) {
-        printf ("%s", v->value.to_str);
+        native_print(v);
         fflush (stdout);
     }
 
@@ -119,6 +119,16 @@ Value native_time(Value v[])
     return vInt(1000 * clock() / CLOCKS_PER_SEC);
 }
 
+Value native_delay(Value v[])
+{
+    if (v->type != VM_INT)
+        runtimeerr(current_vm, "Expected argument of type Int!");
+
+    clock_t t1 = 1000 * clock() / CLOCKS_PER_SEC + v[0].value.to_int;
+    while ((1000 * clock() / CLOCKS_PER_SEC) < t1);
+    return vNull();
+}
+
 void register_all_natives(program* p)
 {
     create_native(p, "print", native_print, 1);
@@ -131,4 +141,5 @@ void register_all_natives(program* p)
     create_native(p, "sqrt", native_sqrt, 1);
     create_native(p, "pow", native_pow, 2);
     create_native(p, "time", native_time, 0);
+    create_native(p, "delay", native_delay, 1);
 }
