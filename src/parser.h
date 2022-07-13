@@ -191,8 +191,20 @@ astnode* parse_branching(parser* p);
  */
 astnode* parse_table_instance(parser* p);
 
+/**
+ * @brief Parses table key-value insertion statement e.g t[k] <- v
+ * 
+ * @param p Reference to parser
+ * @return AST node
+ */
 astnode* parse_table_put(parser* p);
 
+/**
+ * @brief Parses table key-fetch primary into syntax node e.g t[k]
+ * 
+ * @param p Reference to parser
+ * @return AST node
+ */
 astnode* parse_table_get(parser* p);
 
 /**

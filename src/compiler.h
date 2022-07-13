@@ -167,8 +167,21 @@ void compile_branches(program* p, astnode* branches);
  */
 void compile_table(program* p, astnode* table);
 
+/**
+ * @brief Compiles a table key-value insertion into intermediate bytecode
+ *      assembly.
+ * 
+ * @param p Reference to program
+ * @param put Table put node
+ */
 void compile_table_put(program* p, astnode* put);
 
+/**
+ * @brief Compiles a table key-fetch into intermediate bytecode assembly.
+ * 
+ * @param p Reference to program
+ * @param put Table get node
+ */
 void compile_table_get(program* p, astnode* get);
 
 /**

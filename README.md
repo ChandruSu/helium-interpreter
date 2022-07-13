@@ -95,11 +95,10 @@ Use the demo scripts in the `demo/` directory to test the interpreter.
 6. Comments
 
     ```c++
-    # this is a oneline comment
+    # this is a single line comment
     
-    ? This is 
-    a multiline 
-    comment ?
+    ? This is an example of
+    a multiline comment ?
     ```
 
 7. In-built functions, string concatenation and character extraction
@@ -125,7 +124,23 @@ Use the demo scripts in the `demo/` directory to test the interpreter.
     + **time** - returns the current time since the program began in milliseconds
     + **delay** - sleeps the program by *x* millseconds
 
-8. Importing other files
+8. Table data structure
+
+    ```c++
+    table <- { "key1": 1, "key2": null, 3: false, null: 1.07 }
+    table["key3"] <- true
+    @print(table["key2"]) # prints null
+    ```
+    Currently, the sole complex data structure available is the **Table** which maps keys to values. Square brackets can be used to retrieve values by key or insert values with keys. The keys and values for each entry in the table do not need to be of the same type. As of now, there is no way to remove entries from the table
+
+    ```c++
+    # prints key2
+    @print(table % 1)
+    ```
+
+    The modulus operation can be used to fetch any key in the table by index
+
+9. Importing other files
 
     ```c++
     include "relative/path/to/file.he"
@@ -149,10 +164,10 @@ Use the demo scripts in the `demo/` directory to test the interpreter.
 + Lambda functions (anonymous methods)
 + Recursion
 + File imports
++ Table data structure
 
 ### Upcoming
 
-+ Complex data types
 + Garbage collection
 + Bitwise operations
 + File IO
