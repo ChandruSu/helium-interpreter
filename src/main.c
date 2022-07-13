@@ -82,12 +82,7 @@ int main(int argc, const char* argv[])
 
     current_vm = &vm;
 
-    code_object c = {
-        .closure = NULL,
-        .p = &pp
-    };
-
-    run_program(&vm, NULL, &c);
+    run_program(&vm, NULL, vCode(&pp, NULL).value.to_code);
 
 #ifdef HE_DEBUG_MODE
     clock_t end = clock();

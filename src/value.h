@@ -30,7 +30,7 @@ typedef enum vm_type {
     VM_FLOAT,
     VM_STRING,
     VM_PROGRAM,
-} vm_type;
+} __attribute__((packed)) vm_type;
 
 typedef struct Value {
     vm_type type;
@@ -41,7 +41,7 @@ typedef struct Value {
         const char* to_str;
         code_object* to_code;
     } value;
-} Value;
+} __attribute__((packed)) Value;
 
 /**
  * @brief Coerces abstract syntax node into Value object.

@@ -194,6 +194,11 @@ astnode* parse_primary(parser* p)
             node->type = AST_NULL;
             node->value = eat(p)->value;
             break;
+
+        case LX_LEFT_BRACE:
+            free(node);
+            node = parse_table_instance(p);
+            break;
         
         case LX_SYMBOL:
             node->type = AST_REFERENCE;
@@ -342,6 +347,28 @@ astnode* parse_branching(parser* p)
     }
 
     return branch0;   
+}
+
+astnode* parse_table_instance(parser* p)
+{
+    astnode* table = astnode_new("table", AST_TABLE, clone_pos(&consume(p, LX_LEFT_BRACE)->pos));
+    strip_newlines(p);
+
+    if (peek(p)->type != LX_RIGHT_BRACE) 
+    {
+        do {
+            strip_newlines(p);
+            astnode* element = astnode_new("pair", AST_KV_PAIR, clone_pos(&peek(p)->pos));
+            vector_push(&table->children, parse_expression(p));
+            consume(p, LX_COLON);
+            vector_push(&table->children, parse_expression(p));
+            strip_newlines(p);
+        } 
+        while (consume_optional(p, LX_SEPARATOR));
+    }
+    
+    consume(p, LX_RIGHT_BRACE);
+    return table;
 }
 
 // ------------------ UTILITY METHODS ------------------

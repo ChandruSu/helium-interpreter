@@ -51,7 +51,7 @@ Value value_from_node(astnode* node)
 
 const char* value_to_str(Value* v)
 {
-    char* buf = (char*) malloc(sizeof(char) * 32);
+    char* buf = (char*) malloc(sizeof(char) * 64);
 
     switch (v->type)
     {

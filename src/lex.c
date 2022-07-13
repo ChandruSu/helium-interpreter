@@ -174,6 +174,9 @@ lxtoken* lex(lexer* lx)
             case ')':
                 type = LX_RIGHT_PAREN;
                 break;
+            case ':':
+                type = LX_COLON;
+                break;
             case '#':
                 type = LX_COMMENT;
                 while (lx->lookahead != '\n') lexadvance(lx);

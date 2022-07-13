@@ -14,7 +14,7 @@ vm_op scope_load_op_map[] = {
 vm_op scope_store_op_map[] = {
     OP_STORL,
     OP_STORG,
-    OP_NOP,
+    OP_NOP,     // closure variables cannot be assigned
     OP_NOP,
 };
 
