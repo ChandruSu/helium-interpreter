@@ -159,6 +159,28 @@ void decode_execute(virtual_machine* vm, call_info* call, instruction i)
 
             vm->stack[call->tp - 1] = vCode(vm->stack[call->tp - 1].value.to_code->p, closure);
             break;
+
+        case OP_TNEW:
+            vm->stack[call->tp++] = vTable(10);
+            break;
+        
+        case OP_TPUT:
+            v1 = vm->stack[--call->tp];
+            v0 = vm->stack[--call->tp];
+            call->tp--;
+            
+            if (vm->stack[call->tp].type == VM_TABLE)
+                vTablePut(vm->stack[call->tp++].value.to_table, v0, v1);
+            else
+                runtimeerr(vm, "Cannot add element to non table object");
+            break;
+
+        case OP_TGET:
+            v0 = vm->stack[--call->tp];
+            call->tp--;
+            vm->stack[call->tp] = vTableGet(vm->stack[call->tp].value.to_table, v0);
+            call->tp++;
+            break;
         
         default:
             fprintf(stderr, "%s Failed to execute instruction: %i\n", ERROR, i.stackop.op);

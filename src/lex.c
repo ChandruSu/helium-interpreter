@@ -141,6 +141,12 @@ lxtoken* lex(lexer* lx)
             case ')':
                 type = LX_RIGHT_PAREN;
                 break;
+            case '[':
+                type = LX_LEFT_SQUARE;
+                break;
+            case ']':
+                type = LX_RIGHT_SQUARE;
+                break;
             case ':':
                 type = LX_COLON;
                 break;

@@ -65,6 +65,14 @@ void compile_statement(program* p, astnode* statement)
             compile_branches(p, statement);
             break;
 
+        case AST_PUT:
+            compile_table_put(p, statement);
+            break;
+        
+        case AST_GET:
+            compile_table_get(p, statement);
+            break;
+
         default:
             compilererr(p, statement->pos, "Failed to compile statement into bytecode!");
     }
@@ -194,6 +202,14 @@ void compile_expression(program* p, astnode* expression)
             if (scope == VM_UNKNOWN_SCOPE)
                 compilererr(p, expression->pos, "Unknown variable name!");
             break;
+        
+        case AST_TABLE:
+            compile_table(p, expression);
+            break;
+        
+        case AST_GET:
+            compile_table_get(p, expression);
+            break;
 
         case AST_INTEGER:
         case AST_FLOAT:
@@ -263,6 +279,42 @@ void compile_branches(program* p, astnode* branches)
     {
         p->code[pos1].stackop.op = OP_NOP;
     }
+}
+
+void compile_table(program* p, astnode* table)
+{
+    p->code[p->length++].stackop.op = OP_TNEW;
+
+    for (size_t i = 0; i < table->children.size; i++)
+    {
+        astnode* pair = vector_get(&table->children, i);
+        compile_expression(p, pair->children.items[0]); 
+        compile_expression(p, pair->children.items[1]);
+        p->code[p->length++].stackop.op = OP_TPUT;
+    }
+}
+
+void compile_table_put(program* p, astnode* put) 
+{
+    vm_scope scope;
+    p->code[p->length].sx.sx = dereference_variable(p, put->value, &scope);
+    p->code[p->length].sx.op = scope_load_op_map[scope];
+    p->length++;
+
+    compile_expression(p, vector_get(&put->children, 0));
+    compile_expression(p, vector_get(&put->children, 1));
+    p->code[p->length++].stackop.op = OP_TPUT;
+}
+
+void compile_table_get(program* p, astnode* get)
+{
+    vm_scope scope;
+    p->code[p->length].sx.sx = dereference_variable(p, get->value, &scope);
+    p->code[p->length].sx.op = scope_load_op_map[scope];
+    p->length++;
+
+    compile_expression(p, vector_get(&get->children, 0));
+    p->code[p->length++].stackop.op = OP_TGET;
 }
 
 void create_native(program* p, const char* name, Value (*f)(Value[]), int argc)
@@ -497,6 +549,10 @@ const char* operation_strings[] = {
     "OP_JIF      ",
     "OP_JMP      ",
     "OP_CLOSE    ",
+    "OP_TNEW     ",
+    "OP_TPUT     ",
+    "OP_TGET     ",
+    "OP_TREM     ",
 };
 
 const char* disassemble_program(program* p) 
@@ -556,6 +612,10 @@ const char* disassemble(program* p, instruction i) {
         case OP_POP:
         case OP_NOP:
         case OP_JIF:
+        case OP_TNEW:
+        case OP_TPUT:
+        case OP_TGET:
+        case OP_TREM:
             sprintf(buf, "%s", operation_strings[i.stackop.op]);
             break;
         

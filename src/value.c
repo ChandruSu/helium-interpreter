@@ -241,7 +241,7 @@ Value vMod(Value a, Value b)
 {
     char buf[100];
 
-    if (a.type != VM_STRING && b.value.to_int == 0) {
+    if (a.type != VM_STRING && a.type != VM_TABLE && b.value.to_int == 0) {
         sprintf(buf, "Zero modulus error!");
         runtimeerr(current_vm, buf);
     }
@@ -278,6 +278,10 @@ Value vMod(Value a, Value b)
 
 Value vEqual(Value a, Value b)
 {
+    if (a.type == VM_NULL || b.type == VM_NULL) {
+        return vBool(a.type == VM_NULL && b.type == VM_NULL);
+    }
+
     switch (TYPEPAIR(a.type, b.type))
     {
         case TYPEMATCH(VM_STRING): return vBool(streq(a.value.to_str, b.value.to_str));
@@ -291,9 +295,7 @@ Value vEqual(Value a, Value b)
         case TYPEPAIR(VM_FLOAT, VM_BOOL): return vBool(a.value.to_float == b.value.to_bool);
         case TYPEPAIR(VM_BOOL, VM_FLOAT): return vBool(a.value.to_bool == b.value.to_float);
         default:
-            char buf[100];
-            sprintf(buf, "Cannot perform that operation between values of types %s and %s!", vm_type_strings[a.type], vm_type_strings[b.type]);
-            runtimeerr(current_vm, buf);
+            return vBool(false);
     }
 
     return vNull();

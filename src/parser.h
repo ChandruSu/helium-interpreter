@@ -34,7 +34,9 @@ typedef enum asttype {
     AST_BRANCHES,
     AST_INCLUDE,
     AST_TABLE,
-    AST_KV_PAIR
+    AST_KV_PAIR,
+    AST_PUT,
+    AST_GET
 } asttype;
 
 typedef struct astnode {
@@ -188,6 +190,10 @@ astnode* parse_branching(parser* p);
  * @return AST node
  */
 astnode* parse_table_instance(parser* p);
+
+astnode* parse_table_put(parser* p);
+
+astnode* parse_table_get(parser* p);
 
 /**
  * @brief Represents abstract syntax tree into a string representation

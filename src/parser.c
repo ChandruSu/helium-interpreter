@@ -13,6 +13,14 @@ lxtoken* peek(parser* p)
     return vector_get(&p->tokens, p->position);
 }
 
+lxtoken* lookahead(parser* p)
+{
+    if (p->position + 1 < p->tokens.size)
+        return vector_get(&p->tokens, p->position + 1);
+    else
+        return NULL;
+}
+
 lxtoken* eat(parser* p)
 {
     if (!is_empty(p)) {
@@ -78,10 +86,15 @@ astnode* parse_statement(parser* p)
     switch (peek(p)->type)
     {
         case LX_SYMBOL:
-            st->type = AST_ASSIGN;
-            st->value = eat(p)->value;
-            consume(p, LX_ASSIGN);
-            vector_push(&st->children, parse_expression(p));
+            if (lookahead(p)->type == LX_LEFT_SQUARE) {
+                free(st);
+                st = parse_table_put(p);
+            } else {
+                st->type = AST_ASSIGN;
+                st->value = eat(p)->value;
+                consume(p, LX_ASSIGN);
+                vector_push(&st->children, parse_expression(p));
+            }
             break;
 
         case LX_CALL:
@@ -201,8 +214,13 @@ astnode* parse_primary(parser* p)
             break;
         
         case LX_SYMBOL:
-            node->type = AST_REFERENCE;
-            node->value = eat(p)->value;
+            if (lookahead(p)->type == LX_LEFT_SQUARE) {
+                free(node);
+                node = parse_table_get(p);
+            } else {
+                node->type = AST_REFERENCE;
+                node->value = eat(p)->value;
+            }
             break;
             
         case LX_FUNCTION:
@@ -354,21 +372,45 @@ astnode* parse_table_instance(parser* p)
     astnode* table = astnode_new("table", AST_TABLE, clone_pos(&consume(p, LX_LEFT_BRACE)->pos));
     strip_newlines(p);
 
+    // parses table entries
     if (peek(p)->type != LX_RIGHT_BRACE) 
     {
         do {
             strip_newlines(p);
             astnode* element = astnode_new("pair", AST_KV_PAIR, clone_pos(&peek(p)->pos));
-            vector_push(&table->children, parse_expression(p));
+            vector_push(&element->children, parse_expression(p));
             consume(p, LX_COLON);
-            vector_push(&table->children, parse_expression(p));
+            vector_push(&element->children, parse_expression(p));
             strip_newlines(p);
+            vector_push(&table->children, element);
         } 
         while (consume_optional(p, LX_SEPARATOR));
     }
     
     consume(p, LX_RIGHT_BRACE);
     return table;
+}
+
+astnode* parse_table_put(parser* p)
+{
+    lxtoken* var = consume(p, LX_SYMBOL);
+    astnode* s = astnode_new(var->value, AST_PUT, clone_pos(&var->pos));
+    consume(p, LX_LEFT_SQUARE);
+    vector_push(&s->children, parse_expression(p));
+    consume(p, LX_RIGHT_SQUARE);
+    consume(p, LX_ASSIGN);
+    vector_push(&s->children, parse_expression(p));
+    return s;
+}
+
+astnode* parse_table_get(parser* p)
+{
+    lxtoken* var = consume(p, LX_SYMBOL);
+    astnode* get = astnode_new(var->value, AST_GET, clone_pos(&var->pos));
+    consume(p, LX_LEFT_SQUARE);
+    vector_push(&get->children, parse_expression(p));
+    consume(p, LX_RIGHT_SQUARE);
+    return get;
 }
 
 // ------------------ UTILITY METHODS ------------------

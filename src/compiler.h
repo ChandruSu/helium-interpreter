@@ -37,7 +37,11 @@ typedef enum vm_op {
     OP_POP,
     OP_JIF,
     OP_JMP,
-    OP_CLOSE
+    OP_CLOSE,
+    OP_TNEW, // table operations
+    OP_TPUT,
+    OP_TGET,
+    OP_TREM,
 } vm_op;
 
 typedef enum vm_scope {
@@ -153,6 +157,19 @@ void compile_loop(program* p, astnode* loop);
  * @param branches Branching nodes
  */
 void compile_branches(program* p, astnode* branches);
+
+/**
+ * @brief Compiles a table declaration and initial entries into intermediate
+ *      bytecode assembly.
+ * 
+ * @param p Reference to program
+ * @param table Table node
+ */
+void compile_table(program* p, astnode* table);
+
+void compile_table_put(program* p, astnode* put);
+
+void compile_table_get(program* p, astnode* get);
 
 /**
  * @brief Registers native method with C-wrapper as an accessible symbol to program
