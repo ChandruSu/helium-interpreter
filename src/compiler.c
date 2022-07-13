@@ -14,7 +14,7 @@ vm_op scope_load_op_map[] = {
 vm_op scope_store_op_map[] = {
     OP_STORL,
     OP_STORG,
-    OP_NOP,     // closure variables cannot be assigned
+    OP_STORC,
     OP_NOP,
 };
 
@@ -488,6 +488,7 @@ const char* operation_strings[] = {
     "OP_LOADG    ",
     "OP_STORL    ",
     "OP_LOADL    ",
+    "OP_STORC    ",
     "OP_LOADC    ",
     "OP_CALL     ",
     "OP_RET      ",
@@ -572,6 +573,7 @@ const char* disassemble(program* p, instruction i) {
             break;
         
         case OP_LOADC:
+        case OP_STORC:
             const char* c = p->closure_table.keys[i.ux.ux];
             sprintf(buf, "%s %u (%s)", operation_strings[i.stackop.op], i.ux.ux, c);
             break;

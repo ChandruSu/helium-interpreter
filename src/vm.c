@@ -101,6 +101,10 @@ void decode_execute(virtual_machine* vm, call_info* call, instruction i)
 
             if (call->tp >= MAX_STACK_SIZE) runtimeerr(vm, "Stack overflow!");
             break;
+        
+        case OP_STORC:
+            call->program->closure[i.ux.ux] = vm->stack[--call->tp];
+            break;
 
         case OP_LOADC:
             vm->stack[call->tp++] = call->program->closure[i.ux.ux];

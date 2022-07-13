@@ -30,6 +30,7 @@ typedef enum vm_op {
     OP_LOADG,
     OP_STORL,
     OP_LOADL,
+    OP_STORC,
     OP_LOADC,
     OP_CALL,
     OP_RET,
