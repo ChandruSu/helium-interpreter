@@ -9,6 +9,7 @@ const char* vm_type_strings[] = {
     "Float",
     "String",
     "Code",
+    "Table",
 };
 
 Value value_from_node(astnode* node)
@@ -71,6 +72,9 @@ const char* value_to_str(Value* v)
             return buf;
         case VM_NULL:
             return "null";
+        case VM_TABLE:
+            sprintf(buf, "<table at %p>", v->value.to_table);
+            return buf;
     }
     return NULL;
 }
@@ -249,7 +253,7 @@ Value vMod(Value a, Value b)
         case TYPEPAIR(VM_INT, VM_BOOL): return vInt(a.value.to_int % b.value.to_bool);
         case TYPEPAIR(VM_BOOL, VM_INT): return vInt(a.value.to_bool % b.value.to_int);
         case TYPEPAIR(VM_STRING, VM_INT):
-            if (b.value.to_int < 0 && b.value.to_int >= strlen(a.value.to_str)) {
+            if (b.value.to_int < 0 || b.value.to_int >= strlen(a.value.to_str)) {
                 sprintf(buf, "String index [%i] out of bounds!", b.value.to_int);
                 runtimeerr(current_vm, buf);
             }
@@ -258,6 +262,12 @@ Value vMod(Value a, Value b)
             c[0] = a.value.to_str[b.value.to_int];
             c[1] = '\0';
             return vString(c);
+        case TYPEPAIR(VM_TABLE, VM_INT):
+            if (b.value.to_int < 0 || b.value.to_int >= a.value.to_table->size) {
+                sprintf(buf, "Table index [%i] out of bounds!", b.value.to_int);
+                runtimeerr(current_vm, buf);
+            }
+            return a.value.to_table->pairs[b.value.to_int].key;
         default:
             sprintf(buf, "Cannot apply modulo values of types %s and %s!", vm_type_strings[a.type], vm_type_strings[b.type]);
             runtimeerr(current_vm, buf);
@@ -352,4 +362,98 @@ Value vLessEqual(Value a, Value b)
     }
 
     return vNull();
+}
+
+// ------------ TABLE DATA STRUCTURE ------------
+
+Value vTable(size_t init_capacity)
+{
+    Value v = {
+        .type = VM_TABLE,
+        .value.to_table = NULL
+    };
+
+    v.value.to_table = malloc(sizeof(Table));
+    v.value.to_table->capacity = init_capacity;
+    v.value.to_table->size = 0;
+    v.value.to_table->pairs = calloc(init_capacity, 2 * sizeof(Value));
+
+    return v;
+}
+
+void _vTable_resize(Table* t, size_t new_capacity)
+{
+    t->pairs = realloc(t->pairs, 2 * sizeof(Value) * new_capacity);
+    
+    if (t->pairs) {
+        t->capacity = new_capacity;
+    } else {
+        runtimeerr(current_vm, "Failed to resize table!");
+    }
+}
+
+Value vTableGet(Table* t, Value k)
+{
+    for (size_t i = 0; i < t->size; i++)
+    {
+        if (vEqual(t->pairs[i].key, k).value.to_bool) {
+            return t->pairs[i].value;
+        }
+    }
+    return vNull();
+}
+
+void vTablePut(Table* t, Value k, Value v)
+{
+    for (size_t i = 0; i < t->size; i++) 
+    {
+        if (vEqual(t->pairs[i].key, k).value.to_bool) {
+            t->pairs[i].value = v;
+            return;
+        }
+    }
+
+    if (t->size == t->capacity) {
+        _vTable_resize(t, t->capacity * 2);
+    }
+
+    t->pairs[t->size].key = k;
+    t->pairs[t->size].value = v;
+    t->size++;
+    return;
+}
+
+Value vTableRm(Table* t, Value k)
+{
+    size_t i;
+    Value out = vNull();
+
+    for (i = 0; i < t->size; i++)
+    {
+        if (vEqual(t->pairs[i].key, k).value.to_bool) {
+            out = t->pairs[i].value;
+            t->size--;
+            break;
+        }
+    }
+
+    for (; i < t->size; i++)
+    {
+        t->pairs[i].key = t->pairs[i + 1].key;
+        t->pairs[i].value = t->pairs[i + 1].value;
+    }
+    
+    t->pairs[t->size].key = vNull();
+    t->pairs[t->size].value = vNull();
+    
+    if (t->size < t->capacity / 4) {
+        _vTable_resize(t, t->capacity / 2);
+    }
+
+    return out;
+}
+
+void vTableDelete(Table* t) 
+{
+    free(t->pairs);
 }

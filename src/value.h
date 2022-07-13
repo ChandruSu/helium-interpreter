@@ -11,6 +11,7 @@
 
 typedef struct program program;
 typedef struct Value Value;
+typedef struct Table Table;
 typedef struct virtual_machine virtual_machine;
 
 // Globally accessible virtual machine instance
@@ -30,6 +31,7 @@ typedef enum vm_type {
     VM_FLOAT,
     VM_STRING,
     VM_PROGRAM,
+    VM_TABLE,
 } __attribute__((packed)) vm_type;
 
 typedef struct Value {
@@ -40,6 +42,7 @@ typedef struct Value {
         float to_float;
         const char* to_str;
         code_object* to_code;
+        Table* to_table;
     } value;
 } __attribute__((packed)) Value;
 
@@ -197,5 +200,60 @@ Value vLess(Value a, Value b);
  * @return Boolean result value
  */
 Value vLessEqual(Value a, Value b);
+
+// ------------ TABLE DATA STRUCTURE ------------
+
+typedef struct Table {
+    struct pair {
+        Value key;
+        Value value;
+    } *pairs;
+
+    size_t capacity;
+    size_t size;
+} Table;
+
+/**
+ * @brief Constructor for table value.
+ * 
+ * @param init_capacity Initial size of table
+ * @return Value containing reference to table
+ */
+Value vTable(size_t init_capacity);
+
+/**
+ * @brief Inserts new key-value pair into table
+ * 
+ * @param t Reference to table
+ * @param k Key value
+ * @param v Value value
+ */
+void vTablePut(Table* t, Value k, Value v);
+
+/**
+ * @brief Retrieves value from table by key.
+ * 
+ * @param t Reference to table
+ * @param k Key value
+ * @return Mapped value 
+ */
+Value vTableGet(Table* t, Value k);
+
+/**
+ * @brief Removes value from table by key.
+ * 
+ * @param t Reference to table
+ * @param k Key value
+ * @return Value previously stored
+ */
+Value vTableRm(Table* t, Value k);
+
+/**
+ * @brief Deletes table object and frees the entries from
+ *      memory.
+ * 
+ * @param t Reference to table
+ */
+void vTableDelete(Table* t);
 
 #endif

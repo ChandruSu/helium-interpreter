@@ -23,7 +23,7 @@
 #define MAX_LOCAL_CONSTANTS 0xff
 #define MAX_LOCAL_VARIABLES 0xff
 
-// #define HE_DEBUG_MODE
+#define HE_DEBUG_MODE
 
 #define streq(a, b) strcmp(a, b) == 0
 

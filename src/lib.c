@@ -42,6 +42,7 @@ Value native_int_cast(Value v[])
         case VM_BOOL: return vInt(v[0].value.to_bool);
         case VM_NULL: return vInt(0);
         case VM_PROGRAM: return vInt(0);
+        case VM_TABLE: return vInt(0);
     }
     return vNull();
 }
@@ -56,6 +57,7 @@ Value native_float_cast(Value v[])
         case VM_BOOL: return vFloat((float)v[0].value.to_bool);
         case VM_NULL: return vFloat(0);
         case VM_PROGRAM: return vFloat(0);
+        case VM_TABLE: return vFloat(0);
     }
     return vNull();
 }
@@ -70,6 +72,7 @@ Value native_bool_cast(Value v[])
         case VM_BOOL: return v[0];
         case VM_NULL: return vBool(0);
         case VM_PROGRAM: return vBool(0);
+        case VM_TABLE: return vBool(v[0].value.to_table->size > 0);
     }
     return vNull();
 }
@@ -89,6 +92,7 @@ Value native_length(Value v[])
         case VM_BOOL: return v[0];
         case VM_NULL: return vInt(0);
         case VM_PROGRAM: return vInt(v[0].value.to_code->p->argc);
+        case VM_TABLE: return vInt(v[0].value.to_table->size);
     }
     return vNull();
 }
