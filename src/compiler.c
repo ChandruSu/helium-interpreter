@@ -466,6 +466,7 @@ vm_op decode_unary_op(const char* operator)
     return OP_NOP;
 }
 
+#ifdef HE_DEBUG_MODE
 const char* operation_strings[] = {
     "OP_NOP      ",
     "OP_ADD      ",
@@ -603,6 +604,7 @@ const char* disassemble(program* p, instruction i) {
     }
     return buf;
 }
+#endif
 
 void compilererr(program* p, lxpos pos, const char* msg)
 {

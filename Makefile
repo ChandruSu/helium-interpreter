@@ -7,7 +7,7 @@ OBJECTS := $(SOURCE:src/%.c=bin/%.o)
 EXEC := out/helium
 TEST_FLAGS := test/test.he
 
-DEBUG := -g
+DEBUG :=
 CC := gcc
 CC_FLAGS := $(DEBUG) -c -Wall -Wno-unused-variable
 DB := gdb

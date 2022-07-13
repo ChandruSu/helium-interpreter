@@ -1,4 +1,3 @@
-// #define HE_DEBUG_MODE
 
 #include "he.h"
 #include <time.h>

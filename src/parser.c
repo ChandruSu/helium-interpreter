@@ -444,6 +444,7 @@ void strip_newlines(parser* p)
     while (consume_optional(p, LX_NEWLINE));
 }
 
+#ifdef HE_DEBUG_MODE
 const char* astnode_tostr(astnode* node)
 {
     if (node->children.size == 0) {
@@ -465,6 +466,7 @@ const char* astnode_tostr(astnode* node)
     strcpy(out, buf);
     return out;
 }
+#endif
 
 void parsererror(parser* p, const char* msg) 
 {

@@ -161,7 +161,7 @@ void decode_execute(virtual_machine* vm, call_info* call, instruction i)
             break;
         
         default:
-            fprintf(stderr, "%s Failed to execute instruction: %s\n", ERROR, disassemble(call->program->p, i));
+            fprintf(stderr, "%s Failed to execute instruction: %i\n", ERROR, i.stackop.op);
             exit(0);
             break;
     }

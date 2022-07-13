@@ -6,34 +6,6 @@ lxtype determine_nature(char* s);
 boolean check_pattern(lexer* lx, const char* pattern, char* buf);
 char escapechar(char c);
 
-const char* lxtype_strings[] = {
-    "LX_SYMBOL           ",
-    "LX_INTEGER          ",
-    "LX_OPERATOR         ",
-    "LX_EOF              ",
-    "LX_COMMENT          ",
-    "LX_NEWLINE          ",
-    "LX_WHITESPACE       ",
-    "LX_LEFT_PAREN       ",
-    "LX_RIGHT_PAREN      ",
-    "LX_LEFT_BRACE       ",
-    "LX_RIGHT_BRACE      ",
-    "LX_ASSIGN           ",
-    "LX_STRING           ",
-    "LX_FUNCTION         ",
-    "LX_CALL             ",
-    "LX_BLOCK            ",
-    "LX_SEPARATOR        ",
-    "LX_BOOL             ",
-    "LX_NULL             ",
-    "LX_RETURN           ",
-    "LX_LOOP             ",
-    "LX_IF               ",
-    "LX_ELSE             ",
-    "LX_FLOAT            ",
-    "LX_INCLUDE          ",
-};
-
 lxtoken* lxtoken_new(const char* value, lxtype type, lxpos pos)
 {
     lxtoken* tk = (lxtoken*)malloc(sizeof(lxtoken));
@@ -41,11 +13,6 @@ lxtoken* lxtoken_new(const char* value, lxtype type, lxpos pos)
     tk->type = type;
     tk->value = value;
     return tk;
-}
-
-void lxtoken_display(lxtoken* tk)
-{
-    printf("(%03i, %03i) %s %s\n", tk->pos.line_pos + 1, tk->pos.col_pos + 1, lxtype_strings[tk->type], tk->value);   
 }
 
 lexer lexer_new(const char* src, const char* file_path)
@@ -318,3 +285,39 @@ lxpos clone_pos(lxpos* original)
     };
     return pos;
 }
+
+#ifdef HE_DEBUG_MODE
+
+const char* lxtype_strings[] = {
+    "LX_SYMBOL           ",
+    "LX_INTEGER          ",
+    "LX_OPERATOR         ",
+    "LX_EOF              ",
+    "LX_COMMENT          ",
+    "LX_NEWLINE          ",
+    "LX_WHITESPACE       ",
+    "LX_LEFT_PAREN       ",
+    "LX_RIGHT_PAREN      ",
+    "LX_LEFT_BRACE       ",
+    "LX_RIGHT_BRACE      ",
+    "LX_ASSIGN           ",
+    "LX_STRING           ",
+    "LX_FUNCTION         ",
+    "LX_CALL             ",
+    "LX_BLOCK            ",
+    "LX_SEPARATOR        ",
+    "LX_BOOL             ",
+    "LX_NULL             ",
+    "LX_RETURN           ",
+    "LX_LOOP             ",
+    "LX_IF               ",
+    "LX_ELSE             ",
+    "LX_FLOAT            ",
+    "LX_INCLUDE          ",
+};
+
+void lxtoken_display(lxtoken* tk)
+{
+    printf("(%03i, %03i) %s %s\n", tk->pos.line_pos + 1, tk->pos.col_pos + 1, lxtype_strings[tk->type], tk->value);   
+}
+#endif

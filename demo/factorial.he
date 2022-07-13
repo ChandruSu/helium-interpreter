@@ -14,5 +14,4 @@ factorial <- $(n) {
     }
 }
 
-@print("The factorial of 10 is: ")
-@print(@factorial(10))
+@print("The factorial of 10 is " + @str(@factorial(10)))
