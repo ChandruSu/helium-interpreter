@@ -86,7 +86,7 @@ astnode* parse_statement(parser* p)
     switch (peek(p)->type)
     {
         case LX_SYMBOL:
-            if (lookahead(p)->type == LX_LEFT_SQUARE) {
+            if (lookahead(p)->type == LX_LEFT_SQUARE || lookahead(p)->type == LX_DOT) {
                 free(st);
                 st = parse_table_put(p);
             } else {
@@ -214,7 +214,7 @@ astnode* parse_primary(parser* p)
             break;
         
         case LX_SYMBOL:
-            if (lookahead(p)->type == LX_LEFT_SQUARE) {
+            if (lookahead(p)->type == LX_LEFT_SQUARE || lookahead(p)->type == LX_DOT) {
                 free(node);
                 node = parse_table_get(p);
             } else {
@@ -266,8 +266,9 @@ astnode* parse_function_call(parser* p)
     astnode* fcall = (astnode*) malloc(sizeof(astnode));
     fcall->type = AST_CALL;
     fcall->pos = clone_pos(&peek(p)->pos);
-    fcall->value = eat(p)->value;
+    fcall->value = peek(p)->value;
     fcall->children = vector_new(4);
+    vector_push(&fcall->children, parse_expression(p));
 
     consume(p, LX_LEFT_PAREN);
 
@@ -396,22 +397,40 @@ astnode* parse_table_instance(parser* p)
 astnode* parse_table_put(parser* p)
 {
     lxtoken* var = consume(p, LX_SYMBOL);
-    astnode* s = astnode_new(var->value, AST_PUT, clone_pos(&var->pos));
-    consume(p, LX_LEFT_SQUARE);
-    vector_push(&s->children, parse_expression(p));
-    consume(p, LX_RIGHT_SQUARE);
+    astnode* put = astnode_new(var->value, AST_PUT, clone_pos(&var->pos));
+
+
+    if (consume_optional(p, LX_LEFT_SQUARE)) {
+        vector_push(&put->children, parse_expression(p));
+        consume(p, LX_RIGHT_SQUARE);
+    }
+    else if (consume_optional(p, LX_DOT))
+    {
+        lxtoken* tk = consume(p, LX_SYMBOL);
+        vector_push(&put->children, astnode_new(tk->value, AST_STRING, clone_pos(&tk->pos)));
+    }
+
     consume(p, LX_ASSIGN);
-    vector_push(&s->children, parse_expression(p));
-    return s;
+    vector_push(&put->children, parse_expression(p));
+    return put;
 }
 
 astnode* parse_table_get(parser* p)
 {
     lxtoken* var = consume(p, LX_SYMBOL);
     astnode* get = astnode_new(var->value, AST_GET, clone_pos(&var->pos));
-    consume(p, LX_LEFT_SQUARE);
-    vector_push(&get->children, parse_expression(p));
-    consume(p, LX_RIGHT_SQUARE);
+
+    if (consume_optional(p, LX_LEFT_SQUARE))
+    {
+        vector_push(&get->children, parse_expression(p));
+        consume(p, LX_RIGHT_SQUARE);
+    }
+    else if (consume_optional(p, LX_DOT))
+    {
+        lxtoken* tk = consume(p, LX_SYMBOL);
+        vector_push(&get->children, astnode_new(tk->value, AST_STRING, clone_pos(&tk->pos)));
+    }
+
     return get;
 }
 

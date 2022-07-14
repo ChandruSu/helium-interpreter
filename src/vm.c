@@ -116,7 +116,7 @@ void decode_execute(virtual_machine* vm, call_info* call, instruction i)
             if (vm->stack[--call->tp].type != VM_PROGRAM) {
                 char msg[1000];
                 msg[0] = '\0';
-                sprintf(msg, "Cannot call value %s, expected function type!", value_to_str(&vm->stack[--call->tp]));
+                sprintf(msg, "Cannot call value %s, expected function type!", value_to_str(&vm->stack[call->tp]));
                 runtimeerr(vm, msg);
             }
 

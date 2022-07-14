@@ -96,19 +96,21 @@ void compile_assignment(program* p, astnode* s)
 
 void compile_call(program* p, astnode* call)
 {
-    for (size_t i = 0; i < call->children.size; i++)
+    for (size_t i = 1; i < call->children.size; i++)
     {
         compile_expression(p, vector_get(&call->children, i));   
     }
     
-    vm_scope scope;
-    p->code[p->length].sx.sx = dereference_variable(p, call->value, &scope);
-    p->code[p->length].sx.op = scope_load_op_map[scope];
-    p->length++;
+    // vm_scope scope;
+    // p->code[p->length].sx.sx = dereference_variable(p, call->value, &scope);
+    // p->code[p->length].sx.op = scope_load_op_map[scope];
+    // p->length++;
 
-    if (scope == VM_UNKNOWN_SCOPE) {
-        compilererr(p, call->pos, "Unknown function name!");
-    }
+    // if (scope == VM_UNKNOWN_SCOPE) {
+    //     compilererr(p, call->pos, "Unknown function name!");
+    // }
+
+    compile_expression(p, vector_rm(&call->children, 0));
 
     p->code[p->length].ux.op = OP_CALL;
     p->code[p->length].ux.ux = call->children.size;

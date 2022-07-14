@@ -5,52 +5,32 @@
   -------------------------------- ?
 
 new_man <- $(name, age) {
-    man <- {
-        "name": name,
-        "age": age
+    this <- {
+        "name": @str(name),
+        "age": @int(age)
     }
 
-    return $(f, args) {
-
-        speak <- $(this) {
-            @print("My name is " + this["name"] + ", and I am " + @str(this["age"]) + " years old.")
-        }
-
-        age <- $(this) {
-            this["age"] <- this["age"] + 1
-        }
-
-        getName <- $(this) {
-            return this["name"]
-        }
-
-        setName <- $(this, name) {
-            this["name"] <- name
-        }
-        
-        getAge <- $(this) {
-            return this["age"]
-        }
-
-        # ----- Decodes requested method -----
-        if      f == "speak"   { return @speak(man) }
-        else if f == "age"     { return @age(man) }
-        else if f == "getAge"  { return @getAge(man) }
-        else if f == "getName" { return @getName(man) }
-        else if f == "setName" { return @setName(man, args["name"]) }
+    this.grow <- $() {
+        this.age <- this.age + 1
     }
+
+    this.speak <- $() {
+        @print("Hi i am " + @str(this.name) + ", and I am " + @str(this.age) + " years old.")
+    }
+
+    this.eat <- $(food) {
+        if @str(food) == "spaghetti" {
+            @print("I love spaghetti!")
+        } else {
+            @print("Don't know what "+ @str(food) +" is, I dont want it!")
+        }
+    }
+
+    return this
 }
 
-# ----- Using objects -----
-
-john <- @new_man("John", 20)
-
-@john("speak", null)
-@john("age", null)
-@john("speak", null)
-
-@print(@john("getAge", null))
-@print(@john("getName", null))
-
-@john("setName", {"name": "Jeff"})
-@john("speak", null)
+john <- @new_man("John", 22)
+@john.speak()
+@john.grow()
+@john.speak()
+@john.eat("lasagna")

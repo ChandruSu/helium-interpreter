@@ -161,6 +161,9 @@ lxtoken* lex(lexer* lx)
             case '@':
                 type = LX_CALL;
                 break;
+            case '.':
+                type = LX_DOT;
+                break;
             case ',':
                 type = LX_SEPARATOR;
                 break;
@@ -321,6 +324,10 @@ const char* lxtype_strings[] = {
     "LX_ELSE             ",
     "LX_FLOAT            ",
     "LX_INCLUDE          ",
+    "LX_COLON            ",
+    "LX_LEFT_SQUARE      ",
+    "LX_RIGHT_SQUARE     ",
+    "LX_DOT              ",
 };
 
 void lxtoken_display(lxtoken* tk)

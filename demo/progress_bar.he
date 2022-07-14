@@ -4,34 +4,40 @@
     Date:       14.07.2022
   -------------------------------- ?
 
-t0 <- @time()
+progressbar <- $(procname, pause) {
 
-i <- 0
-loop i <= 100 
-{
-    a <- "\e[32mProgress Bar: \e[0m\e[?25l[\e[33m"
+    t0 <- @time()
 
-    i1 <- 0
-    loop i1 <= i 
+    i <- 0
+    loop i <= 50 
     {
-        a <- a + "#"
-        i1 <- i1 + 1
+        a <- "\e[32m" + procname + ": \e[0m\e[?25l[\e[33m"
+
+        i1 <- 0
+        loop i1 <= i 
+        {
+            a <- a + "#"
+            i1 <- i1 + 1
+        }
+
+        loop i1 <= 50 
+        {
+            a <- a + " "
+            i1 <- i1 + 1
+        }
+
+        a <- a + "\e[0m] \e[31m" + @str(i * 2) + "% (" + @str(@time() - t0) + " ms)\e[0m"
+
+        # prints string and escape character moves cursor up one line
+        @print(a + "\e[1A")
+        i <- i + 1
+        @delay(pause * 2)
     }
 
-    loop i1 <= 100 
-    {
-        a <- a + " "
-        i1 <- i1 + 1
-    }
-
-    a <- a + "\e[0m] \e[31m" + @str(i) + "%\e[0m"
-
-
-    @print(a + "\e[1A")
-    i <- i + 1
-    @delay(20)
+    @print("\e[?25h")
 }
 
-@print("\e[?25h")
-
-@print("Process took: " + @str(@time() - t0) + " ms")
+@progressbar("Process 1", 50)
+@progressbar("Process 2", 20)
+@progressbar("Process 3", 75)
+@progressbar("Process 4", 35)

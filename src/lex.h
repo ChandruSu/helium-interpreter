@@ -37,6 +37,7 @@ typedef enum lxtype {
     LX_COLON,
     LX_LEFT_SQUARE,
     LX_RIGHT_SQUARE,
+    LX_DOT,             // 28
 } lxtype;
 
 typedef struct lxpos {
