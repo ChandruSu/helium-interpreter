@@ -174,8 +174,6 @@ void compile_function(program* p, astnode* function)
 
 void compile_expression(program* p, astnode* expression)
 {
-    recordaddress(p, &expression->pos);
-
     switch (expression->type)
     {
         case AST_BINARY_EXPRESSION:
@@ -684,7 +682,7 @@ void recordaddress(program* p, lxpos* pos)
 {
     lxpos* last = p->line_address_table.values[p->line_address_table.size - 1];
 
-    if (p->line_address_table.size == 0 || last->line_pos < pos->line_pos) {
+    if (p->line_address_table.size == 0 || strcmp(last->origin, pos->origin) || last->line_pos < pos->line_pos) {
         char* buf = malloc(sizeof(char) * 8);
         sprintf(buf, "%li", p->length);
 
