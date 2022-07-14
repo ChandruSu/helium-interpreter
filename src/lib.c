@@ -11,7 +11,7 @@ Value native_input(Value v[])
     int ch, extra;
 
     if (v->value.to_str != NULL) {
-        native_print(v);
+        printf("%s", value_to_str(&v[0]));
         fflush (stdout);
     }
 
@@ -37,7 +37,7 @@ Value native_int_cast(Value v[])
     switch (v[0].type)
     {
         case VM_INT: return v[0];
-        case VM_FLOAT: return vInt((int)v[0].value.to_float);
+        case VM_FLOAT: return vInt((long)v[0].value.to_float);
         case VM_STRING: return vInt(atoi(v[0].value.to_str));
         case VM_BOOL: return vInt(v[0].value.to_bool);
         case VM_NULL: return vInt(0);
@@ -51,10 +51,10 @@ Value native_float_cast(Value v[])
 {
     switch (v[0].type)
     {
-        case VM_INT: return vFloat((float)v[0].value.to_int);
+        case VM_INT: return vFloat((double)v[0].value.to_int);
         case VM_FLOAT: return v[0];
         case VM_STRING: return vFloat(atof(v[0].value.to_str));
-        case VM_BOOL: return vFloat((float)v[0].value.to_bool);
+        case VM_BOOL: return vFloat((double)v[0].value.to_bool);
         case VM_NULL: return vFloat(0);
         case VM_PROGRAM: return vFloat(0);
         case VM_TABLE: return vFloat(0);
@@ -87,7 +87,7 @@ Value native_length(Value v[])
     switch (v[0].type)
     {
         case VM_INT: return v[0];
-        case VM_FLOAT: return vInt((int) v[0].value.to_float);
+        case VM_FLOAT: return vInt((long) v[0].value.to_float);
         case VM_STRING: return vInt(strlen(v[0].value.to_str));
         case VM_BOOL: return v[0];
         case VM_NULL: return vInt(0);
@@ -110,8 +110,8 @@ Value native_pow(Value v[])
     switch (TYPEPAIR(v[0].type, v[1].type))
     {
         case TYPEMATCH(VM_INT): return vInt(powl(v[0].value.to_int, v[1].value.to_int));
-        case TYPEPAIR(VM_INT, VM_FLOAT): return vFloat(powf((float) v[0].value.to_int, v[1].value.to_float));
-        case TYPEPAIR(VM_FLOAT, VM_INT): return vFloat(powf(v[0].value.to_float, (float) v[1].value.to_int));
+        case TYPEPAIR(VM_INT, VM_FLOAT): return vFloat(powf((double) v[0].value.to_int, v[1].value.to_float));
+        case TYPEPAIR(VM_FLOAT, VM_INT): return vFloat(powf(v[0].value.to_float, (double) v[1].value.to_int));
         case TYPEMATCH(VM_FLOAT): return vFloat(powf(v[0].value.to_float, v[1].value.to_float));
     
         default: return vNull();

@@ -172,13 +172,16 @@ void decode_execute(virtual_machine* vm, call_info* call, instruction i)
             if (vm->stack[call->tp].type == VM_TABLE)
                 vTablePut(vm->stack[call->tp++].value.to_table, v0, v1);
             else
-                runtimeerr(vm, "Cannot add element to non table object");
+                runtimeerr(vm, "Cannot add element to non-table object");
             break;
 
         case OP_TGET:
             v0 = vm->stack[--call->tp];
             call->tp--;
-            vm->stack[call->tp] = vTableGet(vm->stack[call->tp].value.to_table, v0);
+            if (vm->stack[call->tp].type == VM_TABLE)
+                vm->stack[call->tp] = vTableGet(vm->stack[call->tp].value.to_table, v0);
+            else
+                runtimeerr(vm, "Cannot retrieve element from non-table object");
             call->tp++;
             break;
         

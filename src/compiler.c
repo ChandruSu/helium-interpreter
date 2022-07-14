@@ -174,6 +174,8 @@ void compile_function(program* p, astnode* function)
 
 void compile_expression(program* p, astnode* expression)
 {
+    recordaddress(p, &expression->pos);
+
     switch (expression->type)
     {
         case AST_BINARY_EXPRESSION:
@@ -356,10 +358,9 @@ void run_import(program* p, astnode* filepath)
     if (p->prev != NULL) {
         compilererr(p, filepath->pos, "Cannot import in local scope!");
     }
-    printf("%s\n", filepath->pos.origin);
 
     // determines absolute system path of include
-    char path[512];
+    char* path = (char*)malloc(sizeof(char) * 512);
     path[0] = '\0';
     strcpy(path, filepath->pos.origin);
     dirname(path);
@@ -672,7 +673,7 @@ const char* disassemble(program* p, instruction i) {
 
 void compilererr(program* p, lxpos pos, const char* msg)
 {
-    fprintf(stderr, "%s[err] %s (%d, %d):\n", ERR_COL, msg, pos.line_pos + 1, pos.col_pos + 1);
+    fprintf(stderr, "%s[err] %s (%d, %d) in %s:\n", ERR_COL, msg, pos.line_pos + 1, pos.col_pos + 1, pos.origin);
     fprintf(stderr, "\t|\n");
     fprintf(stderr, "\t| %04i %s\n", pos.line_pos + 1, get_line(pos.src, pos.line_offset));
     fprintf(stderr, "\t| %s'\n%s", paddchar('~', 5 + pos.col_pos), DEF_COL);
@@ -686,6 +687,7 @@ void recordaddress(program* p, lxpos* pos)
     if (p->line_address_table.size == 0 || last->line_pos < pos->line_pos) {
         char* buf = malloc(sizeof(char) * 8);
         sprintf(buf, "%li", p->length);
+
         map_put(&p->line_address_table, buf, pos);
     }
 }

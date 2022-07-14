@@ -38,8 +38,8 @@ typedef struct Value {
     vm_type type;
     union {
         boolean to_bool;
-        int32_t to_int;
-        float to_float;
+        long to_int;
+        double to_float;
         const char* to_str;
         code_object* to_code;
         Table* to_table;
@@ -74,14 +74,14 @@ Value vNull();
  * 
  * @return Value
  */
-Value vInt(int i);
+Value vInt(long i);
 
 /**
  * @brief Constructor for float value.
  * 
  * @return Value
  */
-Value vFloat(float f);
+Value vFloat(double f);
 
 /**
  * @brief Constructor for string value.

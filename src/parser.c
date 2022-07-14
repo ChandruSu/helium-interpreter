@@ -534,7 +534,7 @@ const char* astnode_tostr(astnode* node)
 void parsererror(parser* p, const char* msg) 
 {
     lxtoken* tk = peek(p);
-    fprintf(stderr, "%s[err] %s (%d, %d):\n", ERR_COL, msg, tk->pos.line_pos + 1, tk->pos.col_pos + 1);
+    fprintf(stderr, "%s[err] %s (%d, %d) in %s:\n", ERR_COL, msg, tk->pos.line_pos + 1, tk->pos.col_pos + 1, tk->pos.origin);
     fprintf(stderr, "\t|\n");
     fprintf(stderr, "\t| %04i %s\n", tk->pos.line_pos + 1, get_line(p->source, tk->pos.line_offset));
     fprintf(stderr, "\t| %s'\n%s", paddchar('~', 5 + tk->pos.col_pos), DEF_COL);

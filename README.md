@@ -179,6 +179,7 @@ Use the demo scripts in the `demo/` directory to test the interpreter.
 
 ### Upcoming
 
++ Optimising compiler
 + Garbage collection
 + Bitwise operations
 + File IO

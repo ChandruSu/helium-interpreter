@@ -62,10 +62,10 @@ const char* value_to_str(Value* v)
             free(buf);
             return v->value.to_bool ? "true" : "false";
         case VM_INT:
-            sprintf(buf, "%i", v->value.to_int);
+            sprintf(buf, "%li", v->value.to_int);
             return buf;
         case VM_FLOAT:
-            sprintf(buf, "%f", v->value.to_float);
+            sprintf(buf, "%lf", v->value.to_float);
             return buf;
         case VM_PROGRAM:
             sprintf(buf, "<code at %p>", v->value.to_code->p);
@@ -87,7 +87,7 @@ Value vNull()
     return v;
 }
 
-Value vInt(int i)
+Value vInt(long i)
 {
     Value v = {
         .type = VM_INT,
@@ -96,7 +96,7 @@ Value vInt(int i)
     return v;
 }
 
-Value vFloat(float f)
+Value vFloat(double f)
 {
     Value v = {
         .type = VM_FLOAT,
@@ -214,7 +214,7 @@ Value vDiv(Value a, Value b)
 {
     char buf[100];
     
-    if (b.value.to_int == 0 || b.value.to_float == 0) {
+    if ((b.type == VM_INT && b.value.to_int == 0) || b.value.to_float == 0.0) {
         sprintf(buf, "Zero division error!");
         runtimeerr(current_vm, buf);
     }
@@ -255,7 +255,7 @@ Value vMod(Value a, Value b)
         case TYPEPAIR(VM_BOOL, VM_INT): return vInt(a.value.to_bool % b.value.to_int);
         case TYPEPAIR(VM_STRING, VM_INT):
             if (b.value.to_int < 0 || b.value.to_int >= strlen(a.value.to_str)) {
-                sprintf(buf, "String index [%i] out of bounds!", b.value.to_int);
+                sprintf(buf, "String index [%li] out of bounds!", b.value.to_int);
                 runtimeerr(current_vm, buf);
             }
 
@@ -265,7 +265,7 @@ Value vMod(Value a, Value b)
             return vString(c);
         case TYPEPAIR(VM_TABLE, VM_INT):
             if (b.value.to_int < 0 || b.value.to_int >= a.value.to_table->size) {
-                sprintf(buf, "Table index [%i] out of bounds!", b.value.to_int);
+                sprintf(buf, "Table index [%li] out of bounds!", b.value.to_int);
                 runtimeerr(current_vm, buf);
             }
             return a.value.to_table->pairs[b.value.to_int].key;

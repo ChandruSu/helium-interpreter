@@ -275,7 +275,7 @@ char* reduce_string_buffer(char* buffer)
 
 void lexerror(lexer* lx, const char* msg)
 {   
-    fprintf(stderr, "%s[err] %s (%d, %d):\n", ERR_COL, msg, lx->pos.line_pos + 1, lx->pos.col_pos + 1);
+    fprintf(stderr, "%s[err] %s (%d, %d) in %s:\n", ERR_COL, msg, lx->pos.line_pos + 1, lx->pos.col_pos + 1, lx->pos.origin);
     fprintf(stderr, "\t|\n");
     fprintf(stderr, "\t| %04i %s\n", lx->pos.line_pos + 1, get_line(lx->source, lx->pos.line_offset));
     fprintf(stderr, "\t| %s'\n%s", paddchar('~', 5 + lx->pos.col_pos), DEF_COL);
