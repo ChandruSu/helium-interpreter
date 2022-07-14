@@ -23,7 +23,7 @@ The interpreter executable can be found in the `out/` directory.
 
 ## Installing & Running
 
-To execute a helium script file, first install the binary to your system or have the executable in the same directory as the target file, then run the following command on your terminal:
+To execute a helium script file, first, install the binary to your system or have the executable in the same directory as the target file, then run the following command on your terminal:
 
 ```bash
 helium filename.he
@@ -85,12 +85,17 @@ Use the demo scripts in the `demo/` directory to test the interpreter.
             return 1
         }
     }
+    ```
+    Function calls must be preceded with the `@` character. Recursive function calls are allowed and function closures are also possible
 
+    ```c++
     # function closure
     multiplier <- $(n) { return $(x) { return x * n } }
     mul2 <- @multiplier(2)
+
+    @print(@mul2(5)) # prints 10
     ```
-    Function calls must be preceeded with the `@` character. Recursive function calls are allowed and function closures are also possible
+    When a function definition references a variable in a parent method, this method will be dereferenced and stored in a **Closure** object linked with the function instance
 
 6. Comments
 
@@ -132,13 +137,19 @@ Use the demo scripts in the `demo/` directory to test the interpreter.
     @print(table["key2"]) # prints null
     ```
     Currently, the sole complex data structure available is the **Table** which maps keys to values. Square brackets can be used to retrieve values by key or insert values with keys. The keys and values for each entry in the table do not need to be of the same type. As of now, there is no way to remove entries from the table
-
+    
     ```c++
     # prints key2
     @print(table % 1)
     ```
 
     The modulus operation can be used to fetch any key in the table by index
+    
+    ```c++
+    table.func <- $(n) { return n + 1 }
+    @table.func(4)
+    ```
+    The dot operator `.` can be used as a shorthand for table retrieval but only works with keys that follow symbol format (alphanumeric, underscores, doesn't begin with a numeric). This allows functions to be stored and called directly to and from a table
 
 9. Importing other files
 
@@ -147,7 +158,7 @@ Use the demo scripts in the `demo/` directory to test the interpreter.
 
     @methodFromFile()
     ```
-    Include statements can only be executed at global scope. Filepaths are relative to the current script file.
+    Include statements can only be executed within global scope. File paths should be given relative to the current script file. Avoid using circular or duplicate imports
 
 ## Features
 
