@@ -338,6 +338,7 @@ astnode* parse_branching(parser* p)
     consume(p, LX_LEFT_BRACE);
     vector_push(&branch0->children, parse_block(p, LX_RIGHT_BRACE));
     consume(p, LX_RIGHT_BRACE);
+    strip_newlines(p);
 
     // else and else if { ... } branches
     astnode* branchx = branch0;
@@ -356,6 +357,7 @@ astnode* parse_branching(parser* p)
         consume(p, LX_LEFT_BRACE);
         vector_push(&branch->children, parse_block(p, LX_RIGHT_BRACE));
         consume(p, LX_RIGHT_BRACE);
+        strip_newlines(p);
         
         // recursive if statement
         vector_push(&branchx->children, branch);

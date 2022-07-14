@@ -1,0 +1,37 @@
+? --------------------------------
+    Title:      Progress Bar Demo
+    Author:     Chandru Suresh
+    Date:       14.07.2022
+  -------------------------------- ?
+
+t0 <- @time()
+
+i <- 0
+loop i <= 100 
+{
+    a <- "\e[32mProgress Bar: \e[0m\e[?25l[\e[33m"
+
+    i1 <- 0
+    loop i1 <= i 
+    {
+        a <- a + "#"
+        i1 <- i1 + 1
+    }
+
+    loop i1 <= 100 
+    {
+        a <- a + " "
+        i1 <- i1 + 1
+    }
+
+    a <- a + "\e[0m] \e[31m" + @str(i) + "%\e[0m"
+
+
+    @print(a + "\e[1A")
+    i <- i + 1
+    @delay(20)
+}
+
+@print("\e[?25h")
+
+@print("Process took: " + @str(@time() - t0) + " ms")

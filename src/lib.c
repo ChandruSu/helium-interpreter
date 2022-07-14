@@ -133,8 +133,17 @@ Value native_delay(Value v[])
     return vNull();
 }
 
+Value native_table_remove(Value v[])
+{
+    if (v[0].type != VM_TABLE)
+        runtimeerr(current_vm, "First argument should be a Table!");
+
+    return vTableRm(v[0].value.to_table, v[1]);
+}
+
 void register_all_natives(program* p)
 {
+    create_native(p, "popkey", native_table_remove, 2);
     create_native(p, "print", native_print, 1);
     create_native(p, "input", native_input, 1);
     create_native(p, "int", native_int_cast, 1);

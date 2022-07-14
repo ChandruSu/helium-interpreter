@@ -354,11 +354,13 @@ void run_import(program* p, astnode* filepath)
     if (p->prev != NULL) {
         compilererr(p, filepath->pos, "Cannot import in local scope!");
     }
+    printf("%s\n", filepath->pos.origin);
 
     // determines absolute system path of include
     char path[512];
     path[0] = '\0';
-    strcat(path, dirname((char*)filepath->pos.origin));
+    strcpy(path, filepath->pos.origin);
+    dirname(path);
     strcat(path, "/");
     strcat(path, filepath->value);
 

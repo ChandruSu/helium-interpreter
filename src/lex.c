@@ -263,8 +263,9 @@ char escapechar(char c)
 char* reduce_string_buffer(char* buffer)
 {
     size_t len = strlen(buffer);
-    char* new_buffer = (char*)malloc(sizeof(char) * len);
+    char* new_buffer = (char*)malloc(sizeof(char) * (len + 1));
     strcpy(new_buffer, buffer);
+    new_buffer[len] = '\0';
     free(buffer);
     return new_buffer;
 }

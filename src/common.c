@@ -2,7 +2,7 @@
 
 void file_error(const char* msg, const char* fname)
 {
-    fprintf(stderr, "Error! %s: %s\n", msg, fname);
+    fprintf(stderr, "%sError! %s: %s%s\n", ERR_COL, msg, fname, DEF_COL);
     exit(0);
 }
 
@@ -30,7 +30,7 @@ const char* read_file(const char* filepath)
 
     fseek(fptr, 0, SEEK_SET);
 
-    char* buffer = (char*) malloc(sizeof(char) * fsize);
+    char* buffer = (char*) calloc(fsize, sizeof(char));
     size_t new_size = fread(buffer, sizeof(char), fsize, fptr);
 
     if (ferror(fptr) != 0) {

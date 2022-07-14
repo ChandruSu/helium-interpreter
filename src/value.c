@@ -152,9 +152,10 @@ Value vAdd(Value a, Value b)
         case TYPEPAIR(VM_FLOAT, VM_BOOL): return vFloat(a.value.to_float + b.value.to_bool);
         case TYPEPAIR(VM_BOOL, VM_FLOAT): return vFloat(a.value.to_bool + b.value.to_float);
         case TYPEMATCH(VM_STRING):
-            buf = malloc(sizeof(char) * (strlen(a.value.to_str) + strlen(b.value.to_str)));
+            buf = malloc(sizeof(char) * (strlen(a.value.to_str) + strlen(b.value.to_str) + 1));
             strcpy(buf, a.value.to_str);
             strcat(buf, b.value.to_str);
+            buf[strlen(buf)] = '\0';
             return vString(buf);
         default:
             char buf0[100];
