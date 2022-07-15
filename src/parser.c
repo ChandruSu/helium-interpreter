@@ -4,7 +4,7 @@ int precedence(parser* p, lxtoken* op);
 astnode* apply_op(vector* primaries, vector* operators);
 void strip_newlines(parser* p);
 astnode* astnode_new(const char* value, asttype type, lxpos pos);
-astnode* parse_table_subscript(parser* p, lxtoken* op);
+astnode* parse_table_subscript(parser* p);
 
 #define TKISFETCH(type) type == LX_DOT || type == LX_LEFT_SQUARE
 
@@ -162,11 +162,7 @@ astnode* parse_expression(parser* p)
         }
 
         vector_push(&operators, op);
-
-        if (TKISFETCH(op->type))
-            vector_push(&primaries, parse_table_subscript(p, op));
-        else
-            vector_push(&primaries, parse_primary(p));
+        vector_push(&primaries, parse_primary(p));
     }
 
     // Applies remaining operations
@@ -221,8 +217,13 @@ astnode* parse_primary(parser* p)
             break;
         
         case LX_SYMBOL:
-            node->type = AST_REFERENCE;
-            node->value = eat(p)->value;
+            if (TKISFETCH(lookahead(p)->type)) {
+                free(node);
+                node = parse_table_subscript(p);
+            } else {
+                node->type = AST_REFERENCE;
+                node->value = eat(p)->value;
+            }
             break;
 
         case LX_FUNCTION:
@@ -405,23 +406,39 @@ astnode* parse_table_put(parser* p)
     return put;
 }
 
-astnode* parse_table_subscript(parser* p, lxtoken* op)
+astnode* parse_table_subscript(parser* p)
 {
-    astnode* out;
-    if (op->type == LX_LEFT_SQUARE) 
+    astnode* rhs = NULL;
+    astnode* lhs = astnode_new(peek(p)->value, AST_REFERENCE, clone_pos(&peek(p)->pos));
+    consume(p, LX_SYMBOL);
+
+    while (TKISFETCH(peek(p)->type))
     {
-        out = parse_expression(p);
-        consume(p, LX_RIGHT_SQUARE);
-    } 
-    else
-    {
-        if (peek(p)->type == LX_SYMBOL) 
-            peek(p)->type = LX_STRING;
+        lxtoken* op = eat(p);
+        
+        if (op->type == LX_LEFT_SQUARE) 
+        {
+            rhs = parse_expression(p);
+            consume(p, LX_RIGHT_SQUARE);
+        } 
         else
-            parsererror(p, "Expected symbol following table fetch!");
-        out = parse_primary(p);
+        {
+            if (peek(p)->type == LX_SYMBOL) 
+                peek(p)->type = LX_STRING;
+            else
+                parsererror(p, "Expected symbol following table fetch!");
+            
+            rhs = parse_primary(p);
+        }
+
+        astnode* e = astnode_new(".", AST_BINARY_EXPRESSION, clone_pos(&op->pos));
+        vector_push(&e->children, lhs);
+        vector_push(&e->children, rhs);
+        lhs = e;
+        rhs = NULL;
     }
-    return out;
+    
+    return lhs;
 }
 
 // ------------------ UTILITY METHODS ------------------
