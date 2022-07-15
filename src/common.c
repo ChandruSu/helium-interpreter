@@ -30,7 +30,7 @@ const char* read_file(const char* filepath)
 
     fseek(fptr, 0, SEEK_SET);
 
-    char* buffer = (char*) calloc(fsize, sizeof(char));
+    char* buffer = (char*) calloc(fsize + 1, sizeof(char));
     size_t new_size = fread(buffer, sizeof(char), fsize, fptr);
 
     if (ferror(fptr) != 0) {

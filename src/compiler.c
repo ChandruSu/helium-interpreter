@@ -68,10 +68,6 @@ void compile_statement(program* p, astnode* statement)
         case AST_PUT:
             compile_table_put(p, statement);
             break;
-        
-        case AST_GET:
-            compile_table_get(p, statement);
-            break;
 
         default:
             compilererr(p, statement->pos, "Failed to compile statement into bytecode!");
@@ -208,10 +204,6 @@ void compile_expression(program* p, astnode* expression)
         case AST_TABLE:
             compile_table(p, expression);
             break;
-        
-        case AST_GET:
-            compile_table_get(p, expression);
-            break;
 
         case AST_INTEGER:
         case AST_FLOAT:
@@ -298,26 +290,16 @@ void compile_table(program* p, astnode* table)
 
 void compile_table_put(program* p, astnode* put) 
 {
-    vm_scope scope;
-    p->code[p->length].sx.sx = dereference_variable(p, put->value, &scope);
-    p->code[p->length].sx.op = scope_load_op_map[scope];
-    p->length++;
-
     compile_expression(p, vector_get(&put->children, 0));
+    
+    if (p->code[--p->length].stackop.op != OP_TGET) {
+        compilererr(p, put->pos, "Expected table index operation!");
+    }
+
     compile_expression(p, vector_get(&put->children, 1));
     p->code[p->length++].stackop.op = OP_TPUT;
 }
 
-void compile_table_get(program* p, astnode* get)
-{
-    vm_scope scope;
-    p->code[p->length].sx.sx = dereference_variable(p, get->value, &scope);
-    p->code[p->length].sx.op = scope_load_op_map[scope];
-    p->length++;
-
-    compile_expression(p, vector_get(&get->children, 0));
-    p->code[p->length++].stackop.op = OP_TGET;
-}
 
 void create_native(program* p, const char* name, Value (*f)(Value[]), int argc)
 {
@@ -502,6 +484,8 @@ vm_op decode_binary_op(const char* operator)
         return OP_GT;
     else if (streq(operator, ">="))
         return OP_GE;
+    else if (streq(operator, "."))
+        return OP_TGET;
     else {
         failure("Failed to decode binary operator!");
     }

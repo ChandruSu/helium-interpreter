@@ -36,7 +36,6 @@ typedef enum asttype {
     AST_TABLE,
     AST_KV_PAIR,
     AST_PUT,
-    AST_GET
 } asttype;
 
 typedef struct astnode {
@@ -198,14 +197,6 @@ astnode* parse_table_instance(parser* p);
  * @return AST node
  */
 astnode* parse_table_put(parser* p);
-
-/**
- * @brief Parses table key-fetch primary into syntax node e.g t[k]
- * 
- * @param p Reference to parser
- * @return AST node
- */
-astnode* parse_table_get(parser* p);
 
 /**
  * @brief Represents abstract syntax tree into a string representation

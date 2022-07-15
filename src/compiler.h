@@ -177,14 +177,6 @@ void compile_table(program* p, astnode* table);
 void compile_table_put(program* p, astnode* put);
 
 /**
- * @brief Compiles a table key-fetch into intermediate bytecode assembly.
- * 
- * @param p Reference to program
- * @param put Table get node
- */
-void compile_table_get(program* p, astnode* get);
-
-/**
  * @brief Registers native method with C-wrapper as an accessible symbol to program
  *      local scope.
  * 
