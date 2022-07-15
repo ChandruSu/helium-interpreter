@@ -295,6 +295,8 @@ Value vEqual(Value a, Value b)
         case TYPEPAIR(VM_FLOAT, VM_INT): return vBool(a.value.to_float == b.value.to_int);
         case TYPEPAIR(VM_FLOAT, VM_BOOL): return vBool(a.value.to_float == b.value.to_bool);
         case TYPEPAIR(VM_BOOL, VM_FLOAT): return vBool(a.value.to_bool == b.value.to_float);
+        case TYPEMATCH(VM_TABLE): return vBool(a.value.to_table == b.value.to_table);
+        case TYPEMATCH(VM_PROGRAM): return vBool(a.value.to_code == b.value.to_code);
         default:
             return vBool(false);
     }
