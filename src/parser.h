@@ -207,4 +207,14 @@ astnode* parse_table_put(parser* p);
  */
 const char* astnode_tostr(astnode* node);
 
+/**
+ * @brief Represents abstract syntax tree as an ASCII directory tree.
+ * 
+ * @param n Reference to AST node
+ * @param stem Bits representing the tree stems to be drawn
+ * @param level Height of node in tree
+ * @param last True if node is the last child of parent tree
+ */
+void print_ast(astnode* n, long stem, int level, boolean last);
+
 #endif

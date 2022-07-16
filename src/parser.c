@@ -89,7 +89,7 @@ astnode* parse_statement(parser* p)
     switch (peek(p)->type)
     {
         case LX_SYMBOL:
-            if (lookahead(p)->type == LX_LEFT_SQUARE || lookahead(p)->type == LX_DOT) {
+            if (TKISFETCH(lookahead(p)->type)) {
                 free(st);
                 st = parse_table_put(p);
             } else {
@@ -151,7 +151,7 @@ astnode* parse_expression(parser* p)
     vector_push(&primaries, parse_primary(p));
 
     // Non-primary expression
-    while (!is_empty(p) && (peek(p)->type == LX_OPERATOR || TKISFETCH(peek(p)->type))) 
+    while (!is_empty(p) && peek(p)->type == LX_OPERATOR) 
     {
         lxtoken* op = eat(p);
 
@@ -269,7 +269,7 @@ astnode* parse_function_call(parser* p)
     astnode* fcall = (astnode*) malloc(sizeof(astnode));
     fcall->type = AST_CALL;
     fcall->pos = clone_pos(&peek(p)->pos);
-    fcall->value = peek(p)->value;
+    fcall->value = "call";
     fcall->children = vector_new(4);
     vector_push(&fcall->children, parse_expression(p));
 
@@ -517,6 +517,7 @@ void strip_newlines(parser* p)
 }
 
 #ifdef HE_DEBUG_MODE
+
 const char* astnode_tostr(astnode* node)
 {
     if (node->children.size == 0) {
@@ -538,6 +539,38 @@ const char* astnode_tostr(astnode* node)
     strcpy(out, buf);
     return out;
 }
+
+void print_ast(astnode* n, long stem, int level, boolean last)
+{
+    stem |= 1 << level;
+    
+    long l0 = stem;
+
+    while (l0 > 1) {
+        printf(l0 & 0x1 ? "  |" : "   ");
+        l0 >>= 1;
+    }
+
+    printf("%s--", last ? "  '" : "  |");
+
+    for (size_t i = 0; i < strlen(n->value); i++)
+    {
+        char c =  n->value[i];
+        if (!iscntrl(c))
+            printf("%c",c);
+    }
+    
+    printf("%c",'\n');
+    
+
+    if (last) stem &= ~(1 << level);
+
+    for (size_t i = 0; i < n->children.size; i++)
+    {
+        print_ast(vector_get(&n->children, i), stem, level + 1, i + 1 >= n->children.size);
+    }
+}
+
 #endif
 
 void parsererror(parser* p, const char* msg) 

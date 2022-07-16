@@ -44,6 +44,8 @@ int main(int argc, const char* argv[])
 
 #ifdef HE_DEBUG_MODE
     printf("%s\n", astnode_tostr(tree));
+    
+    print_ast(tree, 0, 0, true);
 
     printf("\n%s Beginning compilation:\n\n", MESSAGE);
 #endif

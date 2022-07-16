@@ -59,7 +59,8 @@ const char* get_line(const char* source, int start)
 }
 
 const char* paddchar(char c, int n) {
-    char* buf = (char*) malloc(sizeof(char) * n);
+    char* buf = (char*) malloc(sizeof(char) * (n+1));
+    buf[0] = '\0';
     memset(buf, c, n);
     buf[n+1] = '\0';
     return buf;
