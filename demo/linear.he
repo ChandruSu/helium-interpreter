@@ -25,3 +25,5 @@ loop a <= 10 {
     @print("f(" + @str(a) + ") = " + @str(@f(a)))
     a <- a + 1
 }
+
+

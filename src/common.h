@@ -1,12 +1,15 @@
 #ifndef HE_COMMON_HEADER
 #define HE_COMMON_HEADER
 
+#include <ctype.h>
+#include <libgen.h>
+#include <math.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdint.h>
 #include <string.h>
+#include <time.h>
 #include <unistd.h>
-#include <libgen.h>
 
 #define ERR_COL "\033[31m"
 #define WAR_COL "\033[33m"

@@ -1,9 +1,6 @@
 #ifndef HE_LEXER_HEADER
 #define HE_LEXER_HEADER
 
-#include <ctype.h>
-#include <string.h>
-#include <stdio.h>
 
 #include "common.h"
 #include "datatypes.h"

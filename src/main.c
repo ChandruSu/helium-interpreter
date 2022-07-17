@@ -1,6 +1,5 @@
 
 #include "he.h"
-#include <time.h>
 
 virtual_machine* current_vm;
 

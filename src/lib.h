@@ -5,9 +5,6 @@
 #include "compiler.h"
 #include "vm.h"
 
-#include <math.h>
-#include <time.h>
-
 /**
  * @brief Registers all native, in-built methods to the specified
  *      program's local scope. These methods will be available in

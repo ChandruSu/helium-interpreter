@@ -42,7 +42,7 @@ typedef enum vm_op {
     OP_TPUT,
     OP_TGET,
     OP_TREM,
-} vm_op;
+} __attribute__((packed)) vm_op;
 
 typedef enum vm_scope {
     VM_LOCAL_SCOPE,

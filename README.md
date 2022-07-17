@@ -4,6 +4,8 @@ A lightweight, fast interpreter written in C for 'Helium script', a custom esote
 
 The helium language is dynamically typed, follows a procedural programming paradigm and functions are treated as first class objects.
 
+![Helium Demo GIF](demo/demo.gif)
+
 ## Building
 
 GNU build-tools are required to build the interpreter, the following binaries are required:
@@ -31,7 +33,7 @@ To execute a helium script file:
 helium filename.he
 ```
 
-Use the demo scripts in the `demo/` directory to test the interpreter.
+Use the demo scripts in the [demo](demo/) directory to test the interpreter.
 
 ## Language Syntax
 
@@ -185,3 +187,6 @@ Use the demo scripts in the `demo/` directory to test the interpreter.
 + Garbage collection
 + Bitwise operations
 + File IO
+
+## License
+The interpreter and source code are under [GNU GPL v3.0](LICENSE.md) license. Feel free to run, study, share, modify and redistribute the software.

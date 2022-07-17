@@ -1,7 +1,6 @@
 #ifndef HE_DATATYPES_HEADER
 #define HE_DATATYPES_HEADER
 
-#include <stdlib.h>
 #include "common.h"
 
 // ------------------- VECTOR -------------------

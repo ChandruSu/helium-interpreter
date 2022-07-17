@@ -484,7 +484,7 @@ vm_op decode_binary_op(const char* operator)
         return OP_GT;
     else if (streq(operator, ">="))
         return OP_GE;
-    else if (streq(operator, "."))
+    else if (streq(operator, "[]"))
         return OP_TGET;
     else {
         failure("Failed to decode binary operator!");
@@ -507,39 +507,39 @@ vm_op decode_unary_op(const char* operator)
 
 #ifdef HE_DEBUG_MODE
 const char* operation_strings[] = {
-    "OP_NOP      ",
-    "OP_ADD      ",
-    "OP_SUB      ",
-    "OP_MUL      ",
-    "OP_DIV      ",
-    "OP_MOD      ",
-    "OP_NEG      ",
-    "OP_NOT      ",
-    "OP_AND      ",
-    "OP_OR       ",
-    "OP_EQ       ",
-    "OP_NE       ",
-    "OP_LT       ",
-    "OP_LE       ",
-    "OP_GT       ",
-    "OP_GE       ",
-    "OP_PUSHK    ",
-    "OP_STORG    ",
-    "OP_LOADG    ",
-    "OP_STORL    ",
-    "OP_LOADL    ",
-    "OP_STORC    ",
-    "OP_LOADC    ",
-    "OP_CALL     ",
-    "OP_RET      ",
-    "OP_POP      ",
-    "OP_JIF      ",
-    "OP_JMP      ",
-    "OP_CLOSE    ",
-    "OP_TNEW     ",
-    "OP_TPUT     ",
-    "OP_TGET     ",
-    "OP_TREM     ",
+    "NOP      ",
+    "ADD      ",
+    "SUB      ",
+    "MUL      ",
+    "DIV      ",
+    "MOD      ",
+    "NEG      ",
+    "NOT      ",
+    "AND      ",
+    "OR       ",
+    "EQ       ",
+    "NE       ",
+    "LT       ",
+    "LE       ",
+    "GT       ",
+    "GE       ",
+    "PUSHK    ",
+    "STORG    ",
+    "LOADG    ",
+    "STORL    ",
+    "LOADL    ",
+    "STORC    ",
+    "LOADC    ",
+    "CALL     ",
+    "RET      ",
+    "POP      ",
+    "JIF      ",
+    "JMP      ",
+    "CLOSE    ",
+    "TNEW     ",
+    "TPUT     ",
+    "TGET     ",
+    "TREM     ",
 };
 
 const char* disassemble_program(program* p) 

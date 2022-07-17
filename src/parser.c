@@ -431,7 +431,7 @@ astnode* parse_table_subscript(parser* p)
             rhs = parse_primary(p);
         }
 
-        astnode* e = astnode_new(".", AST_BINARY_EXPRESSION, clone_pos(&op->pos));
+        astnode* e = astnode_new("[]", AST_BINARY_EXPRESSION, clone_pos(&op->pos));
         vector_push(&e->children, lhs);
         vector_push(&e->children, rhs);
         lhs = e;
@@ -561,7 +561,6 @@ void print_ast(astnode* n, long stem, int level, boolean last)
     }
     
     printf("%c",'\n');
-    
 
     if (last) stem &= ~(1 << level);
 
