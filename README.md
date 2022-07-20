@@ -12,6 +12,8 @@ GNU build-tools are required to build the interpreter, the following binaries ar
 + make
 + gcc
 
+The following C headers are required to build the source: ctype.h, libgen.h, math.h, stdint.h, stdio.h, stdlib.h, string.h, time.h, unistd.h
+
 To build the interpreter, download the source code and run the following commands in sequence:
 
 ```bash
