@@ -1,0 +1,28 @@
+? --------------------------------
+    Title:      Sieve of Erastosthenes
+    Author:     Chandru Suresh
+    Date:       21.07.2022
+  -------------------------------- ?
+
+N <- 100
+sieve <- {}
+
+i <- 2
+loop i <= N {
+    sieve[i] <- true
+    i <- i + 1
+}
+
+i <- 2
+loop i <= N {
+    if sieve[i] {
+        @print(i)
+
+        j <- i
+        loop j <= N {
+            sieve[j] <- false
+            j <- j + i
+        }
+    }
+    i <- i + 1
+}

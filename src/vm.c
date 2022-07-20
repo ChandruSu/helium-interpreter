@@ -170,7 +170,7 @@ void decode_execute(virtual_machine* vm, call_info* call, instruction i)
             call->tp--;
             
             if (vm->stack[call->tp].type == VM_TABLE)
-                vTablePut(vm->stack[call->tp++].value.to_table, v0, v1);
+                vTablePut(vm->stack[call->tp].value.to_table, v0, v1);
             else
                 runtimeerr(vm, "Cannot add element to non-table object");
             break;
