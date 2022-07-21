@@ -190,5 +190,7 @@ Use the demo scripts in the [demo](demo/) directory to test the interpreter.
 + Bitwise operations
 + File IO
 
+> Warning: As the interpreter does not currently have any form a garbage collection, programs that intensely rely on creating large numbers of tables, strings or function closures will leak memory.
+
 ## License
 The interpreter and source code are under [GNU GPL v3.0](LICENSE.md) license. Feel free to run, study, share, modify and redistribute the software.
