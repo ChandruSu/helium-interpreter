@@ -11,14 +11,25 @@
 #include <time.h>
 #include <unistd.h>
 
-#define ERR_COL "\033[31m"
-#define WAR_COL "\033[33m"
-#define MSG_COL "\033[32m"
-#define DEF_COL "\033[0m"
+#ifdef __MINGW32__
+#define ERR_COL ""
+#define WAR_COL ""
+#define MSG_COL ""
+#define DEF_COL ""
+#define MESSAGE "[message]"
+#define ERROR "[error]"
+#define WARNING "[warning]"
 
-#define MESSAGE "[\033[1;32mmessage\033[0m]"
-#define ERROR "[\033[1;31merror\033[0m]"
-#define WARNING "[\033[1;33mwarning\033[0m]"
+#else
+#define ERR_COL "\e[31m"
+#define WAR_COL "\e[33m"
+#define MSG_COL "\e[32m"
+#define DEF_COL "\e[0m"
+
+#define MESSAGE "[\e[1;32mmessage\033[0m]"
+#define ERROR "[\e[1;31merror\033[0m]"
+#define WARNING "[\e[1;33mwarning\033[0m]"
+#endif
 
 #define MAX_CALL_STACK 0xff
 #define MAX_STACK_SIZE 0xff

@@ -139,6 +139,7 @@ Value vCode(program* p, Value* closure)
 Value vAdd(Value a, Value b)
 {
     char* buf;
+    char buf0[100];
 
     switch (TYPEPAIR(a.type, b.type))
     {
@@ -158,7 +159,6 @@ Value vAdd(Value a, Value b)
             buf[strlen(buf)] = '\0';
             return vString(buf);
         default:
-            char buf0[100];
             sprintf(buf0, "Cannot add values of types %s and %s!", vm_type_strings[a.type], vm_type_strings[b.type]);
             runtimeerr(current_vm, buf0);
     }
@@ -168,6 +168,8 @@ Value vAdd(Value a, Value b)
 
 Value vSub(Value a, Value b)
 {
+    char buf[100];
+    
     switch (TYPEPAIR(a.type, b.type))
     {
         case TYPEMATCH(VM_BOOL): return vBool(a.value.to_bool - b.value.to_bool);
@@ -180,7 +182,6 @@ Value vSub(Value a, Value b)
         case TYPEPAIR(VM_FLOAT, VM_BOOL): return vFloat(a.value.to_float - b.value.to_bool);
         case TYPEPAIR(VM_BOOL, VM_FLOAT): return vFloat(a.value.to_bool - b.value.to_float);
         default:
-            char buf[100];
             sprintf(buf, "Cannot subtract values of types %s and %s!", vm_type_strings[a.type], vm_type_strings[b.type]);
             runtimeerr(current_vm, buf);
     }
@@ -190,6 +191,7 @@ Value vSub(Value a, Value b)
 
 Value vMul(Value a, Value b)
 {
+    char buf[100];
     switch (TYPEPAIR(a.type, b.type))
     {
         case TYPEMATCH(VM_BOOL): return vBool(a.value.to_bool && b.value.to_bool);
@@ -202,7 +204,6 @@ Value vMul(Value a, Value b)
         case TYPEPAIR(VM_FLOAT, VM_BOOL): return vFloat(a.value.to_float * b.value.to_bool);
         case TYPEPAIR(VM_BOOL, VM_FLOAT): return vFloat(a.value.to_bool * b.value.to_float);
         default:
-            char buf[100];
             sprintf(buf, "Cannot multiply values of types %s and %s!", vm_type_strings[a.type], vm_type_strings[b.type]);
             runtimeerr(current_vm, buf);
     }
@@ -311,13 +312,13 @@ Value vNotEqual(Value a, Value b)
 
 Value vNegate(Value a)
 {
+    char buf[100];
     switch (a.type)
     {
         case VM_BOOL: return vBool(1 - a.value.to_bool);
         case VM_INT: return vInt(-a.value.to_int);
         case VM_FLOAT: return vFloat(-a.value.to_float);
         default:
-            char buf[100];
             sprintf(buf, "Cannot negate value of type %s!", vm_type_strings[a.type]);
             runtimeerr(current_vm, buf);
     }
@@ -327,6 +328,7 @@ Value vNegate(Value a)
 
 Value vLess(Value a, Value b)
 {
+    char buf[100];
     switch (TYPEPAIR(a.type, b.type))
     {
         case TYPEMATCH(VM_BOOL): return vBool(a.value.to_bool < b.value.to_bool);
@@ -339,7 +341,6 @@ Value vLess(Value a, Value b)
         case TYPEPAIR(VM_FLOAT, VM_BOOL): return vBool(a.value.to_float < b.value.to_bool);
         case TYPEPAIR(VM_BOOL, VM_FLOAT): return vBool(a.value.to_bool < b.value.to_float);
         default:
-            char buf[100];
             sprintf(buf, "Cannot perform that operation between values of types %s and %s!", vm_type_strings[a.type], vm_type_strings[b.type]);
             runtimeerr(current_vm, buf);
     }
@@ -349,6 +350,7 @@ Value vLess(Value a, Value b)
 
 Value vLessEqual(Value a, Value b)
 {
+    char buf[100];
     switch (TYPEPAIR(a.type, b.type))
     {
         case TYPEMATCH(VM_BOOL): return vBool(a.value.to_bool <= b.value.to_bool);
@@ -361,7 +363,6 @@ Value vLessEqual(Value a, Value b)
         case TYPEPAIR(VM_FLOAT, VM_BOOL): return vBool(a.value.to_float <= b.value.to_bool);
         case TYPEPAIR(VM_BOOL, VM_FLOAT): return vBool(a.value.to_bool <= b.value.to_float);
         default:
-            char buf[100];
             sprintf(buf, "Cannot perform that operation between values of types %s and %s!", vm_type_strings[a.type], vm_type_strings[b.type]);
             runtimeerr(current_vm, buf);
     }

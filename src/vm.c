@@ -42,6 +42,7 @@ void run_program(virtual_machine* vm, call_info* prev, code_object* code)
 void decode_execute(virtual_machine* vm, call_info* call, instruction i)
 {
     Value v0, v1;
+    Value* closure;
 
     switch (i.stackop.op)
     {
@@ -150,7 +151,7 @@ void decode_execute(virtual_machine* vm, call_info* call, instruction i)
             break;
         
         case OP_CLOSE:
-            Value* closure = malloc(sizeof(Value) * i.ux.ux);
+            closure = malloc(sizeof(Value) * i.ux.ux);
             call->tp -= i.ux.ux;
             
             for (size_t i0 = 0; i0 < i.ux.ux; i0++) {

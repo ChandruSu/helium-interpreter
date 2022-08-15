@@ -53,8 +53,7 @@ void compile_statement(program* p, astnode* statement)
             break;
 
         case AST_INCLUDE:
-            astnode* fp = vector_get(&statement->children, 0);
-            run_import(p, fp);
+            run_import(p, (astnode*) vector_get(&statement->children, 0));
             break;
 
         case AST_LOOP:
@@ -170,6 +169,8 @@ void compile_function(program* p, astnode* function)
 
 void compile_expression(program* p, astnode* expression)
 {
+    vm_scope scope;
+
     switch (expression->type)
     {
         case AST_BINARY_EXPRESSION:
@@ -192,7 +193,6 @@ void compile_expression(program* p, astnode* expression)
             break;
 
         case AST_REFERENCE:
-            vm_scope scope;
             p->code[p->length].sx.sx = dereference_variable(p, expression->value, &scope);
             p->code[p->length].sx.op = scope_load_op_map[scope];
             p->length++;
@@ -668,7 +668,7 @@ void recordaddress(program* p, lxpos* pos)
 
     if (p->line_address_table.size == 0 || strcmp(last->origin, pos->origin) || last->line_pos < pos->line_pos) {
         char* buf = malloc(sizeof(char) * 8);
-        sprintf(buf, "%li", p->length);
+        sprintf(buf, "%uli", p->length);
 
         map_put(&p->line_address_table, buf, pos);
     }

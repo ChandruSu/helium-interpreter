@@ -4,7 +4,7 @@
 char* reduce_string_buffer(char* buffer);
 lxtype determine_nature(char* s);
 boolean check_pattern(lexer* lx, const char* pattern, char* buf);
-char escapechar(char c);
+char escapechar(lexer* lx, char c);
 
 lxtoken* lxtoken_new(const char* value, lxtype type, lxpos pos)
 {
@@ -82,7 +82,7 @@ lxtoken* lex(lexer* lx)
     {
         char c = lexadvance(lx);
         while ((c = lexadvance(lx)) != '"') {
-            buf[len++] = c == '\\' ? escapechar(lexadvance(lx)) : c;
+            buf[len++] = c == '\\' ? escapechar(lx, lexadvance(lx)) : c;
         }
         
         type = LX_STRING;
@@ -245,7 +245,7 @@ boolean check_pattern(lexer* lx, const char* pattern, char* buf)
     return true;
 }
 
-char escapechar(char c)
+char escapechar(lexer* lx, char c)
 {
     switch (c)
     {
@@ -258,8 +258,9 @@ char escapechar(char c)
         case '"': return '\"';
         case 't': return '\t';
         case 'v': return '\v';
-        default: return '?';
+        default: lexerror(lx, "Illegal escape character!");
     }
+    return '\0';
 }
 
 // Reduces memory allocated for a terminated character buffer
